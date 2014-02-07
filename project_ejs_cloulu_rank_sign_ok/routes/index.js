@@ -8,8 +8,8 @@
 
 var async = require('async');
 
-var db = require('./localDB.js');
-//var db = require('./clouluDB.js');
+//var db = require('./localDB.js');
+var db = require('./clouluDB.js');
 
 exports.index = function(req, res){
   res.render('index', { title: 'Express' });
