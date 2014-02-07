@@ -41,7 +41,7 @@ exports.ranking = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     }//error on connection pool
                     else{
-                        connection.query('SELECT name,country,prophoto,ballphoto,allscore,allgame,all_highscore,highscore,profile_detail, FROM account order by (allscore/allgame) desc limit ?,30',[limit],
+                        connection.query('SELECT name,country,prophoto,ballphoto,allscore,allgame,all_highscore,highscore,profile_detail FROM account order by (allscore/allgame) desc limit ?,30',[limit],
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query world rank',err2);
@@ -78,6 +78,7 @@ exports.ranking = function(req,res){
                                     console.log(worldRank,avg,results);
                                     for(var i=0;i<arg1.length;i++){
                                         arr[i]={
+                                            rank : i+1,
                                             name : arg1[i].name,
                                             country : arg1[i].country,
                                             proPhoto : arg1[i].prophoto,
@@ -155,6 +156,7 @@ exports.ranking = function(req,res){
                                     localRank = results[0].cnt+1;
                                     for(var i=0;i<arg1.length;i++){
                                         arr[i]={
+                                            rank : i+1,
                                             name : arg1[i].name,
                                             country : arg1[i].country,
                                             proPhoto : arg1[i].prophoto,
@@ -233,6 +235,7 @@ exports.ranking = function(req,res){
                                     groupRank = results[0].cnt;
                                     for(var i = 0; i < arg1.length; i++){
                                         arr[i]={
+                                            rank : i+1,
                                             name : arg1[i].name,
                                             country : arg1[i].country,
                                             proPhoto : arg1[i].prophoto,
