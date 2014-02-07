@@ -78,6 +78,7 @@ exports.ranking = function(req,res){
                                     console.log(worldRank,avg,results);
                                     for(var i=0;i<arg1.length;i++){
                                         arr[i]={
+                                            rank : i+1,
                                             name : arg1[i].name,
                                             country : arg1[i].country,
                                             proPhoto : arg1[i].prophoto,
@@ -155,6 +156,7 @@ exports.ranking = function(req,res){
                                     localRank = results[0].cnt+1;
                                     for(var i=0;i<arg1.length;i++){
                                         arr[i]={
+                                            rank : i+1,
                                             name : arg1[i].name,
                                             country : arg1[i].country,
                                             proPhoto : arg1[i].prophoto,
@@ -233,6 +235,7 @@ exports.ranking = function(req,res){
                                     groupRank = results[0].cnt;
                                     for(var i = 0; i < arg1.length; i++){
                                         arr[i]={
+                                            rank : i+1,
                                             name : arg1[i].name,
                                             country : arg1[i].country,
                                             proPhoto : arg1[i].prophoto,
