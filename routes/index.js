@@ -41,7 +41,7 @@ exports.ranking = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     }//error on connection pool
                     else{
-                        connection.query('SELECT name,country,prophoto,ballphoto,allscore,allgame,all_highscore,highscore,profile_detail, FROM account order by (allscore/allgame) desc limit ?,30',[limit],
+                        connection.query('SELECT name,country,prophoto,ballphoto,allscore,allgame,all_highscore,highscore,profile_detail FROM account order by (allscore/allgame) desc limit ?,30',[limit],
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query world rank',err2);
