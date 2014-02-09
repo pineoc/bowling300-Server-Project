@@ -18,7 +18,14 @@ app.use(express.logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.methodOverride());
+
+//upload enable
+app.use(express.multipart());
+
 app.use(app.router);
+
+app.use('/uploads', express.directory(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
@@ -40,13 +47,14 @@ app.post('/user/addsign',user.addsign);
 //insert data function( 점수 입력 함수 )
 app.post('/user/score',user.insertScore);
 //test
-app.get('/test/upload',test.upload);
+app.post('/test/upload',test.upload);
 
 //group function ( 그룹 관련 함수)
 app.post('/user/groupmake',user.groupMake);
 app.post('/user/groupjoin',user.groupJoin);
 app.post('/user/grouplist',user.groupList);
 app.post('/user/groupdel',user.groupDelete);
+app.post('/user/groupsearch',user.groupsearch);
 //test
 
 //board function ( 게시판 관련 함수 )

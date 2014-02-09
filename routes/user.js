@@ -14,7 +14,7 @@ var db = require('./localDB.js');
 var path = require('path');
 var fs = require('fs');
 var easyimage = require('easyimage');
-
+var util = require('util');
 /*
  * test page
  * 최초 생성 날짜 : 2014.02.02
@@ -516,7 +516,7 @@ exports.groupDelete = function(req,res){
                                                                             else{
                                                                                 console.log('success grp master del update: ',result);//update
                                                                                 //res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
-                                                                                callback(null,{result:"SUCCESS"});
+                                                                                callback(null,{result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
                                                                             }
                                                                             connection.release();
                                                                         });//query
@@ -547,7 +547,7 @@ exports.groupDelete = function(req,res){
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                                     }
                                     else{
-                                        console.log('success grp meber del : ',result);//그룹원 수 출력
+                                        console.log('success grp member del : ',result);//그룹원 수 출력
                                         res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
                                     }
                                     callback(null,{result:"SUCCESS"});
@@ -595,23 +595,60 @@ exports.groupDelete = function(req,res){
          }
     });//waterfall
 
-
-
-
-
 };//그룹 삭제
+    /*
+     * 그룹 찾기
+     * 최초 생성 날짜 : 2014.02.09
+     * 최종 수정 날짜 : 2014.02.09
+     *
+     * 받는 데이터 groupname ( gname )
+     * editor : pineoc
+     * */
+exports.groupsearch = function(req,res){
+    var grpsearchData = req.body;
+    var arr=[];
+    db.pool.getConnection(function(err,connection){
+        if(err){
+            console.log('error on grp search conn pool');
+            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+        }else{
+            connection.query('SELECT g_name,g_photo from groups where g_name=?',[grpsearchData.gname],
+                function(err2,result){
+                    if(err2){
+                        console.log('error on grp search query');
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    }
+                    else if(result.length!=0){
+                        for(var i=0;i<result.length;i++){
+                            console.log('search result : ',result);
+                            console.log('search name : ',result[i].g_name);
+                            arr[i] = {result:"SUCCESS",gname:result[i].g_name,gphoto:result[i].g_photo};
+                        }//for arr
+                        res.json(arr);
+                    }
+                    else{
+                        console.log('nothing on grp search : ',result);
+                        res.json({result:"FAIL",resultmsg:"NO SEARCH GROUP"});
+                    }
+            });//query
+        }
+    });//connection pool
+};//group search
+
 
 if(process.env.UPLOAD_PATH == undefined)
 {
-    process.env.UPLOAD_PATH = 'photo';
+    process.env.UPLOAD_PATH = 'public';
 }//if =local
 
 exports.uploadPhoto = function(req,res){
     var type = req.body.type;
+
     var upfile = req.files.upfile;
-    var userid = req.params.a_idx;
+    var userid = req.body.aidx;
+
     if(upfile.originalFilename!=''){
-        var userfolder = path.resolve(process.env.UPLOAD_PATH,userid);
+        var userfolder = path.resolve(process.env.UPLOAD_PATH, userid);
         console.log('userfolder : ',userfolder);
         if(!fs.existsSync(userfolder)){
             fs.mkdirSync(userfolder);
@@ -624,6 +661,7 @@ exports.uploadPhoto = function(req,res){
         var is = fs.createReadStream(srcpath);
         //소스로부터 스트림을 입력받음
         var os = fs.createWriteStream(destpath);
+
         //읽어온 스트림을 통해서 사진파일 생성
         is.pipe(os);
         is.on('end',function(){
@@ -635,17 +673,25 @@ exports.uploadPhoto = function(req,res){
             var destimg = filename + '-thumnail'+ext;
             //c:~\public\lee\koala + '-thumnail'+.jpg
 
-            easyimage.resize({src:srcimg,dst:destimg,
-                width:100,height:100},function(err,image){
-                if(err) {
-                    console.log('err',err);
+            easyimage.thumbnail(
+                {
+                    src:srcimg,
+                    dst:destimg,
+                    width:100,
+                    height:100,
+                    x:0,
+                    y:0
+                },
+                function(err){
+                    if(err){
+                        console.log(err);
+                        res.json(err);
+                    }
+                    else{
+                        res.json("success");
+                    }
                 }
-                else{
-                    console.log('image',image);
-                    res.json({result:'SUCCESS',image:image});
-                }
-            }); //function easyimage resize
-
+            );
         });//is.on callback function
     }
     else{
