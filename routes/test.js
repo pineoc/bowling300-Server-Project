@@ -22,9 +22,9 @@ var uploadFunc = function(data){
  * */
 exports.upload = function(req, res){
     //res.send("respond with a resource");
-    var uploadData = req.files;
+    var uploadData = req.files.upfile;
     var a_idx = req.body.aidx;
-    if(uploadData){
+    if(uploadData.originalFilename!=''){
         var userfolder = path.resolve(process.env.UPLOAD_PATH,a_idx);
         console.log('userfolder : ',userfolder);
         if(!fs.existsSync(userfolder)){
@@ -63,6 +63,7 @@ exports.upload = function(req, res){
                         res.json(err);
                     }
                     else{
+                        console.log('path : ',srcimg,'/ thumnail : ',destimg);
                         res.json("success");
                     }
                 }
@@ -73,8 +74,7 @@ exports.upload = function(req, res){
     }
     else
     {
-        console.log('file : ',uploadData);
-        console.log('req',req.body);
+        console.log('error on no file');
         res.json({result:"FAIL",resultmsg:"NO FILE EXISTS"});
     }
 };
