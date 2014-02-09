@@ -8,8 +8,8 @@
 
 var async = require('async');
 
-//var db = require('./localDB.js');
-var db = require('./clouluDB.js');
+var db = require('./localDB.js');
+//var db = require('./clouluDB.js');
 
 exports.index = function(req, res){
   res.render('index', { title: 'Express' });
@@ -18,6 +18,7 @@ exports.index = function(req, res){
 exports.login = function(req,res){
 
 };
+
 /*
  * 랭킹 데이터
  * 최초 생성 날짜 : 2014.02.02

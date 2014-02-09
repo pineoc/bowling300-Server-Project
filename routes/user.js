@@ -8,13 +8,87 @@ content : user
 
 var async = require('async');
 
-//var db = require('./localDB.js');
-var db = require('./clouluDB.js');
+var db = require('./localDB.js');
+//var db = require('./clouluDB.js');
 
 var path = require('path');
 var fs = require('fs');
 var easyimage = require('easyimage');
 var util = require('util');
+
+
+/*
+ * upload function
+ * 최초 생성 날짜 : 2014.02.09
+ * 최종 수정 날짜 : 2014.02.09
+ *
+ * 받는 데이터 aidx, upfile, type
+ * editor : pineoc
+ * */
+var uploadfunction = function(userid,type,upfile){
+    //var type = req.body.type;
+
+    //var upfile = req.files.upfile;
+    //var userid = req.body.aidx;
+
+    if(upfile.originalFilename!=''){
+        var userfolder = path.resolve(process.env.UPLOAD_PATH, userid);//aidx를 이용
+        console.log('userfolder : ',userfolder);
+        if(!fs.existsSync(userfolder)){
+            fs.mkdirSync(userfolder);
+        }
+
+        var name = upfile.name;//upload file name ex>file.jpg
+        var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
+        var destpath = path.resolve(__dirname,'..',userfolder,name);
+        //public/1/이미지.jpg
+        var is = fs.createReadStream(srcpath);
+        //소스로부터 스트림을 입력받음
+        var os = fs.createWriteStream(destpath);
+
+        //읽어온 스트림을 통해서 사진파일 생성
+        is.pipe(os);
+        is.on('end',function(){
+            fs.unlinkSync(srcpath);
+            var srcimg = destpath;
+            var idx = destpath.lastIndexOf('.');
+            var ext = destpath.substring(idx); // .jpg
+            var filename = destpath.substring(0,idx);
+            var destimg = filename + '-thumnail'+ext;
+            //c:~\public\lee\koala + '-thumnail'+.jpg
+//            easyimage.thumbnail(
+//                {
+//                    src:srcimg,
+//                    dst:destimg,
+//                    width:100,
+//                    height:100,
+//                    x:0,
+//                    y:0
+//                },
+//                function(err){
+//                    if(err){
+//                        console.log(err);
+//                        res.json(err);
+//                    }
+//                    else{
+//                        res.json("success");
+//                    }
+//                }
+//            );
+            console.log('success file upload, file path:',srcimg);
+        });//is.on callback function
+    }
+    else{
+        console.log('error on file upload');
+        res.json({result:'FAIL',result_msg:'FILE NOT EXISTS'});
+    }
+
+};//upload function
+
+
+
+
+
 /*
  * test page
  * 최초 생성 날짜 : 2014.02.02
@@ -672,7 +746,6 @@ exports.uploadPhoto = function(req,res){
             var filename = destpath.substring(0,idx);
             var destimg = filename + '-thumnail'+ext;
             //c:~\public\lee\koala + '-thumnail'+.jpg
-
             easyimage.thumbnail(
                 {
                     src:srcimg,
