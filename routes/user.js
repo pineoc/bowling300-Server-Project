@@ -220,29 +220,7 @@ exports.groupMake = function(req,res){
                             res.json({result: "FAIL", resultmsg: "DUP GROUP NAME"});
                         } else {
                             async.waterfall([
-                                function(callback){
-                                    db.pool.getConnection(function (err, connection) {
-                                        if (err) {
-                                            console.log('error on connection pool makegrp getemail', err);
-                                            res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
-                                        }//error on connection pool
-                                        else {
-                                            connection.query('SELECT email from account where a_idx=?',
-                                                [groupmakeData.aidx],
-                                                function (err2, result) {
-                                                    if (err2) {
-                                                        console.log('error on query makegrp on make', err2);
-                                                        res.json({result: "FAIL", result_msg: "INVALID"});
-                                                    }
-                                                    else if (result) {
-                                                        callback(null,{gemail:result[0].email});
-                                                    }//insert success
-                                                    connection.release();
-                                                });//query
-                                        }//no error on connection pool
-                                    });//connection pool
-                                },
-                                function (arg,callback) {//그룹을 만든다.
+                                function (callback) {//그룹을 만든다.
                                     db.pool.getConnection(function (err, connection) {
                                         if (err) {
                                             console.log('error on connection pool makegrp on make', err);
@@ -250,7 +228,7 @@ exports.groupMake = function(req,res){
                                         }//error on connection pool
                                         else {
                                             connection.query('INSERT into groups(g_name,g_pwd,g_master)values(?,?,?)',
-                                                [groupmakeData.gname, groupmakeData.gpwd, arg.gemail],
+                                                [groupmakeData.gname, groupmakeData.gpwd, arg.aidx],
                                                 function (err2, result) {
                                                     if (err2) {
                                                         console.log('error on query makegrp on make', err2);
@@ -431,17 +409,195 @@ exports.groupList = function(req,res){
 /*
  * 그룹 삭제
  * 최초 생성 날짜 : 2014.02.06
- * 최종 수정 날짜 : 2014.02.06
+ * 최종 수정 날짜 : 2014.02.07
  *
- * 받는 데이터 aidx , gname, gpwd
+ * 받는 데이터 aidx, gidx,
  * editor : pineoc
  * */
 exports.groupDelete = function(req,res){
     /*
     * 1. 그룹원일 경우 account_has_group에서 그 그룹원만 지운다( 탈퇴 )
-    * 2. 그룹장일 경우 account_has_group에 있는 같은 그룹원들의 데이터가 모두 삭제 ( 그룹 삭제 )
-    * 3. 그룹장이 탈퇴 하더라도 그룹이 삭제 되지 않는 경우(고려중)
+    * 2. 그룹장이 탈퇴 하면 그룹원 탈퇴하듯이 탈퇴하되 master는 다음 회원이 master
+    * 3. 그룹원이 없을경우 그룹테이블에서 그룹을 지운다.
     * */
+    var grpdelData = req.body; // aidx, gidx 를 받아온다
+     async.waterfall([
+        function(callback){
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on pool chk grp member',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                }else{
+                    connection.query('SELECT count(*) cnt from account_has_group where account_a_idx=? and group_g_idx=?',
+                        [grpdelData.aidx,grpdelData.gidx],function(err2,result){
+                            if(err2){
+                                console.log('error on query chk grp member',err2);
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            }
+                            else{
+                                console.log('success chk grp member n : ',result[0].cnt);//그룹원 수 출력
+                                callback(null,result[0].cnt);
+                            }
+                            connection.release();
+                        });//query
+                }
+            });//connection pool
+        },
+        function(arg1,callback){//check master
+            var account_email;
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on pool chk grp master account',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                }else{
+                    connection.query('SELECT count(*) cnt from groups where g_master=? ',
+                        [grpdelData.aidx],function(err2,result){
+                            if(err2){
+                                console.log('error on query chk grp master account',err2);
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            }
+                            else{
+                                console.log('success chk grp g_master : ',result[0].cnt);//마스터 여부 출력
+                                if(result[0].cnt !=0){
+                                    callback(null,{cnt:arg1,result:"master"});
+                                }
+                                else{
+                                    callback(null,{cnt:arg1,result:"member"});
+                                }
+                            }
+                            connection.release();
+                        });//query
+                }
+            });//connection pool
+        },
+        function(arg2,callback){
+            if(arg2.cnt!=1){
+                if(arg2.result=="master"){
+                    var updateAidx;
+                    db.pool.getConnection(function(err,connection){
+                        if(err){
+                            console.log('error on pool grp master del',err);
+                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        }else{
+                            connection.query('DELETE FROM account_has_group a_idx=? and g_idx=?',
+                                [grpdelData.aidx,grpdelData.gidx],function(err2,result){
+                                    if(err2){
+                                        console.log('error on query grp master del',err2);
+                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                    }
+                                    else{
+                                        console.log('success grp master email : ',result);//그룹원 수 출력
+                                        db.pool.getConnection(function(err,connection){
+                                            if(err){
+                                                console.log('error on pool grp master change select',err);
+                                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                            }else{
+                                                connection.query('SELECT account_a_idx FROM account_has_group where group_g_idx=?',
+                                                    [grpdelData.gidx],function(err2,result){
+                                                        if(err2){
+                                                            console.log('error on query grp master change select',err2);
+                                                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                                        }
+                                                        else{
+                                                            console.log('success grp master change select : ',result[0].account_a_idx);
+                                                            //res.json({result:"SUCCESS",resultmsg:"CHANGE SUCCESS"});
+                                                            updateAidx = result[0].account_a_idx;
+                                                            db.pool.getConnection(function(err,connection){
+                                                                if(err){
+                                                                    console.log('error on pool grp member del update',err);
+                                                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                                                }else{
+                                                                    connection.query('UPDATE groups set g_master=? where and g_idx=?',
+                                                                        [updateAidx,grpdelData.gidx],function(err2,result){
+                                                                            if(err2){
+                                                                                console.log('error on query grp member del update',err2);
+                                                                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                                                            }
+                                                                            else{
+                                                                                console.log('success grp master del update: ',result);//update
+                                                                                //res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
+                                                                                callback(null,{result:"SUCCESS"});
+                                                                            }
+                                                                            connection.release();
+                                                                        });//query
+                                                                }
+                                                            });//connection pool
+                                                        }
+                                                        connection.release();
+                                                    });//query
+                                            }
+                                        });//connection pool
+                                    }
+                                    connection.release();
+                                });//query
+                        }
+                    });//connection pool
+
+                }
+                else if(arg2.result=="member"){
+                    db.pool.getConnection(function(err,connection){
+                        if(err){
+                            console.log('error on pool grp member del',err);
+                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        }else{
+                            connection.query('DELETE FROM account_has_group account_a_idx=? and group_g_idx=?',
+                                [grpdelData.aidx,grpdelData.gidx],function(err2,result){
+                                    if(err2){
+                                        console.log('error on query grp member del',err2);
+                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                    }
+                                    else{
+                                        console.log('success grp meber del : ',result);//그룹원 수 출력
+                                        res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
+                                    }
+                                    callback(null,{result:"SUCCESS"});
+                                    connection.release();
+                                });//query
+                        }
+                    });//connection pool
+                }
+                else{
+                    console.log('not master or member');
+                    res.json({result:"FAIL",resultmsg:"UNEXPECTED ERR"});
+                }
+            }
+            else{// count =1, 그룹 삭제
+                db.pool.getConnection(function(err,connection){
+                    if(err){
+                        console.log('error on pool grp member del',err);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    }else{
+                        connection.query('DELETE FROM account_has_group where account_a_idx=? and group_g_idx=?',
+                            [grpdelData.aidx,grpdelData.gidx],function(err2,result){
+                                if(err2){
+                                    console.log('error on query grp member del',err2);
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                }
+                                else{
+                                    console.log('success grp meber del : ',result);//그룹원 수 출력
+                                    res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
+                                }
+                                callback(null,{result:"SUCCESS"});
+                                connection.release();
+                            });//query
+                    }
+                });//connection pool
+            }
+        }
+    ],function(err,result){
+         if(result.result=="SUCCESS"){
+             console.log('success on waterfall result',result);
+             res.json({result:"SUCCESS",resultmsg:"DEL SUCCESS"});
+         }
+         else{
+             console.log('fail on waterfall result',result);
+             res.json({result:"FAIL",resultmsg:"DEL FAIL"});
+         }
+    });//waterfall
+
+
+
+
 
 };//그룹 삭제
 
