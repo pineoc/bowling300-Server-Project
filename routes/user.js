@@ -8,19 +8,23 @@ content : user
 
 var async = require('async');
 
-var db = require('./localDB.js');
-//var db = require('./clouluDB.js');
+//var db = require('./localDB.js');
+var db = require('./clouluDB.js');
 
 var path = require('path');
 var fs = require('fs');
 var easyimage = require('easyimage');
 var util = require('util');
 
+if(process.env.UPLOAD_PATH == undefined)
+{
+    process.env.UPLOAD_PATH = 'public';
+}//if =local
 
 /*
  * upload function
  * 최초 생성 날짜 : 2014.02.09
- * 최종 수정 날짜 : 2014.02.09
+ * 최종 수정 날짜 : 2014.02.10
  *
  * 받는 데이터 aidx, upfile, type
  * editor : pineoc
@@ -180,7 +184,7 @@ exports.addsign = function(req,res){
 /*
  * 점수 데이터 입력
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.05
+ * 최종 수정 날짜 : 2014.02.10
  *
  * 받는 데이터 aidx , data(점수)
  * editor : pineoc
@@ -189,15 +193,15 @@ exports.addsign = function(req,res){
 exports.insertScore = function(req,res){
     var insData = req.body; // 입력할 데이터를 받음
     var dataLength = insData.data.length;
-    var aidx = parseInt(insData.aidx);
+    var aidx = insData.aidx;
     var s_allScore = 0;
     var s_allGame = 0;
     console.log('req.body : ',insData);
     console.log('datalength: ',dataLength);
-    console.log('data : ',aidx,insData.data.length);
+    console.log('data : ',insData.data);
     if(dataLength!=0){
         for(var i=0;i<dataLength;i++){
-            if(insData.data[i].type=="solo"){
+            if(insData.data[i].type==-1){
                 s_allScore = insData.data[i].allScore;
                 s_allGame = insData.data[i].allGame;
                 console.log('s_data :',s_allGame,s_allScore );
@@ -216,7 +220,7 @@ exports.insertScore = function(req,res){
                                     res.json({result:"FAIL",resultmsg:"INVALID"});
                                 }
                                 else if(result.affectedRows==1){
-                                    console.log('result',result);
+                                    console.log('success, result',result);
                                     res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
                                 }//insert success
                                 connection.release();
@@ -242,6 +246,7 @@ exports.insertScore = function(req,res){
                                     res.json({result:"FAIL",resultmsg:"INVALID"});
                                 }//error on query
                                 else if(result.affectedRows==1){
+                                    console.log('success, result : ',result);
                                     res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
                                 }//insert success
                                 connection.release();
@@ -709,11 +714,6 @@ exports.groupsearch = function(req,res){
     });//connection pool
 };//group search
 
-
-if(process.env.UPLOAD_PATH == undefined)
-{
-    process.env.UPLOAD_PATH = 'public';
-}//if =local
 
 exports.uploadPhoto = function(req,res){
     var type = req.body.type;
