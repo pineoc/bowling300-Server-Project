@@ -36,7 +36,7 @@ var uploadfunction = function(userid,type,upfile){
     //var userid = req.body.aidx;
 
     if(upfile.originalFilename!=''){
-        var userfolder = path.resolve(process.env.UPLOAD_PATH, userid);//aidx를 이용
+        var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',userid.toString());//aidx를 이용
         console.log('userfolder : ',userfolder);
         if(!fs.existsSync(userfolder)){
             //fs.mkdirSync(userfolder);
