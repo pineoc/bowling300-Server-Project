@@ -113,6 +113,18 @@ exports.list = function(req, res){
 };
 
 /*
+ * ranking 기준점 전송
+ * 최초 생성 날짜 : 2014.02.10
+ * 최종 수정 날짜 : 2014.02.10
+ *
+ * 받는 데이터
+ * editor : pineoc
+ * */
+exports.rankpoint = function(req,res){
+
+};
+
+/*
 * 기능 : 회원가입 ( 기본정보 )
 * 최초 생성 날짜 : 2014.02.02
 * 최종 수정 날짜 : 2014.02.05

@@ -32,19 +32,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="index.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/routes/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="249" column="93" selection-start="12071" selection-end="12071" vertical-scroll-proportion="0.5472482" vertical-offset="3621" max-vertical-offset="4743">
+            <state line="25" column="24" selection-start="405" selection-end="405" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4743">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="user.js" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="user.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/user.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="0" selection-start="292" selection-end="319" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="13260">
+            <state line="110" column="34" selection-start="3342" selection-end="3342" vertical-scroll-proportion="0.12357217" vertical-offset="1309" max-vertical-offset="13464">
               <folding>
                 <element signature="e#1785#1828#0" expanded="false" />
               </folding>
@@ -86,8 +86,8 @@
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/routes/test.js" />
         <option value="$PROJECT_DIR$/app.js" />
-        <option value="$PROJECT_DIR$/routes/user.js" />
         <option value="$PROJECT_DIR$/routes/index.js" />
+        <option value="$PROJECT_DIR$/routes/user.js" />
       </list>
     </option>
   </component>
@@ -655,15 +655,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/routes/user.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="0" selection-start="292" selection-end="319" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="13260">
-          <folding>
-            <element signature="e#1785#1828#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$APPLICATION_HOME_DIR$/plugins/JavaScriptLanguage/lib/JavaScriptLanguage.jar!/com/intellij/lang/javascript/index/predefined/EcmaScript.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="558" column="5" selection-start="8830" selection-end="8830" vertical-scroll-proportion="0.33333334" vertical-offset="9165" max-vertical-offset="15929">
@@ -673,8 +664,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="249" column="93" selection-start="12071" selection-end="12071" vertical-scroll-proportion="0.5472482" vertical-offset="3621" max-vertical-offset="4743">
+        <state line="25" column="24" selection-start="405" selection-end="405" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4743">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/routes/user.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="110" column="34" selection-start="3342" selection-end="3342" vertical-scroll-proportion="0.12357217" vertical-offset="1309" max-vertical-offset="13464">
+          <folding>
+            <element signature="e#1785#1828#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
