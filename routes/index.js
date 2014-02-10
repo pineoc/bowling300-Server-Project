@@ -86,7 +86,7 @@ exports.ranking = function(req,res){
                                             country : arg1[i].country,
                                             proPhoto : "http://bowling.pineoc.cloulu.com/uploads/"+arg1[i].a_idx+"/"+arg1[i].prophoto,
                                             ballPhoto : arg1[i].ballphoto,
-                                            avg : (arg1[i].allscore/arg1[i].allgame).round(2),
+                                            avg : (arg1[i].allscore/arg1[i].allgame),
                                             allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1[i].highscore,//그주의 최고점수
                                             hand : arg1[i].hand,
@@ -168,7 +168,7 @@ exports.ranking = function(req,res){
                                             country : arg1[i].country,
                                             proPhoto : arg1[i].prophoto,
                                             ballPhoto : arg1[i].ballphoto,
-                                            avg : (arg1[i].allscore/arg1[i].allgame).round(2),
+                                            avg : (arg1[i].allscore/arg1[i].allgame),
                                             allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1[i].highscore,//그주의 최고점수
                                             profileDetail : arg1[i].profile_detail // 구질, 구력, 스텝, 800시리즈 string
@@ -247,7 +247,7 @@ exports.ranking = function(req,res){
                                             country : arg1[i].country,
                                             proPhoto : arg1[i].prophoto,
                                             ballPhoto : arg1[i].ballphoto,
-                                            avg : (arg1[i].allscore/arg1[i].allgame).round(2),
+                                            avg : (arg1[i].allscore/arg1[i].allgame),
                                             allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1[i].highscore,//그주의 최고점수
                                             profileDetail : arg1[i].profile_detail // 구질, 구력, 스텝, 800시리즈 string

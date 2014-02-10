@@ -121,7 +121,7 @@ exports.list = function(req, res){
  * editor : pineoc
  * */
 exports.rankpoint = function(req,res){
-
+    res.send("respond with a resource");
 };
 
 /*
