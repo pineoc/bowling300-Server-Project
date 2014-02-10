@@ -31,7 +31,6 @@ if(process.env.UPLOAD_PATH == undefined)
  * */
 var uploadfunction = function(userid,type,upfile){
     //var type = req.body.type;
-
     //var upfile = req.files.upfile;
     //var userid = req.body.aidx;
 

@@ -38,7 +38,7 @@ exports.upload = function(req, res){
         var checkext = path.extname(name);
 
         //check image ext
-        if(chcekext=='.jpg' || checkext=='.jpeg' || checkext=='.png'){
+        if(checkext=='.jpg' || checkext=='.jpeg' || checkext=='.png'){
             var is = fs.createReadStream(srcpath); //소스로부터 스트림을 입력받음
             var os = fs.createWriteStream(destpath);//읽어온 스트림을 통해서 사진파일 생성
             is.pipe(os);
