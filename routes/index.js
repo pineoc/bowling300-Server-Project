@@ -90,7 +90,7 @@ exports.ranking = function(req,res){
                                             profileDetail : arg1[i].profile_detail // 구질, 구력, 스텝, 800시리즈 string
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {rank:worldRank,arr:arr};
+                                    resultData = {myrank:worldRank,arr:arr};
                                     callback(null,resultData);
                                 }
                                 connection.release();
@@ -168,7 +168,7 @@ exports.ranking = function(req,res){
                                             profileDetail : arg1[i].profile_detail // 구질, 구력, 스텝, 800시리즈 string
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {rank:localRank,arr:arr};
+                                    resultData = {myrank:localRank,arr:arr};
                                     callback(null,resultData);
                                 }
                                 connection.release();
@@ -247,7 +247,7 @@ exports.ranking = function(req,res){
                                             profileDetail : arg1[i].profile_detail // 구질, 구력, 스텝, 800시리즈 string
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {rank:groupRank,arr:arr};
+                                    resultData = {myrank:groupRank,arr:arr};
                                     callback(null,arr);
                                 }
 
