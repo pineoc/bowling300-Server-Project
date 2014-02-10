@@ -10,6 +10,7 @@ var async = require('async');
 
 //var db = require('./localDB.js');
 var db = require('./clouluDB.js');
+var math = require('math');
 
 exports.index = function(req, res){
   res.render('index', { title: 'Express' });
@@ -76,7 +77,8 @@ exports.ranking = function(req,res){
                                 }
                                 else{
                                     worldRank = results[0].cnt+1;
-                                    console.log(worldRank,avg,results);
+                                    console.log(worldRank,avg,results.length);
+                                    //console.log(worldRank,avg,results);
                                     for(var i=0;i<arg1.length;i++){
                                         arr[i]={
                                             rank : i+1,
@@ -84,10 +86,14 @@ exports.ranking = function(req,res){
                                             country : arg1[i].country,
                                             proPhoto : "http://bowling.pineoc.cloulu.com/uploads/"+arg1[i].a_idx+"/"+arg1[i].prophoto,
                                             ballPhoto : arg1[i].ballphoto,
-                                            avg : (arg1[i].allscore/arg1[i].allgame),
+                                            avg : (arg1[i].allscore/arg1[i].allgame).round(2),
                                             allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1[i].highscore,//그주의 최고점수
-                                            profileDetail : arg1[i].profile_detail // 구질, 구력, 스텝, 800시리즈 string
+                                            hand : arg1[i].hand,
+                                            style : arg1[i].style,
+                                            step : arg1[i].step,
+                                            series300 : arg1[i].series300,
+                                            series800 : arg1[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
                                     resultData = {myrank:worldRank,arr:arr};
@@ -162,7 +168,7 @@ exports.ranking = function(req,res){
                                             country : arg1[i].country,
                                             proPhoto : arg1[i].prophoto,
                                             ballPhoto : arg1[i].ballphoto,
-                                            avg : parseInt(arg1[i].allscore/arg1[i].allgame),
+                                            avg : (arg1[i].allscore/arg1[i].allgame).round(2),
                                             allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1[i].highscore,//그주의 최고점수
                                             profileDetail : arg1[i].profile_detail // 구질, 구력, 스텝, 800시리즈 string
@@ -241,7 +247,7 @@ exports.ranking = function(req,res){
                                             country : arg1[i].country,
                                             proPhoto : arg1[i].prophoto,
                                             ballPhoto : arg1[i].ballphoto,
-                                            avg : parseInt(arg1[i].allscore/arg1[i].allgame),
+                                            avg : (arg1[i].allscore/arg1[i].allgame).round(2),
                                             allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1[i].highscore,//그주의 최고점수
                                             profileDetail : arg1[i].profile_detail // 구질, 구력, 스텝, 800시리즈 string
