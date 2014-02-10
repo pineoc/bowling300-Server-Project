@@ -105,6 +105,7 @@ var uploadfunction = function(userid,type,upfile){
 exports.list = function(req, res){
   res.send("respond with a resource");
 };
+
 /*
 * 기능 : 회원가입 ( 기본정보 )
 * 최초 생성 날짜 : 2014.02.02
@@ -257,7 +258,7 @@ exports.insertScore = function(req,res){
             }//group data
             else{
                 console.log('type error',insData);
-                console.log('insData.data',{type:insData.data[0].type,allScore:insData[0].allScore,allGame:insData.data[i].allGame});
+                //console.log('insData.data',{type:insData.data[0].type,allScore:insData[0].allScore,allGame:insData.data[0].allGame});
                 res.json({result:"FAIL",resultmsg:"TYPE ERR"});
             }
         }//for
