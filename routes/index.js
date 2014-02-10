@@ -10,7 +10,7 @@ var async = require('async');
 
 //var db = require('./localDB.js');
 var db = require('./clouluDB.js');
-var math = require('math');
+//var math = require('Math');
 
 exports.index = function(req, res){
   res.render('index', { title: 'Express' });

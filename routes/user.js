@@ -15,7 +15,7 @@ var path = require('path');
 var fs = require('fs');
 var easyimage = require('easyimage');
 var util = require('util');
-var math = require('math');
+//var math = require('Math');
 
 if(process.env.UPLOAD_PATH == undefined)
 {
@@ -127,7 +127,7 @@ exports.rankpoint = function(req,res){
 /*
 * 기능 : 회원가입 ( 기본정보 )
 * 최초 생성 날짜 : 2014.02.02
-* 최종 수정 날짜 : 2014.02.05
+* 최종 수정 날짜 : 2014.02.10
 *
 * editor : pineoc
 * 미구현 부분 : 사진 파일 업로드 부분
