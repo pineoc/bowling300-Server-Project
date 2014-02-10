@@ -21,7 +21,12 @@ var uploadFunc = function(data){
  * 받는 데이터 : 사진file ( req.files 로 받음) 변수명 prophoto, aidx
  * editor : pineoc
  * */
-exports.upload = function(req, res){
+if(process.env.UPLOAD_PATH == undefined)
+{
+    process.env.UPLOAD_PATH = 'test';
+}//if =local
+
+ exports.upload = function(req, res){
     //res.send("respond with a resource");
     var uploadData = req.files.upfile;
     var a_idx = req.body.aidx;
