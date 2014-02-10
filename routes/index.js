@@ -42,7 +42,7 @@ exports.ranking = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     }//error on connection pool
                     else{
-                        connection.query('SELECT name,country,prophoto,ballphoto,allscore,allgame,all_highscore,highscore,profile_detail FROM account order by (allscore/allgame) desc limit ?,30',[limit],
+                        connection.query('SELECT * FROM account order by (allscore/allgame) desc limit ?,30',[limit],
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query world rank',err2);
@@ -82,7 +82,7 @@ exports.ranking = function(req,res){
                                             rank : i+1,
                                             name : arg1[i].name,
                                             country : arg1[i].country,
-                                            proPhoto : arg1[i].prophoto,
+                                            proPhoto : "http://bowling.pineoc.cloulu.com/uploads/"+arg1[i].a_idx+"/"+arg1[i].prophoto,
                                             ballPhoto : arg1[i].ballphoto,
                                             avg : parseInt(arg1[i].allscore/arg1[i].allgame),
                                             allhighScore : arg1[i].all_highscore,//지금까지의 최고점수

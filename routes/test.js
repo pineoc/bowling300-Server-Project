@@ -28,7 +28,6 @@ if(process.env.UPLOAD_PATH == undefined)
 }//if =local
 
  exports.upload = function(req, res){
-    //res.send("respond with a resource");
     var uploadData = req.files.upfile;
     var a_idx = req.body.aidx;
     if(uploadData.originalFilename!=''){
