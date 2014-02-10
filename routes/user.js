@@ -230,7 +230,7 @@ exports.insertScore = function(req,res){
                 });//connection pool
                 //-------------------------------------------------------------
             }//solo data
-            else{
+            else if(insData.data[i].type>0){
                 var grpIdx = insData.data[i].type;
                 var grpScore = insData.data[i].allScore;
                 var grpGame = insData.data[i].allGame;
@@ -255,6 +255,11 @@ exports.insertScore = function(req,res){
                     }//no error on connection pool
                 });//connection pool
             }//group data
+            else{
+                console.log('type error',insData);
+                console.log('insData.data',{type:insData.data[0].type,allScore:insData[0].allScore,allGame:insData.data[i].allGame});
+                res.json({result:"FAIL",resultmsg:"TYPE ERR"});
+            }
         }//for
     }//if end
     else{

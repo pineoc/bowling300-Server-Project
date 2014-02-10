@@ -44,7 +44,7 @@
       <file leaf-file-name="user.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/user.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="190" column="24" selection-start="5963" selection-end="5963" vertical-scroll-proportion="2.9304256" vertical-offset="0" max-vertical-offset="12903">
+            <state line="260" column="63" selection-start="9791" selection-end="9791" vertical-scroll-proportion="0.43509865" vertical-offset="3593" max-vertical-offset="12988">
               <folding>
                 <element signature="e#1650#1691#0" expanded="false" />
               </folding>
@@ -274,7 +274,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1873" height="1096" extended-state="7" />
+    <frame x="-8" y="-8" width="1873" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -671,7 +671,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/user.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="190" column="24" selection-start="5963" selection-end="5963" vertical-scroll-proportion="2.9304256" vertical-offset="0" max-vertical-offset="12903">
+        <state line="260" column="63" selection-start="9791" selection-end="9791" vertical-scroll-proportion="0.43509865" vertical-offset="3593" max-vertical-offset="12988">
           <folding>
             <element signature="e#1650#1691#0" expanded="false" />
           </folding>
