@@ -60,8 +60,8 @@ if(process.env.UPLOAD_PATH == undefined)
                     {
                         src:srcimg,
                         dst:destimg,
-                        width:100,
-                        height:100,
+                        width:32,
+                        height:32,
                         x:0,
                         y:0
                     },
