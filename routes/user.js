@@ -41,56 +41,63 @@ var uploadfunction = function(userid,type,upfile){
             fs.mkdirSync(userfolder);
         }
 
-        var name = upfile.name;//upload file name ex>file.jpg
+        var name=upfile.name;//upload file name ex>file.jpg
         var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
         var destpath = path.resolve(__dirname,'..',userfolder,name);
         //public/1/이미지.jpg
-        var is = fs.createReadStream(srcpath);
-        //소스로부터 스트림을 입력받음
-        var os = fs.createWriteStream(destpath);
 
-        //읽어온 스트림을 통해서 사진파일 생성
-        is.pipe(os);
-        is.on('end',function(){
-            fs.unlinkSync(srcpath);
-            var srcimg = destpath;
-            var idx = destpath.lastIndexOf('.');
-            var ext = destpath.substring(idx); // .jpg
-            var filename = destpath.substring(0,idx);
-            //var destimg = filename + '-thumnail'+ext;
-            //c:~\public\lee\koala + '-thumnail'+.jpg
-//            easyimage.thumbnail(
-//                {
-//                    src:srcimg,
-//                    dst:destimg,
-//                    width:100,
-//                    height:100,
-//                    x:0,
-//                    y:0
-//                },
-//                function(err){
-//                    if(err){
-//                        console.log(err);
-//                        res.json(err);
+        var checkext = path.extname(name);
+
+        //check image ext
+        if(checkext=='.jpg' || checkext=='.jpeg' || checkext=='.png'){
+            var is = fs.createReadStream(srcpath); //소스로부터 스트림을 입력받음
+            var os = fs.createWriteStream(destpath);//읽어온 스트림을 통해서 사진파일 생성
+            is.pipe(os);
+            is.on('end',function(){
+                fs.unlinkSync(srcpath);
+                var srcimg = destpath;
+                var idx = destpath.lastIndexOf('.');
+                var ext = destpath.substring(idx); // .jpg
+                var filename = destpath.substring(0,idx);
+                //var destimg = filename + '-thumnail'+ext;
+                //c:~\public\lee\koala + '-thumnail'+.jpg
+//                easyimage.thumbnail(
+//                    {
+//                        src:srcimg,
+//                        dst:destimg,
+//                        width:32,
+//                        height:32,
+//                        x:0,
+//                        y:0
+//                    },
+//                    function(err){
+//                        if(err){
+//                            console.log(err);
+//                            res.json(err);
+//                        }
+//                        else{
+//                            console.log('path : ',srcimg,'/ thumnail : ',destimg);
+//                            res.json("success");
+//                        }
 //                    }
-//                    else{
-//                        res.json("success");
-//                    }
-//                }
-//            );
-            console.log('success file upload, file path:',srcimg);
-        });//is.on callback function
+//                );
+            });//is.on callback function
+            console.log('success');
+            //res.json({result:"SUCCESS",resultmsg:"FILE UPLOAD SUCCESS"});
+            return {result:"SUCCESS",resultmsg:"UPLOAD SUCCESS"};
+        }
+        else{
+                console.log('invalid file image');
+                //res.json({result:"FAIL",resultmsg:"INVALID"});
+            return {result:"FAIL",resultmsg:"INVALID"};
+        }
     }
     else{
-        console.log('error on file upload');
-        res.json({result:'FAIL',result_msg:'FILE NOT EXISTS'});
+        console.log('no file');
+        return {result:"FAIL",resultmsg:"NO FILE"};
     }
 
 };//upload function
-
-
-
-
 
 /*
  * test page
@@ -118,8 +125,10 @@ exports.list = function(req, res){
     var signData = req.body; // 입력할 json 데이터 받을 변수
     console.log(req.body);
     //사진 파일 업로드 부분 현재
-    //
-     var chkDup;
+    var proPhoto_file = req.files.proPhoto;
+    var photo_name = proPhoto_file.name;
+
+    var chkDup;
     db.pool.getConnection(function(err,connection){
         if(err){
             console.log('error on connection pool sign check dup',err);
@@ -146,8 +155,8 @@ exports.list = function(req, res){
                                 res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
                             }//error on connection pool
                             else {
-                                connection.query('insert into account(email,name,pwd,all_highscore,allscore,allgame,highscore) values(?,?,?,?,?,?,?)',
-                                    [signData.email, signData.name, signData.pwd,0,0,0,0], function (err2, result) {
+                                connection.query('insert into account(email,name,pwd,sex,country,hand,prophoto) values(?,?,?,?,?,?,?)',
+                                    [signData.email, signData.name, signData.pwd,signData.sex,signData.country,signData.hand,photo_name], function (err2, result) {
                                         if (err2) {
                                             console.log('error on query sign', err2);
                                             res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
@@ -155,7 +164,15 @@ exports.list = function(req, res){
                                         else if (result.affectedRows == 1) {
                                             console.log('sign result : ', result);
                                             returnData = {result: "SUCCESS", aidx: result.insertId};
-                                            res.json(returnData);
+                                            var result_upload = uploadfunction(result.insertId,"profile",proPhoto_file);
+                                            if(result_upload.result=="SUCCESS"){
+                                                console.log(result_upload);
+                                                res.json(returnData);
+                                            }
+                                            else{
+                                                console.log(result_upload);
+                                                res.json(result_upload);
+                                            }
                                         }
                                         connection.release();
                                     });//query
