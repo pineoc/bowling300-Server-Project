@@ -58,7 +58,7 @@ var uploadfunction = function(userid,type,upfile){
             var idx = destpath.lastIndexOf('.');
             var ext = destpath.substring(idx); // .jpg
             var filename = destpath.substring(0,idx);
-            var destimg = filename + '-thumnail'+ext;
+            //var destimg = filename + '-thumnail'+ext;
             //c:~\public\lee\koala + '-thumnail'+.jpg
 //            easyimage.thumbnail(
 //                {
@@ -202,7 +202,7 @@ exports.insertScore = function(req,res){
     console.log('data.type : ',insData.data[0].type);
     if(dataLength!=0){
         for(var i=0;i<dataLength;i++){
-            if(insData.data[i].type==-1){
+            if(insData.data[i].type==-1){//solo data
                 s_allScore = insData.data[i].allScore;
                 s_allGame = insData.data[i].allGame;
                 console.log('s_data :',s_allGame,s_allScore );
@@ -229,8 +229,8 @@ exports.insertScore = function(req,res){
                     }//no error on connection pool
                 });//connection pool
                 //-------------------------------------------------------------
-            }//solo data
-            else if(insData.data[i].type>0){
+            }
+            else if(insData.data[i].type>0){//group data
                 var grpIdx = insData.data[i].type;
                 var grpScore = insData.data[i].allScore;
                 var grpGame = insData.data[i].allGame;
@@ -240,7 +240,7 @@ exports.insertScore = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     }//error on connection pool
                     else{
-                        connection.query('UPDATE account_has_group SET g_score=?,g_game=? WHERE a_idx=? and g_idx=?',
+                        connection.query('UPDATE account_has_group SET g_score=?,g_game=? WHERE account_a_idx=? AND group_g_idx=?',
                             [grpScore,grpGame,aidx,grpIdx],function(err2,result){
                                 if(err2){
                                     console.log('error on query insert grp',err2);
@@ -343,6 +343,7 @@ exports.groupMake = function(req,res){
                                                     }
                                                     else if (result.affectedRows == 1) {
                                                         //res.json({result:"SUCCESS",result_msg:result}); // result_msg에 대한 부분은 차후 수정
+                                                        console.log('success on insert into account_has_group, result : ',result);
                                                         callback(null, {result: "SUCCESS"});
                                                     }//insert success
                                                     connection.release();
@@ -353,7 +354,7 @@ exports.groupMake = function(req,res){
                             ],
                                 function (err, results) {
                                     if (err) {
-                                        console.log('error on grpmake async waterfall', err);
+                                        console.log('error on grpmake async waterfall, err:', err);
                                         res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
                                     }
                                     else {
