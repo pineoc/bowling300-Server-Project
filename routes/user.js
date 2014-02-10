@@ -15,7 +15,7 @@ var path = require('path');
 var fs = require('fs');
 var easyimage = require('easyimage');
 var util = require('util');
-//var math = require('Math');
+var mkdirp = require('mkdirp');
 
 if(process.env.UPLOAD_PATH == undefined)
 {
@@ -39,7 +39,15 @@ var uploadfunction = function(userid,type,upfile){
         var userfolder = path.resolve(process.env.UPLOAD_PATH, userid);//aidx를 이용
         console.log('userfolder : ',userfolder);
         if(!fs.existsSync(userfolder)){
-            fs.mkdirSync(userfolder);
+            //fs.mkdirSync(userfolder);
+            mkdirp(userfolder,function(err){
+                if(err){
+                    console.log('error on mkdirp make dir',err);
+                    res.json({result:"FAIL",resultmsg:"FAIL MKDIR"});
+                }else{
+                    console.log('success');
+                }
+            });//mkdirp
         }
 
         var name=upfile.name;//upload file name ex>file.jpg
@@ -48,7 +56,7 @@ var uploadfunction = function(userid,type,upfile){
         //public/1/이미지.jpg
 
         var checkext = path.extname(name);
-
+        checkext=checkext.toLowerCase();
         //check image ext
         if(checkext=='.jpg' || checkext=='.jpeg' || checkext=='.png'){
             var is = fs.createReadStream(srcpath); //소스로부터 스트림을 입력받음
@@ -148,7 +156,7 @@ exports.rankpoint = function(req,res){
         }//error on connection pool
         else{
             //console.log('data : ',signData,signData.email,signData.name,signData.pwd);
-            connection.query('select count(*) cnt from account where email=?',[signData.email],
+            connection.query('SELECT count(*) cnt FROM account WHERE email=?',[signData.email],
                 function(err2,result){
                 if(err2){
                     console.log('error on query sign check dup',err2);
@@ -167,7 +175,7 @@ exports.rankpoint = function(req,res){
                                 res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
                             }//error on connection pool
                             else {
-                                connection.query('insert into account(email,name,pwd,sex,country,hand,prophoto) values(?,?,?,?,?,?,?)',
+                                connection.query('INSERT INTO account(email,name,pwd,sex,country,hand,prophoto) VALUES(?,?,?,?,?,?,?)',
                                     [signData.email, signData.name, signData.pwd,signData.sex,signData.country,signData.hand,photo_name], function (err2, result) {
                                         if (err2) {
                                             console.log('error on query sign', err2);
@@ -749,64 +757,6 @@ exports.groupsearch = function(req,res){
         }
     });//connection pool
 };//group search
-
-
-exports.uploadPhoto = function(req,res){
-    var type = req.body.type;
-
-    var upfile = req.files.upfile;
-    var userid = req.body.aidx;
-
-    if(upfile.originalFilename!=''){
-        var userfolder = path.resolve(process.env.UPLOAD_PATH, userid);
-        console.log('userfolder : ',userfolder);
-        if(!fs.existsSync(userfolder)){
-            fs.mkdirSync(userfolder);
-        }
-
-        var name = upfile.name;//upload file name ex>file.jpg
-        var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
-        var destpath = path.resolve(__dirname,'..',userfolder,name);
-        //public/1/이미지.jpg
-        var is = fs.createReadStream(srcpath);
-        //소스로부터 스트림을 입력받음
-        var os = fs.createWriteStream(destpath);
-
-        //읽어온 스트림을 통해서 사진파일 생성
-        is.pipe(os);
-        is.on('end',function(){
-            fs.unlinkSync(srcpath);
-            var srcimg = destpath;
-            var idx = destpath.lastIndexOf('.');
-            var ext = destpath.substring(idx); // .jpg
-            var filename = destpath.substring(0,idx);
-            var destimg = filename + '-thumnail'+ext;
-            //c:~\public\lee\koala + '-thumnail'+.jpg
-            easyimage.thumbnail(
-                {
-                    src:srcimg,
-                    dst:destimg,
-                    width:100,
-                    height:100,
-                    x:0,
-                    y:0
-                },
-                function(err){
-                    if(err){
-                        console.log(err);
-                        res.json(err);
-                    }
-                    else{
-                        res.json("success");
-                    }
-                }
-            );
-        });//is.on callback function
-    }
-    else{
-        res.json({result:'FAIL',result_msg:'FILE NOT EXISTS'});
-    }
-};//사진 올리기
 
 exports.deletePhoto = function(req,res){
 

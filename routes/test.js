@@ -11,6 +11,7 @@ var db = require('./clouluDB');
 var path = require('path');
 var fs = require('fs');
 var easyimage = require('easyimage');
+var mkdirp = require('mkdirp');
 var uploadFunc = function(data){
 
 };
@@ -31,19 +32,29 @@ if(process.env.UPLOAD_PATH == undefined)
     var uploadData = req.files.upfile;
     var a_idx = req.body.aidx;
     if(uploadData.originalFilename!=''){
-        var userfolder = path.resolve(process.env.UPLOAD_PATH,a_idx);
+        var userfolder = path.resolve(process.env.UPLOAD_PATH,'test',a_idx);
         console.log('userfolder : ',userfolder);
         if(!fs.existsSync(userfolder)){
-            fs.mkdirSync(userfolder);
+            mkdirp(userfolder,function(err){
+                if(err){
+                    console.log('error on mkdirp make dir',err);
+                    res.json({result:"FAIL",resultmsg:"FAIL MKDIR"});
+                }else{
+                    console.log('success');
+                }
+            });//mkdirp
         }
 
         var name = uploadData.name;//upload file name ex>file.jpg
         var srcpath = uploadData.path;//현재 폴더 위치 -> 업로드 하는 기기
         var destpath = path.resolve(__dirname,'..',userfolder,name);//public/1/이미지.jpg
         var checkext = path.extname(name);
+        checkext=checkext.toLowerCase();
+        console.log(destpath);
+        console.log(checkext);
 
         //check image ext
-        if(checkext=='.jpg' || checkext=='.jpeg' || checkext=='.png'){
+        if(checkext=='.jpg' || checkext=='.jpeg' || checkext=='.png' ){
             var is = fs.createReadStream(srcpath); //소스로부터 스트림을 입력받음
             var os = fs.createWriteStream(destpath);//읽어온 스트림을 통해서 사진파일 생성
             is.pipe(os);
@@ -76,7 +87,7 @@ if(process.env.UPLOAD_PATH == undefined)
                     }
                 );
             });//is.on callback function
-            console.log('result');
+            console.log('success',{result:"SUCCESS",resultmsg:"FILE UPLOAD SUCCESS"});
             res.json({result:"SUCCESS",resultmsg:"FILE UPLOAD SUCCESS"});
         }
         else{

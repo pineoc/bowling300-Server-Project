@@ -67,7 +67,6 @@ app.post('/user/group/board/:groupidx/:conidx/comwrite',board.commWrite);//덧�
 app.post('/user/group/board/:groupidx/:conidx/comupdate',board.commUpdate);//덧글 수정 / 삭제
 
 //사진 업로드 -> 공 사진 및 프로필 사진
-app.post('/user/uploadphoto',user.uploadPhoto);
 app.post('/user/deletephoto',user.deletePhoto);
 
 
