@@ -5,8 +5,8 @@
  2014.02.03 - start
  * */
 
-var db = require('./localDB');
-//var db = require('./clouluDB');
+//var db = require('./localDB');
+var db = require('./clouluDB');
 
 var path = require('path');
 var fs = require('fs');
