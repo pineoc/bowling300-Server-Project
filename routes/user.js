@@ -15,6 +15,7 @@ var path = require('path');
 var fs = require('fs');
 var easyimage = require('easyimage');
 var util = require('util');
+var math = require('math');
 
 if(process.env.UPLOAD_PATH == undefined)
 {
@@ -86,17 +87,16 @@ var uploadfunction = function(userid,type,upfile){
             //res.json({result:"SUCCESS",resultmsg:"FILE UPLOAD SUCCESS"});
             return {result:"SUCCESS",resultmsg:"UPLOAD SUCCESS"};
         }
-        else{
+        else{//invalid data type
                 console.log('invalid file image');
                 //res.json({result:"FAIL",resultmsg:"INVALID"});
             return {result:"FAIL",resultmsg:"INVALID"};
         }
     }
-    else{
+    else{//no file
         console.log('no file');
         return {result:"FAIL",resultmsg:"NO FILE"};
     }
-
 };//upload function
 
 /*
