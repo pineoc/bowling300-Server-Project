@@ -199,6 +199,7 @@ exports.insertScore = function(req,res){
     console.log('req.body : ',insData);
     console.log('datalength: ',dataLength);
     console.log('data : ',insData.data);
+    console.log('data.type : ',insData.data[0].type);
     if(dataLength!=0){
         for(var i=0;i<dataLength;i++){
             if(insData.data[i].type==-1){
