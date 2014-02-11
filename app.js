@@ -34,7 +34,6 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/users', user.list);
 
 //ranking function ( 랭킹 출력 함수 )
 app.post('/ranking',routes.ranking);

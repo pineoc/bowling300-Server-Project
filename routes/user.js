@@ -17,6 +17,32 @@ var easyimage = require('easyimage');
 var util = require('util');
 var mkdirp = require('mkdirp');
 
+
+/*
+ * cron function
+ * 최초 생성 날짜 : 2014.02.11
+ * 최종 수정 날짜 : 2014.02.11
+ *
+ * 기준날짜를 설정하여 exports.rankpoint에서 사용한다.
+ * editor : pineoc
+ * */
+var cronJob = require('cron').CronJob;
+var rankPointDateStart = new Date();
+var rankPointDateEnd = new Date();
+var job = new cronJob({
+    cronTime: '00 00 00 * * 1',
+    onTick: function() {
+        // Runs every weekday (Monday)
+        // at 00:00:00 AM.
+        rankPointDateStart.setDate(rankPointDateStart.getDate());
+        rankPointDateEnd.setDate(rankPointDateStart.getDate()+7);
+    },
+    start: false,
+    timeZone: "Asia/Seoul"
+});
+job.start();
+
+
 if(process.env.UPLOAD_PATH == undefined)
 {
     process.env.UPLOAD_PATH = 'public';
@@ -25,7 +51,7 @@ if(process.env.UPLOAD_PATH == undefined)
 /*
  * upload function
  * 최초 생성 날짜 : 2014.02.09
- * 최종 수정 날짜 : 2014.02.10
+ * 최종 수정 날짜 : 2014.02.11
  *
  * 받는 데이터 aidx, upfile, type
  * editor : pineoc
@@ -36,24 +62,55 @@ var uploadfunction = function(userid,type,upfile){
     //var userid = req.body.aidx;
 
     if(upfile.originalFilename!=''){
-        var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',userid.toString());//aidx를 이용
-        console.log('userfolder : ',userfolder);
-        if(!fs.existsSync(userfolder)){
-            //fs.mkdirSync(userfolder);
-            mkdirp(userfolder,function(err){
-                if(err){
-                    console.log('error on mkdirp make dir',err);
-                    res.json({result:"FAIL",resultmsg:"FAIL MKDIR"});
-                }else{
-                    console.log('success');
-                }
-            });//mkdirp
+        if(type=="profile"){
+            var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',userid.toString());//aidx를 이용
+            console.log('userfolder : ',userfolder);
+            if(!fs.existsSync(userfolder)){
+                //fs.mkdirSync(userfolder);
+                mkdirp(userfolder,function(err){
+                    if(err){
+                        console.log('error on mkdirp make userdir',err);
+                        res.json({result:"FAIL",resultmsg:"FAIL MKDIR"});
+                    }else{
+                        console.log('success');
+                    }
+                });//mkdirp
+            }
+            var name=upfile.name;//upload file name ex>file.jpg
+            var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
+            var destpath = path.resolve(__dirname,'..',userfolder,name);
+        }
+        else if(type=="ball"){
+
+        }
+        else if(type=="board"){
+
+        }
+        else if(type=="group"){
+            var groupfolder = path.resolve(process.env.UPLOAD_PATH,'group',userid.toString());//gidx를 이용
+            console.log('groupfolder : ',groupfolder);
+            if(!fs.existsSync(groupfolder)){
+                //fs.mkdirSync(userfolder);
+                mkdirp(groupfolder,function(err){
+                    if(err){
+                        console.log('error on mkdirp make groupdir',err);
+                        res.json({result:"FAIL",resultmsg:"FAIL MKDIR"});
+                    }else{
+                        console.log('success');
+                    }
+                });//mkdirp
+            }
+            var name=upfile.name;//upload file name ex>file.jpg
+            var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
+            var destpath = path.resolve(__dirname,'..',groupfolder,name);
+
         }
 
-        var name=upfile.name;//upload file name ex>file.jpg
-        var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
-        var destpath = path.resolve(__dirname,'..',userfolder,name);
-        //public/1/이미지.jpg
+
+//        var name=upfile.name;//upload file name ex>file.jpg
+//        var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
+//        var destpath = path.resolve(__dirname,'..',userfolder,name);
+//        //public/1/이미지.jpg
 
         var checkext = path.extname(name);
         checkext=checkext.toLowerCase();
@@ -107,30 +164,25 @@ var uploadfunction = function(userid,type,upfile){
     }
 };//upload function
 
-/*
- * test page
- * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.02
- *
- * 받는 데이터 no
- * editor : pineoc
- * */
-
-exports.list = function(req, res){
-  res.send("respond with a resource");
-};
 
 /*
  * ranking 기준점 전송
  * 최초 생성 날짜 : 2014.02.10
- * 최종 수정 날짜 : 2014.02.10
+ * 최종 수정 날짜 : 2014.02.11
  *
  * 받는 데이터
  * editor : pineoc
  * */
 exports.rankpoint = function(req,res){
-    res.send("respond with a resource");
+    //res.send("respond with a resource");
+
+
+
+
+
+
 };
+
 
 /*
 * 기능 : 회원가입 ( 기본정보 )
@@ -318,7 +370,7 @@ exports.insertScore = function(req,res){
 exports.groupMake = function(req,res){
     var groupmakeData = req.body; // json data get
 
-    //var grp_photo=req.files;
+    var grp_photo=req.files.grpPhoto;
     var grp_id;
     var chkDup; // check duplication
     db.pool.getConnection(function(err,connection){
@@ -354,7 +406,7 @@ exports.groupMake = function(req,res){
                                                 function (err2, result) {
                                                     if (err2) {
                                                         console.log('error on query makegrp on make', err2);
-                                                        res.json({result: "FAIL", result_msg: "INVALID"});
+                                                        res.json({result: "FAIL", resultmsg: "INVALID"});
                                                     }
                                                     else if (result.affectedRows == 1) {
                                                         grp_id = result.insertId;
