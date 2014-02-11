@@ -592,7 +592,7 @@ exports.groupList = function(req,res){
             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
         }//error on conn pool
         else{
-            connection.query('SELECT g_name gname, g_photo gphoto FROM groups WHERE g_idx IN (SELECT group_g_idx FROM account_has_group WHERE account_a_idx=?)',
+            connection.query('SELECT g_name gname, g_photo gphoto,g_idx gidx FROM groups WHERE g_idx IN (SELECT group_g_idx FROM account_has_group WHERE account_a_idx=?)',
                 [grplistData.aidx],function(err2,results){
                     if(err2){
                         console.log('error on query grp list',err2);
@@ -601,7 +601,10 @@ exports.groupList = function(req,res){
                     else if(results){
                         console.log('success list grp : ',results);
                         for(var i=0;i<results.length;i++){
-                            arr[i] = {gname:results[i].gname,gphoto:results[i].gphoto};
+                            arr[i] = {
+                                gname:results[i].gname,
+                                gphoto:"http://bowling.pineoc.cloulu.com/uploads/group/"+gidx+"/"+results[i].gphoto
+                            };
                         }//for
                         res.json({result:"SUCCESS",group:arr});
                     }
