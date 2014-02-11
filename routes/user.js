@@ -8,8 +8,8 @@ content : user
 
 var async = require('async');
 
-var db = require('./localDB.js');
-//var db = require('./clouluDB.js');
+//var db = require('./localDB.js');
+var db = require('./clouluDB.js');
 
 var path = require('path');
 var fs = require('fs');
