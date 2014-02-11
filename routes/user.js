@@ -8,8 +8,8 @@ content : user
 
 var async = require('async');
 
-//var db = require('./localDB.js');
-var db = require('./clouluDB.js');
+var db = require('./localDB.js');
+//var db = require('./clouluDB.js');
 
 var path = require('path');
 var fs = require('fs');
@@ -60,6 +60,9 @@ var uploadfunction = function(userid,type,upfile){
     //var type = req.body.type;
     //var upfile = req.files.upfile;
     //var userid = req.body.aidx;
+    var name=upfile.name;//upload file name ex>file.jpg
+    var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
+    var destpath ;
 
     if(upfile.originalFilename!=''){
         if(type=="profile"){
@@ -76,8 +79,6 @@ var uploadfunction = function(userid,type,upfile){
                     }
                 });//mkdirp
             }
-            var name=upfile.name;//upload file name ex>file.jpg
-            var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
             var destpath = path.resolve(__dirname,'..',userfolder,name);
         }
         else if(type=="group"){
@@ -94,8 +95,6 @@ var uploadfunction = function(userid,type,upfile){
                     }
                 });//mkdirp
             }
-            var name=upfile.name;//upload file name ex>file.jpg
-            var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
             var destpath = path.resolve(__dirname,'..',groupfolder,name);
         }
 //        else if(type=="board"){
@@ -108,6 +107,7 @@ var uploadfunction = function(userid,type,upfile){
 //        var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
 //        var destpath = path.resolve(__dirname,'..',userfolder,name);
 //        //public/1/이미지.jpg
+
 
         var checkext = path.extname(name);
         checkext=checkext.toLowerCase();
@@ -376,7 +376,7 @@ exports.insertScore = function(req,res){
 exports.groupMake = function(req,res){
     var groupmakeData = req.body; // json data get
 
-    var grp_photo=req.files.grpPhoto;
+    var grp_photo = req.files.grpPhoto;
     var grp_id;
     var chkDup; // check duplication
     db.pool.getConnection(function(err,connection){
@@ -408,7 +408,7 @@ exports.groupMake = function(req,res){
                                         }//error on connection pool
                                         else {
                                             connection.query('INSERT into groups(g_name,g_pwd,g_master)values(?,?,?)',
-                                                [groupmakeData.gname, groupmakeData.gpwd, arg.aidx],
+                                                [groupmakeData.gname, groupmakeData.gpwd, groupmakeData.aidx],
                                                 function (err2, result) {
                                                     if (err2) {
                                                         console.log('error on query makegrp on make', err2);
