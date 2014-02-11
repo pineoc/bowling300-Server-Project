@@ -443,7 +443,7 @@ exports.groupMake = function(req,res){
                                                     else if (result.affectedRows == 1) {
                                                         //res.json({result:"SUCCESS",result_msg:result}); // result_msg에 대한 부분은 차후 수정
                                                         console.log('success on insert into account_has_group, result : ',result);
-                                                        callback(null, {result: "SUCCESS"});
+                                                        callback(null, {result: "SUCCESS",gidx:arg1.gidx});
                                                     }//insert success
                                                     connection.release();
                                                 });//query
@@ -452,15 +452,44 @@ exports.groupMake = function(req,res){
                                 }
                             ],
                                 function (err, results) {
-                                    if (err) {
+                                    if (err) {//error
                                         console.log('error on grpmake async waterfall, err:', err);
                                         res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
                                     }
-                                    else {
+                                    else {//no error
                                         console.log('data : ', results);
-                                        res.json(results);
+                                        var result_upload = uploadfunction(results.gidx,"group",grp_photo);
+                                        if(result_upload.result=="SUCCESS"){//file upload success
+                                            console.log(result_upload);
+                                            db.pool.getConnection(function (err, connection) {
+                                                if (err) {
+                                                    console.log('error on connection pool makegrp on make file upload', err);
+                                                    res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                                                }//error on connection pool
+                                                else {
+                                                    connection.query('UPDATE groups SET g_photo=? where g_idx=?',
+                                                        [grp_photo.name,results.gidx],
+                                                        function (err2, result) {
+                                                            if (err2) {
+                                                                console.log('error on query makegrp on make upload file', err2);
+                                                                res.json({result: "FAIL", resultmsg: "FAIL UPLOAD"});
+                                                            }
+                                                            else if (result.affectedRows == 1) {
+                                                                console.log('success on query mkgrp on file upload',result);
+                                                                res.json({result:"SUCCESS",gidx:results.gidx});
+                                                            }//insert success
+                                                            connection.release();
+                                                        });//query
+                                                }//no error on connection pool
+                                            });//connection pool
+                                            //res.json(returnData);
+                                        }
+                                        else{//fail upload
+                                            console.log(result_upload);
+                                            res.json(result_upload);
+                                        }
                                     }
-                                }
+                                }//last waterfall
                             );//async waterfall
                         }
                     }
