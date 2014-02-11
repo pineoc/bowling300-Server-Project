@@ -167,8 +167,8 @@ function formatDate(date) {
     var year = date.getFullYear();
     var month = date.getMonth() + 1;
     var day = date.getDate();
-
-    return (year + month + day).toString();
+    console.log((year.toString() + month.toString() + day.toString()));
+    return (year.toString() + month.toString() + day.toString());
 }
 /*
  * ranking 기준점 전송
