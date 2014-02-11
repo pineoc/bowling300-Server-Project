@@ -34,8 +34,8 @@ var job = new cronJob({
     onTick: function() {
         // Runs every weekday (Monday)
         // at 00:00:00 AM.
-        rankPointDateStart.setDate(rankPointDateStart.getDate());
-        rankPointDateEnd.setDate(rankPointDateStart.getDate()+7);
+        rankPointDateStart.setDate(rankPointDateStart.getDate());//start point
+        rankPointDateEnd.setDate(rankPointDateStart.getDate()+7);//end point
     },
     start: false,
     timeZone: "Asia/Seoul"
@@ -165,6 +165,14 @@ var uploadfunction = function(userid,type,upfile){
 };//upload function
 
 
+
+function formatDate(date) {
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+
+    return (year + month + day).toString();
+}
 /*
  * ranking 기준점 전송
  * 최초 생성 날짜 : 2014.02.10
@@ -175,13 +183,15 @@ var uploadfunction = function(userid,type,upfile){
  * */
 exports.rankpoint = function(req,res){
     //res.send("respond with a resource");
-
-
-
-
-
+    var point = {
+        startPoint:formatDate(rankPointDateStart),
+        endPoint:formatDate(rankPointDateEnd)
+    };
+    console.log('point start : ',point.startPoint,' end : ',point.endPoint);
+    res.json(point);
 
 };
+
 
 
 /*
