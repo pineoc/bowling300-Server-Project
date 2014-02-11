@@ -80,12 +80,6 @@ var uploadfunction = function(userid,type,upfile){
             var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
             var destpath = path.resolve(__dirname,'..',userfolder,name);
         }
-        else if(type=="ball"){
-
-        }
-        else if(type=="board"){
-
-        }
         else if(type=="group"){
             var groupfolder = path.resolve(process.env.UPLOAD_PATH,'group',userid.toString());//gidx를 이용
             console.log('groupfolder : ',groupfolder);
@@ -103,10 +97,13 @@ var uploadfunction = function(userid,type,upfile){
             var name=upfile.name;//upload file name ex>file.jpg
             var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
             var destpath = path.resolve(__dirname,'..',groupfolder,name);
-
         }
-
-
+//        else if(type=="board"){
+//
+//        }
+//        else if(type=="ball"){
+//
+//        }
 //        var name=upfile.name;//upload file name ex>file.jpg
 //        var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
 //        var destpath = path.resolve(__dirname,'..',userfolder,name);
@@ -371,11 +368,10 @@ exports.insertScore = function(req,res){
 /*
  * 그룹 생성
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.05
+ * 최종 수정 날짜 : 2014.02.11
  *
- * 받는 데이터 aidx , gname, gpwd, gPhoto(사진)
+ * 받는 데이터 aidx , gname, gpwd, grpPhoto(사진)
  * editor : pineoc
- * 미구현 부분 : 사진 파일 업로드 부분
  * */
 exports.groupMake = function(req,res){
     var groupmakeData = req.body; // json data get

@@ -12,7 +12,6 @@
     "async": "*",
     "easyimage": "~0.1.6",
     "mkdirp" : "*",
-    "cron":"*",
-    "time":"*"
+    "cron":"*"
   }
 }
