@@ -80,11 +80,18 @@ exports.ranking = function(req,res){
                                     console.log(worldRank,avg,results.length);
                                     //console.log(worldRank,avg,results);
                                     for(var i=0;i<arg1.length;i++){
+                                        var link;
+                                        if(arg1[i].prophoto.isNull){
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
+                                        }
+                                        else{
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1[i].a_idx+"/"+arg1[i].prophoto;
+                                        }
                                         arr[i]={
                                             rank : i+1,
                                             name : arg1[i].name,
                                             country : arg1[i].country,
-                                            proPhoto : "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1[i].a_idx+"/"+arg1[i].prophoto,
+                                            proPhoto : link,
                                             ballPhoto : arg1[i].ballphoto,
                                             avg : (arg1[i].allscore/arg1[i].allgame).toFixed(1),
                                             allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
@@ -162,16 +169,27 @@ exports.ranking = function(req,res){
                                 else{
                                     localRank = results[0].cnt+1;
                                     for(var i=0;i<arg1.length;i++){
+                                        var link;
+                                        if(arg1[i].prophoto.isNull){
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
+                                        }
+                                        else{
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1[i].a_idx+"/"+arg1[i].prophoto;
+                                        }
                                         arr[i]={
                                             rank : i+1,
                                             name : arg1[i].name,
                                             country : arg1[i].country,
-                                            proPhoto : "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1[i].a_idx+"/"+arg1[i].prophoto,
+                                            proPhoto : link,
                                             ballPhoto : arg1[i].ballphoto,
                                             avg : (arg1[i].allscore/arg1[i].allgame).toFixed(1),
                                             allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1[i].highscore,//그주의 최고점수
-                                            profileDetail : arg1[i].profile_detail // 구질, 구력, 스텝, 800시리즈 string
+                                            hand : arg1[i].hand,
+                                            style : arg1[i].style,
+                                            step : arg1[i].step,
+                                            series300 : arg1[i].series300,
+                                            series800 : arg1[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
                                     resultData = {myrank:localRank,arr:arr};
@@ -240,17 +258,28 @@ exports.ranking = function(req,res){
                                 }
                                 else{
                                     groupRank = results[0].cnt;
-                                    for(var i = 0; i < arg1.length; i++){
+                                    for(var i=0;i<arg1.length;i++){
+                                        var link;
+                                        if(arg1[i].prophoto.isNull){
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
+                                        }
+                                        else{
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1[i].a_idx+"/"+arg1[i].prophoto;
+                                        }
                                         arr[i]={
                                             rank : i+1,
                                             name : arg1[i].name,
                                             country : arg1[i].country,
-                                            proPhoto : "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1[i].a_idx+"/"+arg1[i].prophoto,
+                                            proPhoto : link,
                                             ballPhoto : arg1[i].ballphoto,
                                             avg : (arg1[i].allscore/arg1[i].allgame).toFixed(1),
                                             allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1[i].highscore,//그주의 최고점수
-                                            profileDetail : arg1[i].profile_detail // 구질, 구력, 스텝, 800시리즈 string
+                                            hand : arg1[i].hand,
+                                            style : arg1[i].style,
+                                            step : arg1[i].step,
+                                            series300 : arg1[i].series300,
+                                            series800 : arg1[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
                                     resultData = {myrank:groupRank,arr:arr};
