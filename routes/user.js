@@ -35,7 +35,7 @@ var job = new cronJob({
         // Runs every weekday (Monday)
         // at 00:00:00 AM.
         rankPointDateStart.setDate(rankPointDateStart.getDate());//start point
-        rankPointDateEnd.setDate(rankPointDateStart.getDate()+7);//end point
+        cosole.log(rankPointDateStart,rankPointDateEnd);
     },
     start: false,
     timeZone: "Asia/Seoul"
@@ -180,6 +180,7 @@ function formatDate(date) {
  * */
 exports.rankpoint = function(req,res){
     //res.send("respond with a resource");
+    rankPointDateEnd.setDate(rankPointDateStart.getDate()+7);
     var point = {
         startPoint:formatDate(rankPointDateStart),
         endPoint:formatDate(rankPointDateEnd)
