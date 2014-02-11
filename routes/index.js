@@ -81,7 +81,7 @@ exports.ranking = function(req,res){
                                     //console.log(worldRank,avg,results);
                                     for(var i=0;i<arg1.length;i++){
                                         var link;
-                                        if(arg1[i].prophoto.isNull){
+                                        if(arg1[i].prophoto==null){
                                             link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{
@@ -170,7 +170,7 @@ exports.ranking = function(req,res){
                                     localRank = results[0].cnt+1;
                                     for(var i=0;i<arg1.length;i++){
                                         var link;
-                                        if(arg1[i].prophoto.isNull){
+                                        if(arg1[i].prophoto==null){
                                             link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{
@@ -260,7 +260,7 @@ exports.ranking = function(req,res){
                                     groupRank = results[0].cnt;
                                     for(var i=0;i<arg1.length;i++){
                                         var link;
-                                        if(arg1[i].prophoto.isNull){
+                                        if(arg1[i].prophoto==null){
                                             link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{

@@ -208,6 +208,7 @@ exports.rankpoint = function(req,res){
     var photo_name = proPhoto_file.name;
 
     var chkDup;
+    console.log('recv data sign : ',signData);
     db.pool.getConnection(function(err,connection){
         if(err){
             console.log('error on connection pool sign check dup',err);
@@ -292,7 +293,7 @@ exports.insertScore = function(req,res){
     var aidx = insData.aidx;
     var s_allScore = 0;
     var s_allGame = 0;
-    console.log('req.body : ',insData);
+    console.log('recv data insert Score: ',insData);
     console.log('datalength: ',dataLength);
     console.log('data : ',insData.data);
     console.log('data.type : ',insData.data[0].type);
@@ -379,6 +380,7 @@ exports.groupMake = function(req,res){
     var grp_photo = req.files.grpPhoto;
     var grp_id;
     var chkDup; // check duplication
+    console.log('recv data grpmake : ',groupmakeData);
     db.pool.getConnection(function(err,connection){
         if(err){
             console.log('error on connection pool sign check dup',err);
@@ -506,6 +508,7 @@ exports.groupMake = function(req,res){
  * */
 exports.groupJoin = function(req,res){
     var grpjoinData = req.body;
+    console.log('recv data grpJoin : ',grpjoinData);
 
     async.waterfall([
         function(callback){//check g_idx use g_name
@@ -586,6 +589,7 @@ exports.groupJoin = function(req,res){
 exports.groupList = function(req,res){
     var grplistData = req.body;
     var arr=[];
+    console.log('recv data grplist : ',grplistData);
     db.pool.getConnection(function(err,connection){
         if(err){
             console.log('error on connection pool grp list',err);
