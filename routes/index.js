@@ -43,7 +43,7 @@ exports.ranking = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETOWRK ERR"});
                     }
                     else{
-                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
+                        connection.query('SELECT allscore,allgame from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
@@ -55,8 +55,7 @@ exports.ranking = function(req,res){
                                 else{
                                     avg=0;
                                 }
-
-                                console.log('avg : ',result[0].allscore/result[0].allgame);
+                                console.log('avg : ',avg);
                                 //console.log(result);
                                 callback(null,avg);
                             }
@@ -64,6 +63,7 @@ exports.ranking = function(req,res){
                                 console.log('no data');
                                 res.json({result:"FAIL",resultmsg:"NO DATA"});
                             }
+                            connection.release();
                         });//query
                     }
                 });//connection pool
@@ -93,7 +93,7 @@ exports.ranking = function(req,res){
             function (arg1,callback){
                 //console.log('arg1 : ',arg1,arg1.allscore,arg1.allgame);
                 var arr=[];
-                var avg = arg1.avg ;
+                var avg = arg1.avg;
                 var resultData;
                 var worldRank=0;
 
@@ -105,13 +105,13 @@ exports.ranking = function(req,res){
                     else{
                         connection.query('SELECT count(*) cnt FROM account a where (a.allscore/a.allgame)>=? order by (a.allscore/a.allgame) desc',
                             [avg],//평균 값, 해당 아이디 idx
-                            function(err2,results){
+                            function(err2,results2){
                                 if(err2){
                                     console.log('error on query world rank me',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
                                 }
                                 else{
-                                    worldRank = results[0].cnt+1;
+                                    worldRank = results2[0].cnt+1;
                                     console.log(worldRank,avg);
                                     //console.log(worldRank,avg,results);
                                     for(var i=0;i<arg1.results.length;i++){
@@ -171,16 +171,26 @@ exports.ranking = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETOWRK ERR"});
                     }
                     else{
-                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
+                        connection.query('SELECT allscore,allgame from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
                             }
-                            else{
-                                avg = result[0].allscore/result[0].allgame;
+                            else if(result.length){
+                                if(result[0].allgame!=0){
+                                    avg = result[0].allscore/result[0].allgame;
+                                }
+                                else{
+                                    avg=0;
+                                }
                                 console.log('avg : ',avg);
                                 callback(null,avg);
                             }
+                            else{
+                                console.log('no data');
+                                res.json({result:"FAIL",resultmsg:"NO DATA"});
+                            }
+                            connection.release();
                         });//query
                     }
                 });//connection pool
@@ -199,7 +209,15 @@ exports.ranking = function(req,res){
                                     console.log('error on query local rank',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
                                 }
-                                callback(null,{results:results,avg:arg});//data
+                                else if(results.length){
+                                    console.log('avg : ',result[0].allscore/result[0].allgame);
+                                    //console.log(result);
+                                    callback(null,{results:results,avg:arg});
+                                }
+                                else{
+                                    console.log('no data');
+                                    res.json({result:"FAIL",resultmsg:"NO DATA"});
+                                }
                                 connection.release();
                             });//query
                     }
@@ -219,13 +237,13 @@ exports.ranking = function(req,res){
                     else{
                         connection.query('SELECT count(*) cnt FROM account a where (a.allscore/a.allgame)>=? and a.locale=? order by (a.allscore/a.allgame) desc',
                             [avg,rankData.locale],//평균 값, 해당 아이디 idx
-                            function(err2,results){
+                            function(err2,results2){
                                 if(err2){
                                     console.log('error on query local rank me',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
                                 }
                                 else{
-                                    localRank = results[0].cnt+1;
+                                    localRank = results2[0].cnt+1;
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
                                         if(arg1[i].results.prophoto==null){
@@ -285,16 +303,27 @@ exports.ranking = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETOWRK ERR"});
                     }
                     else{
-                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
+                        connection.query('SELECT allscore,allgame from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
                             }
-                            else{
-                                avg = result[0].allscore/result[0].allgame;
-                                console.log('avg : ',avg);
+                            else if(result.length){
+                                if(result[0].allgame!=0){
+                                    avg = result[0].allscore/result[0].allgame;
+                                }
+                                else{
+                                    avg=0;
+                                }
+                                console.log('avg : ',result[0].allscore/result[0].allgame);
+                                //console.log(result);
                                 callback(null,avg);
                             }
+                            else{
+                                console.log('no data');
+                                res.json({result:"FAIL",resultmsg:"NO DATA"});
+                            }
+                            connection.release();
                         });//query
                     }
                 });//connection pool
@@ -313,7 +342,13 @@ exports.ranking = function(req,res){
                                     console.log('error on query group rank',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
                                 }
-                                callback(null,{results:results,avg:arg});//data
+                                else if(results.length){
+                                    callback(null,{results:results,avg:arg});//data
+                                }
+                                else{
+                                    console.log('no data');
+                                    res.json({result:"FAIL",resultmsg:"NO DATA"});
+                                }
                                 connection.release();
                             });//query
                     }
