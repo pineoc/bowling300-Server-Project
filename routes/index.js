@@ -127,7 +127,7 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myrank:worldRank,arr:arr};
+                                    resultData = {myrank:worldRank,myproPhoto:arr[worldRank-1].proPhoto,arr:arr};
                                     callback(null,resultData);
                                 }
                                 connection.release();
@@ -239,7 +239,7 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myrank:localRank,arr:arr};
+                                    resultData = {myrank:localRank,myproPhoto:arr[localRank-1].proPhoto.proPhoto,arr:arr};
                                     callback(null,resultData);
                                 }
                                 connection.release();
@@ -327,7 +327,7 @@ exports.ranking = function(req,res){
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
                                 }
                                 else{
-                                    groupRank = results[0].cnt;
+                                    groupRank = results[0].cnt+1;
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
                                         if(arg1[i].results.prophoto==null){
@@ -352,10 +352,9 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myrank:groupRank,arr:arr};
+                                    resultData = {myrank:groupRank,myproPhoto:arr[groupRank-1].proPhoto,arr:arr};
                                     callback(null,resultData);
                                 }
-
                                 connection.release();
                             });//query
                     }
