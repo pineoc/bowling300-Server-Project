@@ -214,13 +214,14 @@ var checkValid = function(type,data){
                         return -1;
                     }
                     else{
-                        if(result.cnt==1){
+                        if(result[0].cnt==1){
                             return 1;
                         }
                         else{
                             return 0;
                         }
                     }
+                    connection.release();
                 });//query
             }
         });//conn pool
@@ -238,14 +239,16 @@ var checkValid = function(type,data){
                         return -1;
                     }
                     else{
-                        if(result.cnt==1){
+                        if(result[0].cnt==1){
                             return 1;
                         }
                         else{
                             return 0;
                         }
                     }
+                    connection.release();
                 });//query
+
             }
         });//conn pool
     }
