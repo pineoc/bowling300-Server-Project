@@ -267,7 +267,14 @@ var checkValid = function(type,data){
     console.log(req.body);
     //사진 파일 업로드 부분 현재
     var proPhoto_file = req.files.proPhoto;
-    var photo_name = proPhoto_file.name;
+     var photo_name;
+    if(proPhoto_file!=null){
+        photo_name = proPhoto_file.name;
+    }
+    else{
+        photo_name = null;
+    }
+
     if(signData.email==null || signData.pwd==null || signData.name==null || signData.sex==null){
         console.log('error on invalid data');
         res.json({result:"FAIL",resultmsg:"INVALID DATA(NULL)"});
@@ -517,7 +524,7 @@ exports.groupMake = function(req,res){
                                                     [groupmakeData.aidx, arg1.gidx, 0, 0], function (err2, result) {
                                                         if (err2) {
                                                             console.log('error on query makegrp on insert account has group', err2);
-                                                            res.json({result: "FAIL", resultmsg: "INVALID"});
+                                                            res.json({result: "FAIL", resultmsg: "INVALID QUERY"});
                                                         }
                                                         else if (result.affectedRows == 1) {
                                                             console.log('success on insert into account_has_group, result : ',result);

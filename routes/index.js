@@ -7,9 +7,9 @@
 
 var async = require('async');
 
-//var db = require('./localDB.js');
+var db = require('./localDB.js');
 
-var db = require('./clouluDB.js');
+//var db = require('./clouluDB.js');
 //var math = require('Math');
 
 exports.index = function(req, res){
@@ -23,7 +23,7 @@ exports.login = function(req,res){
 /*
  * 랭킹 데이터
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.06
+ * 최종 수정 날짜 : 2014.02.12
  *
  * 받는 데이터 allscore, allgame, type, limit
  * editor : pineoc
@@ -31,12 +31,34 @@ exports.login = function(req,res){
 exports.ranking = function(req,res){
     var rankData = req.body;
     var limit = 0;
-
+    console.log('recv data : ',rankData);
     //limit = req.params.limit;
     if(rankData.type=="world"){//개인 데이터에 따른 월드 랭킹
-
+        var avg;
         async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
-            function (callback){
+            function(callback){
+                //get allscore and allgame
+                db.pool.getConnection(function(err,connection){
+                    if(err){
+                        console.log('error on get allscore allgame in ranking conn pool',err);
+                        res.json({result:"FAIL",resultmsg:"NETOWRK ERR"});
+                    }
+                    else{
+                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
+                            if(err2){
+                                console.log('error on get allscore allgame in ranking query',err2);
+                                res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
+                            }
+                            else{
+                                avg = result.allscore/result.allgame;
+                                console.log('avg : ',avg);
+                                callback(null,avg);
+                            }
+                        });//query
+                    }
+                });//connection pool
+            },
+            function (arg,callback){
                 db.pool.getConnection(function(err,connection){
                     if(err){
                         console.log('error on connection pool world rank',err);
@@ -49,7 +71,11 @@ exports.ranking = function(req,res){
                                     console.log('error on query world rank',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
                                 }
-                                callback(null,results);//data
+                                else{
+                                    console.log('avg on query : ',arg);
+                                    callback(null,{results:results,avg:arg});//data
+
+                                }
                                 connection.release();
                             });//query
                     }
@@ -58,7 +84,7 @@ exports.ranking = function(req,res){
             function (arg1,callback){
                 //console.log('arg1 : ',arg1,arg1.allscore,arg1.allgame);
                 var arr=[];
-                var avg = rankData.allscore/rankData.allgame;
+                var avg = arg1.avg ;
                 var resultData;
                 var worldRank=0;
 
@@ -77,30 +103,30 @@ exports.ranking = function(req,res){
                                 }
                                 else{
                                     worldRank = results[0].cnt+1;
-                                    console.log(worldRank,avg,results.length);
+                                    console.log(worldRank,avg);
                                     //console.log(worldRank,avg,results);
-                                    for(var i=0;i<arg1.length;i++){
+                                    for(var i=0;i<arg1.results.length;i++){
                                         var link;
-                                        if(arg1[i].prophoto==null){
+                                        if(arg1.results[i].prophoto==null){
                                             link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1[i].a_idx+"/"+arg1[i].prophoto;
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.result[i].a_idx+"/"+arg1.result[i].prophoto;
                                         }
                                         arr[i]={
                                             rank : i+1,
-                                            name : arg1[i].name,
-                                            country : arg1[i].country,
+                                            name : arg1.result[i].name,
+                                            country : arg1.result[i].country,
                                             proPhoto : link,
-                                            ballPhoto : arg1[i].ballphoto,
-                                            avg : (arg1[i].allscore/arg1[i].allgame).toFixed(1),
-                                            allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
-                                            highscore : arg1[i].highscore,//그주의 최고점수
-                                            hand : arg1[i].hand,
-                                            style : arg1[i].style,
-                                            step : arg1[i].step,
-                                            series300 : arg1[i].series300,
-                                            series800 : arg1[i].series800
+                                            ballPhoto : arg1.result[i].ballphoto,
+                                            avg : (avg).toFixed(1),
+                                            allhighScore : arg1.result[i].all_highscore,//지금까지의 최고점수
+                                            highscore : arg1.result[i].highscore,//그주의 최고점수
+                                            hand : arg1.result[i].hand,
+                                            style : arg1.result[i].style,
+                                            step : arg1.result[i].step,
+                                            series300 : arg1.result[i].series300,
+                                            series800 : arg1.result[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
                                     resultData = {myrank:worldRank,arr:arr};
@@ -127,7 +153,30 @@ exports.ranking = function(req,res){
     }
     else if(rankData.type=="local"){//점수를 입력한 데이터
         async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
-            function (callback){
+            function(callback){
+                var avg;
+                //get allscore and allgame
+                db.pool.getConnection(function(err,connection){
+                    if(err){
+                        console.log('error on get allscore allgame in ranking conn pool',err);
+                        res.json({result:"FAIL",resultmsg:"NETOWRK ERR"});
+                    }
+                    else{
+                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
+                            if(err2){
+                                console.log('error on get allscore allgame in ranking query',err2);
+                                res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
+                            }
+                            else{
+                                avg = result.allscore/result.allgame;
+                                console.log('avg : ',avg);
+                                callback(null,avg);
+                            }
+                        });//query
+                    }
+                });//connection pool
+            },
+            function (arg,callback){
                 db.pool.getConnection(function(err,connection){
                     if(err){
                         console.log('error on connection pool local rank',err);
@@ -141,7 +190,7 @@ exports.ranking = function(req,res){
                                     console.log('error on query local rank',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
                                 }
-                                callback(null,results);//data
+                                callback(null,{results:results,avg:arg});//data
                                 connection.release();
                             });//query
                     }
@@ -150,7 +199,7 @@ exports.ranking = function(req,res){
             function (arg1,callback){
                 console.log('arg1 : ',arg1);
                 var arr=[];
-                var avg = rankData.allscore/rankData.allgame;
+                var avg = arg1.avg;
                 var resultData;
                 var localRank=0;
                 db.pool.getConnection(function(err,connection){
@@ -168,28 +217,28 @@ exports.ranking = function(req,res){
                                 }
                                 else{
                                     localRank = results[0].cnt+1;
-                                    for(var i=0;i<arg1.length;i++){
+                                    for(var i=0;i<arg1.results.length;i++){
                                         var link;
-                                        if(arg1[i].prophoto==null){
+                                        if(arg1[i].results.prophoto==null){
                                             link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1[i].a_idx+"/"+arg1[i].prophoto;
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
                                         }
                                         arr[i]={
                                             rank : i+1,
-                                            name : arg1[i].name,
-                                            country : arg1[i].country,
+                                            name : arg1.results[i].name,
+                                            country : arg1.results[i].country,
                                             proPhoto : link,
-                                            ballPhoto : arg1[i].ballphoto,
-                                            avg : (arg1[i].allscore/arg1[i].allgame).toFixed(1),
-                                            allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
-                                            highscore : arg1[i].highscore,//그주의 최고점수
-                                            hand : arg1[i].hand,
-                                            style : arg1[i].style,
-                                            step : arg1[i].step,
-                                            series300 : arg1[i].series300,
-                                            series800 : arg1[i].series800
+                                            ballPhoto : arg1.results[i].ballphoto,
+                                            avg : (avg).toFixed(1),
+                                            allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
+                                            highscore : arg1.results[i].highscore,//그주의 최고점수
+                                            hand : arg1.results[i].hand,
+                                            style : arg1.results[i].style,
+                                            step : arg1.results[i].step,
+                                            series300 : arg1.results[i].series300,
+                                            series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
                                     resultData = {myrank:localRank,arr:arr};
@@ -218,7 +267,30 @@ exports.ranking = function(req,res){
         var groupidx = rankData.type;
         var groupRank=0;
         async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
-            function (callback){
+            function(callback){
+                var avg;
+                //get allscore and allgame
+                db.pool.getConnection(function(err,connection){
+                    if(err){
+                        console.log('error on get allscore allgame in ranking conn pool',err);
+                        res.json({result:"FAIL",resultmsg:"NETOWRK ERR"});
+                    }
+                    else{
+                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
+                            if(err2){
+                                console.log('error on get allscore allgame in ranking query',err2);
+                                res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
+                            }
+                            else{
+                                avg = result.allscore/result.allgame;
+                                console.log('avg : ',avg);
+                                callback(null,avg);
+                            }
+                        });//query
+                    }
+                });//connection pool
+            },
+            function (arg,callback){
                 db.pool.getConnection(function(err,connection){
                     if(err){
                         console.log('error on connection pool group rank',err);
@@ -232,7 +304,7 @@ exports.ranking = function(req,res){
                                     console.log('error on query group rank',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
                                 }
-                                callback(null,results);//data
+                                callback(null,{results:results,avg:arg});//data
                                 connection.release();
                             });//query
                     }
@@ -241,7 +313,7 @@ exports.ranking = function(req,res){
             function (arg1,callback){
                 console.log('arg1 : ',arg1);
                 var arr=[];
-                var avg = rankData.allscore/rankData.allgame;
+                var avg = arg1.avg;
                 var resultData;
                 db.pool.getConnection(function(err,connection){
                     if(err){
@@ -258,9 +330,9 @@ exports.ranking = function(req,res){
                                 }
                                 else{
                                     groupRank = results[0].cnt;
-                                    for(var i=0;i<arg1.length;i++){
+                                    for(var i=0;i<arg1.results.length;i++){
                                         var link;
-                                        if(arg1[i].prophoto==null){
+                                        if(arg1[i].results.prophoto==null){
                                             link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{
@@ -268,18 +340,18 @@ exports.ranking = function(req,res){
                                         }
                                         arr[i]={
                                             rank : i+1,
-                                            name : arg1[i].name,
-                                            country : arg1[i].country,
+                                            name : arg1.results[i].name,
+                                            country : arg1.results[i].country,
                                             proPhoto : link,
-                                            ballPhoto : arg1[i].ballphoto,
-                                            avg : (arg1[i].allscore/arg1[i].allgame).toFixed(1),
-                                            allhighScore : arg1[i].all_highscore,//지금까지의 최고점수
-                                            highscore : arg1[i].highscore,//그주의 최고점수
-                                            hand : arg1[i].hand,
-                                            style : arg1[i].style,
-                                            step : arg1[i].step,
-                                            series300 : arg1[i].series300,
-                                            series800 : arg1[i].series800
+                                            ballPhoto : arg1.results[i].ballphoto,
+                                            avg : (avg).toFixed(1),
+                                            allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
+                                            highscore : arg1.results[i].highscore,//그주의 최고점수
+                                            hand : arg1.results[i].hand,
+                                            style : arg1.results[i].style,
+                                            step : arg1.results[i].step,
+                                            series300 : arg1.results[i].series300,
+                                            series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
                                     resultData = {myrank:groupRank,arr:arr};
