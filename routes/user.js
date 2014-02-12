@@ -189,77 +189,10 @@ exports.rankpoint = function(req,res){
     res.json(point);
 };
 
-
-
-/*
- * 기능 : 유효성 체크 함수
- * 최초 생성 날짜 : 2014.02.11
- * 최종 수정 날짜 : 2014.02.11
- * type:
- * 1. aidx 체크 (있으면 1)
- * 2. gidx 체크 (있으면 1)
- * editor : pineoc
- * */
-function chk(type,data){
-    if(type==1){//check aidx
-        db.pool.getConnection(function(err,connection){
-            if(err){
-                console.log('err on chkfunc (aidx) conn pool',err);
-                return -1;
-            }
-            else{
-                connection.query('SELECT count(*) cnt FROM account WHERE a_idx=?',[data],function(err2,result){
-                    if(err2){
-                        console.log('err on chkfunc (aidx) query',err2);
-                        return {res:-1};
-                    }
-                    else{
-                        if(result[0].cnt==1){
-                            return {res:1};
-                        }
-                        else{
-                            return {res:0};
-                        }
-                    }
-                    connection.release();
-                });//query
-            }
-        });//conn pool
-    }
-    else{
-        db.pool.getConnection(function(err,connection){
-            if(err){
-                console.log('err on chkfunc (gidx) conn pool',err);
-                return {res:-1};
-            }
-            else{
-                connection.query('SELECT count(*) cnt FROM groups WHERE g_idx=?',[data],function(err2,result){
-                    if(err2){
-                        console.log('err on chkfunc (gidx) query',err2);
-                        return {res:-1};
-                    }
-                    else{
-                        if(result[0].cnt==1){
-                            return {res:1};
-                        }
-                        else{
-                            return {res:0};
-                        }
-                    }
-                    connection.release();
-                });//query
-
-            }
-        });//conn pool
-    }
-};
-
-
-
 /*
 * 기능 : 회원가입 ( 기본정보 )
 * 최초 생성 날짜 : 2014.02.02
-* 최종 수정 날짜 : 2014.02.11
+* 최종 수정 날짜 : 2014.02.12
 *
 * editor : pineoc
 * 미구현 부분 : 사진 파일 업로드 부분
@@ -277,7 +210,6 @@ function chk(type,data){
     else{
         photo_name = null;
     }
-
     if(signData.email==null || signData.pwd==null || signData.name==null || signData.sex==null){
         console.log('error on invalid data');
         res.json({result:"FAIL",resultmsg:"INVALID DATA(NULL)"});
@@ -289,6 +221,7 @@ function chk(type,data){
             if(err){
                 console.log('error on connection pool sign check dup',err);
                 res.json({result:"FAIL",result_msg:"NETWORK ERR"});
+                return;
             }//error on connection pool
             else{
                 //console.log('data : ',signData,signData.email,signData.name,signData.pwd);
@@ -297,6 +230,7 @@ function chk(type,data){
                     if(err2){
                         console.log('error on query sign check dup',err2);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
                     }
                     else{
                         console.log('check dup result : ',result[0].cnt);
@@ -309,6 +243,7 @@ function chk(type,data){
                                 if (err) {
                                     console.log('error on connection pool sign', err);
                                     res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                                    return;
                                 }//error on connection pool
                                 else {
                                     connection.query('INSERT INTO account(email,name,pwd,sex,country,hand,prophoto,allscore,allgame) VALUES(?,?,?,?,?,?,?,?,?)',
@@ -390,6 +325,7 @@ exports.insertScore = function(req,res){
                         if(err){
                             console.log('error on connection pool insert',err);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            return;
                         }//error on connection pool
                         else{
                             connection.query('UPDATE account SET allscore=?, allgame=? WHERE a_idx=?',
@@ -422,6 +358,7 @@ exports.insertScore = function(req,res){
                         if(err){
                             console.log('error on connection pool group',err);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            return;
                         }//error on connection pool
                         else{
                             connection.query('UPDATE account_has_group SET g_score=?,g_game=? WHERE account_a_idx=? AND group_g_idx=?',
@@ -465,7 +402,7 @@ exports.groupMake = function(req,res){
     var groupmakeData = req.body; // json data get
     var grp_photo = req.files.grpPhoto;
     var grpfilename;
-    if(req.files.grpPhoto!=null){
+    if(grp_photo!=null){
         grpfilename=grp_photo.name;
     }else{
         grpfilename = null;
@@ -482,6 +419,7 @@ exports.groupMake = function(req,res){
             if(err){
                 console.log('error on connection pool sign check dup',err);
                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                return;
             }//error on connection pool
             else{
                 connection.query('select count(*) cnt from groups where g_name=? ',[groupmakeData.gname],
@@ -503,6 +441,7 @@ exports.groupMake = function(req,res){
                                             if (err) {
                                                 console.log('error on connection pool makegrp on make', err);
                                                 res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                                                return;
                                             }//error on connection pool
                                             else {
                                                 connection.query('INSERT into groups(g_name,g_pwd,g_master)values(?,?,?)',
@@ -526,6 +465,7 @@ exports.groupMake = function(req,res){
                                             if (err) {
                                                 console.log('error on connection pool makegrp on insert account_has_group', err);
                                                 res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                                                return;
                                             }//error on connection pool
                                             else {
                                                 connection.query('INSERT into account_has_group(account_a_idx,group_g_idx,g_score,g_game)values(?,?,?,?)',
@@ -559,6 +499,7 @@ exports.groupMake = function(req,res){
                                                         if (err) {
                                                             console.log('error on connection pool makegrp on make file upload', err);
                                                             res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                                                            return;
                                                         }//error on connection pool
                                                         else {
                                                             connection.query('UPDATE groups SET g_photo=? where g_idx=?',
@@ -622,6 +563,7 @@ exports.groupJoin = function(req,res){
                     if(err){
                         console.log('error on connection pool grp join chk gidx',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
                     }//error on conn pool
                     else{
                         connection.query('SELECT g_idx,g_pwd from groups where g_name=?',
@@ -645,6 +587,7 @@ exports.groupJoin = function(req,res){
                         if(err){
                             console.log('error on connection pool grp join',err);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            return;
                         }//error on conn pool
                         else{
                             connection.query('INSERT INTO account_has_group(account_a_idx,group_g_idx,g_score,g_game)values(?,?,?,?)',
@@ -668,12 +611,12 @@ exports.groupJoin = function(req,res){
                 }
                 else{
                     console.log('error, not equal gpwd',arg1.gpwd,grpjoinData.gpwd);
-                    res.json({result:"FAIL",resultmsg:"PWD NOT EQUAL"})
+                    res.json({result:"FAIL",resultmsg:"PWD NOT EQUAL"});
                 }
             }
         ],function(err,result){
             if(err){
-                console.log('error on grp join waterfall');
+                console.log('error on grp join waterfall',err);
                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
             }
             else{
@@ -706,6 +649,7 @@ exports.groupList = function(req,res){
             if(err){
                 console.log('error on connection pool grp list',err);
                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                return;
             }//error on conn pool
             else{
                 connection.query('SELECT g_name gname, g_photo gphoto,g_idx gidx FROM groups WHERE g_idx IN (SELECT group_g_idx FROM account_has_group WHERE account_a_idx=?)',
@@ -756,6 +700,7 @@ exports.groupDelete = function(req,res){
                 if(err){
                     console.log('error on pool chk grp member',err);
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return;
                 }else{
                     connection.query('SELECT count(*) cnt from account_has_group where account_a_idx=? and group_g_idx=?',
                         [grpdelData.aidx,grpdelData.gidx],function(err2,result){
@@ -778,6 +723,7 @@ exports.groupDelete = function(req,res){
                 if(err){
                     console.log('error on pool chk grp master account',err);
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return;
                 }else{
                     connection.query('SELECT count(*) cnt from groups where g_master=? ',
                         [grpdelData.aidx],function(err2,result){
@@ -807,6 +753,7 @@ exports.groupDelete = function(req,res){
                         if(err){
                             console.log('error on pool grp master del',err);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            return;
                         }else{
                             connection.query('DELETE FROM account_has_group a_idx=? and g_idx=?',
                                 [grpdelData.aidx,grpdelData.gidx],function(err2,result){
@@ -820,6 +767,7 @@ exports.groupDelete = function(req,res){
                                             if(err){
                                                 console.log('error on pool grp master change select',err);
                                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                                return;
                                             }else{
                                                 connection.query('SELECT account_a_idx FROM account_has_group where group_g_idx=?',
                                                     [grpdelData.gidx],function(err2,result){
@@ -835,6 +783,7 @@ exports.groupDelete = function(req,res){
                                                                 if(err){
                                                                     console.log('error on pool grp member del update',err);
                                                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                                                    return;
                                                                 }else{
                                                                     connection.query('UPDATE groups set g_master=? where and g_idx=?',
                                                                         [updateAidx,grpdelData.gidx],function(err2,result){
@@ -868,6 +817,7 @@ exports.groupDelete = function(req,res){
                         if(err){
                             console.log('error on pool grp member del',err);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            return;
                         }else{
                             connection.query('DELETE FROM account_has_group account_a_idx=? and group_g_idx=?',
                                 [grpdelData.aidx,grpdelData.gidx],function(err2,result){
@@ -895,6 +845,7 @@ exports.groupDelete = function(req,res){
                     if(err){
                         console.log('error on pool grp member del',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
                     }else{
                         connection.query('DELETE FROM account_has_group where account_a_idx=? and group_g_idx=?',
                             [grpdelData.aidx,grpdelData.gidx],function(err2,result){
@@ -940,6 +891,7 @@ exports.groupsearch = function(req,res){
         if(err){
             console.log('error on grp search conn pool');
             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+            return;
         }else{
             connection.query('SELECT g_name,g_photo from groups where g_name=?',[grpsearchData.gname],
                 function(err2,result){
