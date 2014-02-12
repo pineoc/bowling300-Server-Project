@@ -7,10 +7,9 @@
 
 var async = require('async');
 
-var db = require('./localDB.js');
+//var db = require('./localDB.js');
+var db = require('./clouluDB.js');
 
-//var db = require('./clouluDB.js');
-//var math = require('Math');
 
 exports.index = function(req, res){
   res.render('index', { title: 'Express' });
@@ -34,7 +33,6 @@ exports.ranking = function(req,res){
     console.log('recv data : ',rankData);
     //limit = req.params.limit;
     if(rankData.type=="world"){//개인 데이터에 따른 월드 랭킹
-        var avg;
         async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
             function(callback){
                 //get allscore and allgame
@@ -50,8 +48,9 @@ exports.ranking = function(req,res){
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
                             }
                             else{
-                                avg = result.allscore/result.allgame;
-                                console.log('avg : ',avg);
+                                var avg = result[0].allscore/result[0].allgame;
+                                console.log('avg : ',result[0].allscore/result[0].allgame);
+                                //console.log(result);
                                 callback(null,avg);
                             }
                         });//query
@@ -74,7 +73,6 @@ exports.ranking = function(req,res){
                                 else{
                                     console.log('avg on query : ',arg);
                                     callback(null,{results:results,avg:arg});//data
-
                                 }
                                 connection.release();
                             });//query
@@ -111,22 +109,22 @@ exports.ranking = function(req,res){
                                             link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.result[i].a_idx+"/"+arg1.result[i].prophoto;
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
                                         }
                                         arr[i]={
                                             rank : i+1,
-                                            name : arg1.result[i].name,
-                                            country : arg1.result[i].country,
+                                            name : arg1.results[i].name,
+                                            country : arg1.results[i].country,
                                             proPhoto : link,
-                                            ballPhoto : arg1.result[i].ballphoto,
+                                            ballPhoto : arg1.results[i].ballphoto,
                                             avg : (avg).toFixed(1),
-                                            allhighScore : arg1.result[i].all_highscore,//지금까지의 최고점수
-                                            highscore : arg1.result[i].highscore,//그주의 최고점수
-                                            hand : arg1.result[i].hand,
-                                            style : arg1.result[i].style,
-                                            step : arg1.result[i].step,
-                                            series300 : arg1.result[i].series300,
-                                            series800 : arg1.result[i].series800
+                                            allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
+                                            highscore : arg1.results[i].highscore,//그주의 최고점수
+                                            hand : arg1.results[i].hand,
+                                            style : arg1.results[i].style,
+                                            step : arg1.results[i].step,
+                                            series300 : arg1.results[i].series300,
+                                            series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
                                     resultData = {myrank:worldRank,arr:arr};
@@ -168,7 +166,7 @@ exports.ranking = function(req,res){
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
                             }
                             else{
-                                avg = result.allscore/result.allgame;
+                                avg = result[0].allscore/result[0].allgame;
                                 console.log('avg : ',avg);
                                 callback(null,avg);
                             }
@@ -282,7 +280,7 @@ exports.ranking = function(req,res){
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
                             }
                             else{
-                                avg = result.allscore/result.allgame;
+                                avg = result[0].allscore/result[0].allgame;
                                 console.log('avg : ',avg);
                                 callback(null,avg);
                             }
@@ -336,7 +334,7 @@ exports.ranking = function(req,res){
                                             link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1[i].a_idx+"/"+arg1[i].prophoto;
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
                                         }
                                         arr[i]={
                                             rank : i+1,
@@ -355,7 +353,7 @@ exports.ranking = function(req,res){
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
                                     resultData = {myrank:groupRank,arr:arr};
-                                    callback(null,arr);
+                                    callback(null,resultData);
                                 }
 
                                 connection.release();
