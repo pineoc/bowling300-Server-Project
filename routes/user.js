@@ -167,8 +167,8 @@ function formatDate(date) {
     var year = date.getFullYear();
     var month = date.getMonth() + 1;
     var day = date.getDate();
-    console.log((year.toString() + month.toString() + day.toString()));
-    return (year.toString() + month.toString() + day.toString());
+    console.log((year.toString() +'-'+ month.toString() +'-'+ day.toString()));
+    return (year.toString() +'-'+ month.toString() +'-'+ day.toString());
 }
 /*
  * ranking 기준점 전송
@@ -308,8 +308,8 @@ var checkValid = function(type,data){
                                     res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
                                 }//error on connection pool
                                 else {
-                                    connection.query('INSERT INTO account(email,name,pwd,sex,country,hand,prophoto) VALUES(?,?,?,?,?,?,?)',
-                                        [signData.email, signData.name, signData.pwd,signData.sex,signData.country,signData.hand,photo_name], function (err2, result) {
+                                    connection.query('INSERT INTO account(email,name,pwd,sex,country,hand,prophoto,allscore,allgame) VALUES(?,?,?,?,?,?,?,?,?)',
+                                        [signData.email, signData.name, signData.pwd,signData.sex,signData.country,signData.hand,photo_name,0,0], function (err2, result) {
                                             if (err2) {
                                                 console.log('error on query sign', err2);
                                                 res.json({result: "FAIL", resultmsg: "NETWORK ERR"});

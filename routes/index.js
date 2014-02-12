@@ -51,7 +51,7 @@ exports.ranking = function(req,res){
                                 var avg = result[0].allscore/result[0].allgame;
                                 console.log('avg : ',result[0].allscore/result[0].allgame);
                                 //console.log(result);
-                                callback(null,avg);
+                                callback(null,result[0].allscore/result[0].allgame);
                             }
                         });//query
                     }
