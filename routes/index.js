@@ -47,11 +47,15 @@ exports.ranking = function(req,res){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
                             }
-                            else{
+                            else if(result.length){
                                 var avg = result[0].allscore/result[0].allgame;
                                 console.log('avg : ',result[0].allscore/result[0].allgame);
                                 //console.log(result);
                                 callback(null,result[0].allscore/result[0].allgame);
+                            }
+                            else{
+                                console.log('no data');
+                                res.json({result:"FAIL",resultmsg:"NO DATA"});
                             }
                         });//query
                     }
