@@ -35,6 +35,7 @@ exports.ranking = function(req,res){
     if(rankData.type=="world"){//개인 데이터에 따른 월드 랭킹
         async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
             function(callback){
+                var avg;
                 //get allscore and allgame
                 db.pool.getConnection(function(err,connection){
                     if(err){
@@ -48,10 +49,16 @@ exports.ranking = function(req,res){
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
                             }
                             else if(result.length){
-                                var avg = result[0].allscore/result[0].allgame;
+                                if(result[0].allgame!=0){
+                                    avg = result[0].allscore/result[0].allgame;
+                                }
+                                else{
+                                    avg=0;
+                                }
+
                                 console.log('avg : ',result[0].allscore/result[0].allgame);
                                 //console.log(result);
-                                callback(null,result[0].allscore/result[0].allgame);
+                                callback(null,avg);
                             }
                             else{
                                 console.log('no data');
