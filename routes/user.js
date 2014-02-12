@@ -200,7 +200,7 @@ exports.rankpoint = function(req,res){
  * 2. gidx 체크 (있으면 1)
  * editor : pineoc
  * */
-var checkValid = function(type,data){
+function chk(type,data){
     if(type==1){//check aidx
         db.pool.getConnection(function(err,connection){
             if(err){
@@ -211,14 +211,14 @@ var checkValid = function(type,data){
                 connection.query('SELECT count(*) cnt FROM account WHERE a_idx=?',[data],function(err2,result){
                     if(err2){
                         console.log('err on chkfunc (aidx) query',err2);
-                        return -1;
+                        return {res:-1};
                     }
                     else{
                         if(result[0].cnt==1){
-                            return 1;
+                            return {res:1};
                         }
                         else{
-                            return 0;
+                            return {res:0};
                         }
                     }
                     connection.release();
@@ -230,20 +230,20 @@ var checkValid = function(type,data){
         db.pool.getConnection(function(err,connection){
             if(err){
                 console.log('err on chkfunc (gidx) conn pool',err);
-                return -1;
+                return {res:-1};
             }
             else{
                 connection.query('SELECT count(*) cnt FROM groups WHERE g_idx=?',[data],function(err2,result){
                     if(err2){
                         console.log('err on chkfunc (gidx) query',err2);
-                        return -1;
+                        return {res:-1};
                     }
                     else{
                         if(result[0].cnt==1){
-                            return 1;
+                            return {res:1};
                         }
                         else{
-                            return 0;
+                            return {res:0};
                         }
                     }
                     connection.release();
@@ -463,12 +463,17 @@ exports.insertScore = function(req,res){
  * */
 exports.groupMake = function(req,res){
     var groupmakeData = req.body; // json data get
-
     var grp_photo = req.files.grpPhoto;
+    var grpfilename;
+    if(req.files.grpPhoto!=null){
+        grpfilename=grp_photo.name;
+    }else{
+        grpfilename = null;
+    }
+
     var grp_id;
     var chkDup; // check duplication
-    console.log('recv data grpmake : ',groupmakeData);
-    if(groupmakeData==null || groupmakeData.aidx==null|| groupmakeData.gname==null || groupmakeData.gpwd==null || checkValid(1,groupmakeData.aidx)!=1){
+    if(groupmakeData==null || groupmakeData.aidx==null|| groupmakeData.gname==null || groupmakeData.gpwd==null || groupmakeData.aidx==0 ){
         console.log('INVALID DATA of grpmake data, NULL',groupmakeData);
         res.json({result:"FAIL",resultmsg:"INVALID NULL"});
     }
@@ -546,35 +551,37 @@ exports.groupMake = function(req,res){
                                         }
                                         else {//no error
                                             console.log('data : ', results);
+                                            if(grp_photo!=null){
                                             var result_upload = uploadfunction(results.gidx,"group",grp_photo);
-                                            if(result_upload.result=="SUCCESS"){//file upload success
-                                                console.log(result_upload);
-                                                db.pool.getConnection(function (err, connection) {
-                                                    if (err) {
-                                                        console.log('error on connection pool makegrp on make file upload', err);
-                                                        res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
-                                                    }//error on connection pool
-                                                    else {
-                                                        connection.query('UPDATE groups SET g_photo=? where g_idx=?',
-                                                            [grp_photo.name,results.gidx],
-                                                            function (err2, result) {
-                                                                if (err2) {
-                                                                    console.log('error on query makegrp on make upload file', err2);
-                                                                    res.json({result: "FAIL", resultmsg: "FAIL UPLOAD"});
-                                                                }
-                                                                else if (result.affectedRows == 1) {
-                                                                    console.log('success on query mkgrp on file upload',result);
-                                                                    res.json({result:"SUCCESS",gidx:results.gidx});
-                                                                }//insert success
-                                                                connection.release();
-                                                            });//query
-                                                    }//no error on connection pool
-                                                });//connection pool
-                                                //res.json(returnData);
-                                            }
-                                            else{//fail upload
-                                                console.log(result_upload);
-                                                res.json(result_upload);
+                                                if(result_upload.result=="SUCCESS"){//file upload success
+                                                    console.log(result_upload);
+                                                    db.pool.getConnection(function (err, connection) {
+                                                        if (err) {
+                                                            console.log('error on connection pool makegrp on make file upload', err);
+                                                            res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                                                        }//error on connection pool
+                                                        else {
+                                                            connection.query('UPDATE groups SET g_photo=? where g_idx=?',
+                                                                [grpfilename,results.gidx],
+                                                                function (err2, result) {
+                                                                    if (err2) {
+                                                                        console.log('error on query makegrp on make upload file', err2);
+                                                                        res.json({result: "FAIL", resultmsg: "FAIL UPLOAD"});
+                                                                    }
+                                                                    else if (result.affectedRows == 1) {
+                                                                        console.log('success on query mkgrp on file upload',result);
+                                                                        res.json({result:"SUCCESS",gidx:results.gidx});
+                                                                    }//insert success
+                                                                    connection.release();
+                                                                });//query
+                                                        }//no error on connection pool
+                                                    });//connection pool
+                                                    //res.json(returnData);
+                                                }
+                                                else{//fail upload
+                                                    console.log(result_upload);
+                                                    res.json(result_upload);
+                                                }
                                             }
                                         }
                                     }//last waterfall
@@ -600,7 +607,7 @@ exports.groupMake = function(req,res){
 exports.groupJoin = function(req,res){
     var grpjoinData = req.body;
     console.log('recv data grpJoin : ',grpjoinData);
-    if(checkValid(1,grpjoinData.aidx)!=1||grpjoinData.aidx==null||grpjoinData.gname==null||grpjoinData.pwd){
+    if(grpjoinData.aidx==null||grpjoinData.gname==null||grpjoinData.gpwd){
         console.log('invalid data of null at grpJoin');
         res.json({result:"FAIL",resultmsg:"INVALID NULL"});
     }
@@ -686,7 +693,7 @@ exports.groupList = function(req,res){
     var grplistData = req.body;
     var arr=[];
     console.log('recv data grplist : ',grplistData);
-    if(grplistData==null||checkValid(1,grplistData.aidx)!=1){
+    if(grplistData==null){
         console.log('invalid data of null in grplist');
         res.json({result:"FAIL",resultmsg:"INVALID NULL"});
     }
