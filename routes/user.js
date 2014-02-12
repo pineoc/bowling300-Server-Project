@@ -583,6 +583,10 @@ exports.groupMake = function(req,res){
                                                     res.json(result_upload);
                                                 }
                                             }
+                                            else{//photo null
+                                                console.log('file not exist');
+                                                res.json({result:"SUCCESS",resultmsg:"BUT NO FILE"})
+                                            }
                                         }
                                     }//last waterfall
                                 );//async waterfall
