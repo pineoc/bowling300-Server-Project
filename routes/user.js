@@ -520,7 +520,7 @@ exports.groupMake = function(req,res){
                                                                     }
                                                                     else if (result.affectedRows == 1) {
                                                                         console.log('success on query mkgrp on file upload',result);
-                                                                        res.json({result:"SUCCESS",gidx:results.gidx});
+                                                                        res.json({result:"SUCCESS",gidx:results.gidx,gname:groupmakeData.gname});
                                                                     }//insert success
                                                                     connection.release();
                                                                 });//query
@@ -610,7 +610,7 @@ exports.groupJoin = function(req,res){
                                     }
                                     else if(results.affectedRows==1){
                                         console.log('success : ',results);
-                                        callback(null,{result:"SUCCESS",resultmsg:"success group join",gidx:arg1.gidx});
+                                        callback(null,{result:"SUCCESS",resultmsg:"success group join",gidx:arg1.gidx,gname:grpjoinData.gname});
                                     }
                                     else{
                                         console.log('error on unexpected err');
