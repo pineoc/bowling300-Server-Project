@@ -309,7 +309,7 @@ exports.insertScore = function(req,res){
     console.log('recv data insert Score: ',insData);
     console.log('datalength: ',dataLength);
     console.log('data : ',insData.data);
-    console.log('data.type : ',data[0].type,data[1].type,data[2].type);
+    //console.log('data.type : ',data[0].type,data[1].type,data[2].type);
     if(dataLength!=0){
         for(var i=0;i<dataLength;i++){
             if(data[i].type==-1){//solo data
