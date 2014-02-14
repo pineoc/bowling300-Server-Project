@@ -938,7 +938,6 @@ exports.groupsearch = function(req,res){
                             else if(result.length!=0){
                                 for(var i=0;i<result.length;i++){
                                     arr[i] = {
-                                        result:"SUCCESS",
                                         gidx:result[i].g_idx,
                                         gname:result[i].g_name,
                                         gphoto:result[i].g_photo,
@@ -976,7 +975,6 @@ exports.groupsearch = function(req,res){
                             else if(result.length!=0){
                                 for(var i=0;i<result.length;i++){
                                     arr2[i] = {
-                                        result:"SUCCESS",
                                         gname:arg1[i].gname,
                                         gphoto:"http://bowling.pineoc.cloulu.com/uploads/group/"+arg1[i].gidx+"/"+arg1[i].gphoto,
                                         gmaster:result[i].name,
@@ -1068,13 +1066,6 @@ exports.groupmember = function(req,res){
         }
     });//connection pool
 };
-
-
-
-
-
-
-
 
 
 
