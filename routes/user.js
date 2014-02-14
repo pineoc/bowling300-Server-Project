@@ -681,7 +681,7 @@ exports.groupList = function(req,res){
                 return;
             }//error on conn pool
             else{
-                connection.query('SELECT g_name gname, g_photo gphoto,g_idx gidx,g_date gdate FROM groups WHERE g_idx IN (SELECT group_g_idx FROM account_has_group WHERE account_a_idx=?)',
+                connection.query('SELECT g_name gname, g_photo gphoto,g_idx gidx,DATE_FORMAT(g_date,"%Y-%m-%d") gdate FROM groups WHERE g_idx IN (SELECT group_g_idx FROM account_has_group WHERE account_a_idx=?)',
                     [grplistData.aidx],function(err2,results){
                         if(err2){
                             console.log('error on query grp list',err2);
