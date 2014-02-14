@@ -449,8 +449,8 @@ exports.groupMake = function(req,res){
                                                 return;
                                             }//error on connection pool
                                             else {
-                                                connection.query('INSERT into groups(g_name,g_pwd,g_master,g_date)values(?,?,?,?)',
-                                                    [groupmakeData.gname, groupmakeData.gpwd, groupmakeData.aidx,groupmakeData.gdate],
+                                                connection.query('INSERT into groups(g_name,g_pwd,g_master,g_date)values(?,?,?,now())',
+                                                    [groupmakeData.gname, groupmakeData.gpwd, groupmakeData.aidx],
                                                     function (err2, result) {
                                                         if (err2) {
                                                             console.log('error on query makegrp on make', err2);
@@ -915,7 +915,7 @@ exports.groupsearch = function(req,res){
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     return;
                 }else{
-                    connection.query('SELECT g_name,g_photo,g_master from groups where g_name=?',[grpsearchData.gname],
+                    connection.query('SELECT g_idx,g_name,g_photo,g_master from groups where g_name=?',[grpsearchData.gname],
                         function(err2,result){
                             if(err2){
                                 console.log('error on grp search query');
@@ -924,7 +924,13 @@ exports.groupsearch = function(req,res){
                             }
                             else if(result.length!=0){
                                 for(var i=0;i<result.length;i++){
-                                    arr[i] = {result:"SUCCESS",gname:result[i].g_name,gphoto:result[i].g_photo,gmaster:result[i].g_master};
+                                    arr[i] = {
+                                        result:"SUCCESS",
+                                        gidx:result[i].g_idx,
+                                        gname:result[i].g_name,
+                                        gphoto:result[i].g_photo,
+                                        gmaster:result[i].g_master
+                                    };
                                 }//for arr
                                 console.log('result of w1 : ',arr);
                                 callback(null,arr);
@@ -958,7 +964,7 @@ exports.groupsearch = function(req,res){
                                     arr2[i] = {
                                         result:"SUCCESS",
                                         gname:arg1[i].gname,
-                                        gphoto:arg1[i].gphoto,
+                                        gphoto:"http://bowling.pineoc.cloulu.com/uploads/group/"+arg1[i].gidx+"/"+arg1[i].gphoto,
                                         gmaster:result[i].name
                                     };
                                 }//for arr
