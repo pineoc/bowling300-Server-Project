@@ -301,7 +301,8 @@ exports.addsign = function(req,res){
  * */
 exports.insertScore = function(req,res){
     var insData = req.body; // 입력할 데이터를 받음
-    var dataLength = insData.data.length;
+    var data = insData.myscoredata;
+    var dataLength = data.length;
     var aidx = insData.aidx;
     var s_allScore = 0;
     var s_allGame = 0;
@@ -318,6 +319,7 @@ exports.insertScore = function(req,res){
                 if(s_allScore/s_allGame>300){//check valid
                     console.log('INVALID data over 300 avg solo');
                     res.json({result:"FAIL",resultmsg:"INVALID OVER 300"});
+                    return;
                 }
                 else{
                     //update to db-------------------------------------------------
@@ -332,7 +334,8 @@ exports.insertScore = function(req,res){
                                 [s_allScore,s_allGame,aidx],function(err2,result){
                                     if(err2){
                                         console.log('error on query insert solo',err2);
-                                        res.json({result:"FAIL",resultmsg:"INVALID"});
+                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                        return;
                                     }
                                     else if(result.affectedRows==1){
                                         console.log('success, result',result);
@@ -345,10 +348,10 @@ exports.insertScore = function(req,res){
                     //-------------------------------------------------------------
                 }
             }
-            else if(insData.data[i].type>0){//group data
-                var grpIdx = insData.data[i].type;
-                var grpScore = insData.data[i].allScore;
-                var grpGame = insData.data[i].allGame;
+            else if(data[i].type>0){//group data
+                var grpIdx = data[i].type;
+                var grpScore = data[i].allScore;
+                var grpGame = data[i].allGame;
                 if(grpScore/grpGame>300){//check valid
                     console.log('INVALID data over 300 avg in grp, gidx : ',grpIdx);
                     res.json({result:"FAIL",resultmsg:"INVALID OVER 300"});
@@ -365,7 +368,7 @@ exports.insertScore = function(req,res){
                                 [grpScore,grpGame,aidx,grpIdx],function(err2,result){
                                     if(err2){
                                         console.log('error on query insert grp',err2);
-                                        res.json({result:"FAIL",resultmsg:"INVALID"});
+                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                     }//error on query
                                     else if(result.affectedRows==1){
                                         console.log('success, result : ',result);
@@ -426,7 +429,7 @@ exports.groupMake = function(req,res){
                     function(err2,result){
                         if(err2){
                             console.log('error on query grp name check dup',err2);
-                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                             return;
                         }
                         else{
@@ -451,7 +454,7 @@ exports.groupMake = function(req,res){
                                                     function (err2, result) {
                                                         if (err2) {
                                                             console.log('error on query makegrp on make', err2);
-                                                            res.json({result: "FAIL", resultmsg: "INVALID"});
+                                                            res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
                                                             return;
                                                         }
                                                         else if (result.affectedRows == 1) {
@@ -475,7 +478,7 @@ exports.groupMake = function(req,res){
                                                     [groupmakeData.aidx, arg1.gidx, 0, 0], function (err2, result) {
                                                         if (err2) {
                                                             console.log('error on query makegrp on insert account has group', err2);
-                                                            res.json({result: "FAIL", resultmsg: "INVALID QUERY"});
+                                                            res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
                                                             return;
                                                         }
                                                         else if (result.affectedRows == 1) {
@@ -492,6 +495,7 @@ exports.groupMake = function(req,res){
                                         if (err) {//error
                                             console.log('error on grpmake async waterfall, err:', err);
                                             res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                                            return;
                                         }
                                         else {//no error
                                             console.log('data : ', results);
@@ -560,6 +564,7 @@ exports.groupJoin = function(req,res){
     if(grpjoinData.aidx==null||grpjoinData.gname==null||grpjoinData.gpwd){
         console.log('invalid data of null at grpJoin');
         res.json({result:"FAIL",resultmsg:"INVALID NULL"});
+        return;
     }
     else{
         async.waterfall([
@@ -927,6 +932,7 @@ exports.groupsearch = function(req,res){
                         console.log('nothing on grp search : ',result);
                         res.json({result:"FAIL",resultmsg:"NO SEARCH GROUP"});
                     }
+                    connection.release();
             });//query
         }
     });//connection pool
