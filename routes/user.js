@@ -405,6 +405,7 @@ exports.groupMake = function(req,res){
     var groupmakeData = req.body; // json data get
     var grp_photo = req.files.grpPhoto;
     var grpfilename;
+    var date = new Date();
     if(grp_photo!=null){
         grpfilename=grp_photo.name;
     }else{
@@ -520,7 +521,12 @@ exports.groupMake = function(req,res){
                                                                     }
                                                                     else if (result.affectedRows == 1) {
                                                                         console.log('success on query mkgrp on file upload',result);
-                                                                        res.json({result:"SUCCESS",gidx:results.gidx,gname:groupmakeData.gname});
+                                                                        res.json({
+                                                                            result:"SUCCESS",
+                                                                            gidx:results.gidx,
+                                                                            gname:groupmakeData.gname,
+                                                                            gdate:formatDate(date)
+                                                                        });
                                                                     }//insert success
                                                                     connection.release();
                                                                 });//query
@@ -535,7 +541,14 @@ exports.groupMake = function(req,res){
                                             }
                                             else{//photo null
                                                 console.log('file not exist');
-                                                res.json({result:"SUCCESS",resultmsg:"BUT NO FILE",gidx:results.gidx,gname:groupmakeData.gname,gdate:groupmakeData.gdate});
+
+                                                res.json({
+                                                    result:"SUCCESS",
+                                                    resultmsg:"BUT NO FILE",
+                                                    gidx:results.gidx,
+                                                    gname:groupmakeData.gname,
+                                                    gdate:formatDate(date)
+                                                });
                                             }
                                         }
                                     }//last waterfall
@@ -576,7 +589,7 @@ exports.groupJoin = function(req,res){
                         return;
                     }//error on conn pool
                     else{
-                        connection.query('SELECT g_idx,g_pwd from groups where g_name=?',
+                        connection.query('SELECT g_idx,g_pwd,g_date from groups where g_name=?',
                             [grpjoinData.gname],function(err2,results){
                                 if(err2){
                                     console.log('error on query grp join chk gidx',err2);
@@ -585,7 +598,7 @@ exports.groupJoin = function(req,res){
                                 }
                                 else if(results){
                                     console.log('success chk gidx : ',results);
-                                    callback(null,{gidx:results[0].g_idx,gpwd:results[0].g_pwd});//gidx, gpwd 넘겨줌
+                                    callback(null,{gidx:results[0].g_idx,gpwd:results[0].g_pwd,gdate:results[0].g_date});//gidx, gpwd 넘겨줌
                                 }
                                 connection.release();
                             });//query
@@ -610,7 +623,7 @@ exports.groupJoin = function(req,res){
                                     }
                                     else if(results.affectedRows==1){
                                         console.log('success : ',results);
-                                        callback(null,{result:"SUCCESS",resultmsg:"success group join",gidx:arg1.gidx,gname:grpjoinData.gname});
+                                        callback(null,{result:"SUCCESS",resultmsg:"success group join",gidx:arg1.gidx,gname:grpjoinData.gname,gdate:arg1.gdate});
                                     }
                                     else{
                                         console.log('error on unexpected err');
@@ -993,6 +1006,75 @@ exports.groupsearch = function(req,res){
         }
     );//waterfall
 };//group search
+
+/*
+ * 그룹 찾기
+ * 최초 생성 날짜 : 2014.02.14
+ * 최종 수정 날짜 : 2014.02.14
+ *
+ * 받는 데이터 groupname ( gname )
+ * editor : pineoc
+ * */
+exports.groupmember = function(req,res){
+    var grpmemData = req.body;
+    var arr = [];
+    db.pool.getConnection(function(err,connection){
+        if(err){
+            console.log('error on connection pool on grpmem',err);
+            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+            return;
+        }
+        else{
+            connection.query('SELECT * from account where a_idx in (select account_a_idx from account_has_group where group_g_idx in (select g_idx from groups where g_name=?))',
+                [grpmemData.gname],function(err2,result){
+                if(err2){
+                    console.log('error on query on grpmem',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                    return;
+                }
+                else{
+                    console.log('success on grpmem result : ',result);
+                    for(var i=0;i<result.length;i++){
+                        var link;
+                        if(result[i].prophoto==null){
+                            link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
+                        }
+                        else{
+                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+result[i].a_idx+"/"+result[i].prophoto;
+                        }
+
+                            arr[i]={
+                                name : result[i].name,
+                                country : result[i].country,
+                                proPhoto : link,
+                                ballPhoto : result[i].ballphoto,
+                                avg : (result[i].allscore/result[i].allgame).toFixed(1),
+                                allhighScore : result[i].all_highscore,//지금까지의 최고점수
+                                highscore : result[i].highscore,//그주의 최고점수
+                                hand : result[i].hand,
+                                style : result[i].style,
+                                step : result[i].step,
+                                series300 : result[i].series300,
+                                series800 : result[i].series800
+                            };
+                    }
+                    res.json({result:"SUCCESS",resultmsg:"SUCCESS GRPMEM",member:arr});
+
+                }
+                connection.release();
+            });//query
+        }
+    });//connection pool
+};
+
+
+
+
+
+
+
+
+
 
 exports.deletePhoto = function(req,res){
 

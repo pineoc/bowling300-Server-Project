@@ -55,6 +55,7 @@ app.post('/user/groupjoin',user.groupJoin);
 app.post('/user/grouplist',user.groupList);
 app.post('/user/groupdel',user.groupDelete);
 app.post('/user/groupsearch',user.groupsearch);
+app.post('/user/groupmember',user.groupmember);
 //test
 
 //board function ( 게시판 관련 함수 )
