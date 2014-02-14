@@ -62,7 +62,7 @@ var uploadfunction = function(userid,type,upfile){
     //var userid = req.body.aidx;
     var name=upfile.name;//upload file name ex>file.jpg
     var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
-    var destpath ;
+    var destpath;
 
     if(upfile.originalFilename!=''){
         if(type=="profile"){
@@ -408,6 +408,7 @@ exports.groupMake = function(req,res){
     var groupmakeData = req.body; // json data get
     var grp_photo = req.files.grpPhoto;
     var grpfilename;
+    console.log('recv data grpMake : ',groupmakeData);
     var date = new Date();
     if(grp_photo!=null){
         grpfilename=grp_photo.name;
@@ -680,7 +681,7 @@ exports.groupList = function(req,res){
                 return;
             }//error on conn pool
             else{
-                connection.query('SELECT g_name gname, g_photo gphoto,g_idx gidx FROM groups WHERE g_idx IN (SELECT group_g_idx FROM account_has_group WHERE account_a_idx=?)',
+                connection.query('SELECT g_name gname, g_photo gphoto,g_idx gidx,g_date gdate FROM groups WHERE g_idx IN (SELECT group_g_idx FROM account_has_group WHERE account_a_idx=?)',
                     [grplistData.aidx],function(err2,results){
                         if(err2){
                             console.log('error on query grp list',err2);
@@ -692,7 +693,8 @@ exports.groupList = function(req,res){
                             for(var i=0;i<results.length;i++){
                                 arr[i] = {
                                     gname:results[i].gname,
-                                    gphoto:"http://bowling.pineoc.cloulu.com/uploads/group/"+gidx+"/"+results[i].gphoto
+                                    gphoto:"http://bowling.pineoc.cloulu.com/uploads/group/"+gidx+"/"+results[i].gphoto,
+                                    gdate:results[i].gdate
                                 };
                             }//for
                             res.json({result:"SUCCESS",group:arr});
@@ -923,6 +925,7 @@ exports.groupDelete = function(req,res){
 exports.groupsearch = function(req,res){
     var grpsearchData = req.body;
     var arr=[];
+    console.log('recv data grpSearch : ',grpsearchData);
     async.waterfall([
         function(callback){
             db.pool.getConnection(function(err,connection){
@@ -1021,6 +1024,7 @@ exports.groupsearch = function(req,res){
 exports.groupmember = function(req,res){
     var grpmemData = req.body;
     var arr = [];
+    console.log('recv data grpMem : ',grpmemData);
     db.pool.getConnection(function(err,connection){
         if(err){
             console.log('error on connection pool on grpmem',err);
