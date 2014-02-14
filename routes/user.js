@@ -313,8 +313,8 @@ exports.insertScore = function(req,res){
     if(dataLength!=0){
         for(var i=0;i<dataLength;i++){
             if(data[i].type==-1){//solo data
-                s_allScore = insData.data[i].allScore;
-                s_allGame = insData.data[i].allGame;
+                s_allScore = data[i].allScore;
+                s_allGame = data[i].allGame;
                 console.log('s_data :',s_allGame,s_allScore );
                 if(s_allScore/s_allGame>300){//check valid
                     console.log('INVALID data over 300 avg solo');
