@@ -30,7 +30,7 @@ exports.login = function(req,res){
 exports.ranking = function(req,res){
     var rankData = req.body;
     var limit = 0;
-    console.log('recv data : ',rankData);
+    console.log('recv data ranking : ',rankData);
     //limit = req.params.limit;
     if(rankData.type=="world"){//개인 데이터에 따른 월드 랭킹
         async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
@@ -134,7 +134,7 @@ exports.ranking = function(req,res){
                                             country : arg1.results[i].country,
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
-                                            avg : (avg).toFixed(1),
+                                            avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             hand : arg1.results[i].hand,
@@ -270,7 +270,7 @@ exports.ranking = function(req,res){
                                             country : arg1.results[i].country,
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
-                                            avg : (avg).toFixed(1),
+                                            avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             hand : arg1.results[i].hand,
@@ -406,7 +406,7 @@ exports.ranking = function(req,res){
                                             country : arg1.results[i].country,
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
-                                            avg : (avg).toFixed(1),
+                                            avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             hand : arg1.results[i].hand,
