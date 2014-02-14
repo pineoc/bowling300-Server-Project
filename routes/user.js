@@ -988,7 +988,7 @@ exports.groupsearch = function(req,res){
             }
             else{
                 console.log('result of search : ',result);
-                res.json(result);
+                res.json({result:"SUCCESS",resultmsg:"SUCCESS SEARCH",arr:result});
             }
         }
     );//waterfall
