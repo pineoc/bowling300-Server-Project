@@ -427,6 +427,7 @@ exports.groupMake = function(req,res){
                         if(err2){
                             console.log('error on query grp name check dup',err2);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            return;
                         }
                         else{
                             console.log('check dup result : ',result[0].cnt);
@@ -434,6 +435,7 @@ exports.groupMake = function(req,res){
                             if (chkDup != 0) {
                                 console.log('duplication group name');
                                 res.json({result: "FAIL", resultmsg: "DUP GROUP NAME"});
+                                return;
                             } else {
                                 async.waterfall([
                                     function (callback) {//그룹을 만든다.
@@ -450,6 +452,7 @@ exports.groupMake = function(req,res){
                                                         if (err2) {
                                                             console.log('error on query makegrp on make', err2);
                                                             res.json({result: "FAIL", resultmsg: "INVALID"});
+                                                            return;
                                                         }
                                                         else if (result.affectedRows == 1) {
                                                             grp_id = result.insertId;
@@ -473,6 +476,7 @@ exports.groupMake = function(req,res){
                                                         if (err2) {
                                                             console.log('error on query makegrp on insert account has group', err2);
                                                             res.json({result: "FAIL", resultmsg: "INVALID QUERY"});
+                                                            return;
                                                         }
                                                         else if (result.affectedRows == 1) {
                                                             console.log('success on insert into account_has_group, result : ',result);
@@ -508,6 +512,7 @@ exports.groupMake = function(req,res){
                                                                     if (err2) {
                                                                         console.log('error on query makegrp on make upload file', err2);
                                                                         res.json({result: "FAIL", resultmsg: "FAIL UPLOAD"});
+                                                                        return;
                                                                     }
                                                                     else if (result.affectedRows == 1) {
                                                                         console.log('success on query mkgrp on file upload',result);
@@ -571,6 +576,7 @@ exports.groupJoin = function(req,res){
                                 if(err2){
                                     console.log('error on query grp join chk gidx',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                    return;
                                 }
                                 else if(results){
                                     console.log('success chk gidx : ',results);
@@ -595,6 +601,7 @@ exports.groupJoin = function(req,res){
                                     if(err2){
                                         console.log('error on query grp join',err2);
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                        return;
                                     }
                                     else if(results.affectedRows==1){
                                         console.log('success : ',results);
@@ -657,6 +664,7 @@ exports.groupList = function(req,res){
                         if(err2){
                             console.log('error on query grp list',err2);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            return;
                         }
                         else if(results){
                             console.log('success list grp : ',results);
@@ -707,6 +715,7 @@ exports.groupDelete = function(req,res){
                             if(err2){
                                 console.log('error on query chk grp member',err2);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                return;
                             }
                             else{
                                 console.log('success chk grp member n : ',result[0].cnt);//그룹원 수 출력
@@ -730,6 +739,7 @@ exports.groupDelete = function(req,res){
                             if(err2){
                                 console.log('error on query chk grp master account',err2);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                return;
                             }
                             else{
                                 console.log('success chk grp g_master : ',result[0].cnt);//마스터 여부 출력
@@ -760,6 +770,7 @@ exports.groupDelete = function(req,res){
                                     if(err2){
                                         console.log('error on query grp master del',err2);
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                        return;
                                     }
                                     else{
                                         console.log('success grp master email : ',result);//그룹원 수 출력
@@ -774,6 +785,7 @@ exports.groupDelete = function(req,res){
                                                         if(err2){
                                                             console.log('error on query grp master change select',err2);
                                                             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                                            return;
                                                         }
                                                         else{
                                                             console.log('success grp master change select : ',result[0].account_a_idx);
@@ -790,6 +802,7 @@ exports.groupDelete = function(req,res){
                                                                             if(err2){
                                                                                 console.log('error on query grp member del update',err2);
                                                                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                                                                return;
                                                                             }
                                                                             else{
                                                                                 console.log('success grp master del update: ',result);//update
@@ -824,6 +837,7 @@ exports.groupDelete = function(req,res){
                                     if(err2){
                                         console.log('error on query grp member del',err2);
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                        return;
                                     }
                                     else{
                                         console.log('success grp member del : ',result);//그룹원 수 출력
@@ -852,6 +866,7 @@ exports.groupDelete = function(req,res){
                                 if(err2){
                                     console.log('error on query grp member del',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                    return;
                                 }
                                 else{
                                     console.log('success grp meber del : ',result);//그룹원 수 출력
@@ -898,6 +913,7 @@ exports.groupsearch = function(req,res){
                     if(err2){
                         console.log('error on grp search query');
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
                     }
                     else if(result.length!=0){
                         for(var i=0;i<result.length;i++){

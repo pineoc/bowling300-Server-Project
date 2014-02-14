@@ -41,12 +41,14 @@ exports.ranking = function(req,res){
                     if(err){
                         console.log('error on get allscore allgame in ranking conn pool',err);
                         res.json({result:"FAIL",resultmsg:"NETOWRK ERR"});
+                        return;
                     }
                     else{
                         connection.query('SELECT allscore,allgame from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
+                                return;
                             }
                             else if(result.length){
                                 if(result[0].allgame!=0){
@@ -73,6 +75,7 @@ exports.ranking = function(req,res){
                     if(err){
                         console.log('error on connection pool world rank',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
                     }//error on connection pool
                     else{
                         connection.query('SELECT * FROM account order by (allscore/allgame) desc limit ?,30',[limit],
@@ -80,6 +83,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query world rank',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    return;
                                 }
                                 else{
                                     console.log('avg on query : ',arg);
@@ -101,6 +105,7 @@ exports.ranking = function(req,res){
                     if(err){
                         console.log('error on connection pool world rank me',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
                     }//error on connection pool
                     else{
                         connection.query('SELECT count(*) cnt FROM account a where (a.allscore/a.allgame)>=? order by (a.allscore/a.allgame) desc',
@@ -109,6 +114,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query world rank me',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    return;
                                 }
                                 else{
                                     worldRank = results2[0].cnt+1;
@@ -169,12 +175,14 @@ exports.ranking = function(req,res){
                     if(err){
                         console.log('error on get allscore allgame in ranking conn pool',err);
                         res.json({result:"FAIL",resultmsg:"NETOWRK ERR"});
+                        return;
                     }
                     else{
                         connection.query('SELECT allscore,allgame from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
+                                return;
                             }
                             else if(result.length){
                                 if(result[0].allgame!=0){
@@ -200,6 +208,7 @@ exports.ranking = function(req,res){
                     if(err){
                         console.log('error on connection pool local rank',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
                     }//error on connection pool
                     else{
                         connection.query('SELECT * FROM account where locale=? order by (allscore/allgame) desc limit ?,30',
@@ -208,6 +217,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query local rank',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    return;
                                 }
                                 else if(results.length){
                                     console.log('avg : ',result[0].allscore/result[0].allgame);
@@ -233,6 +243,7 @@ exports.ranking = function(req,res){
                     if(err){
                         console.log('error on connection pool local rank me',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
                     }//error on connection pool
                     else{
                         connection.query('SELECT count(*) cnt FROM account a where (a.allscore/a.allgame)>=? and a.locale=? order by (a.allscore/a.allgame) desc',
@@ -241,6 +252,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query local rank me',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    return;
                                 }
                                 else{
                                     localRank = results2[0].cnt+1;
@@ -301,12 +313,14 @@ exports.ranking = function(req,res){
                     if(err){
                         console.log('error on get allscore allgame in ranking conn pool',err);
                         res.json({result:"FAIL",resultmsg:"NETOWRK ERR"});
+                        return;
                     }
                     else{
                         connection.query('SELECT allscore,allgame from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
+                                return;
                             }
                             else if(result.length){
                                 if(result[0].allgame!=0){
@@ -333,6 +347,7 @@ exports.ranking = function(req,res){
                     if(err){
                         console.log('error on connection pool group rank',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
                     }//error on connection pool
                     else{
                         connection.query('SELECT * FROM account a, account_has_group ag where ag.group_g_idx=? order by (ag.g_score/ag.g_game) desc limit ?,30',
@@ -341,6 +356,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query group rank',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    return;
                                 }
                                 else if(results.length){
                                     callback(null,{results:results,avg:arg});//data
@@ -363,6 +379,7 @@ exports.ranking = function(req,res){
                     if(err){
                         console.log('error on connection pool group rank me',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
                     }//error on connection pool
                     else{
                         connection.query('SELECT count(*) cnt FROM account a,account_has_group ag where (ag.g_score/ag.g_game)>=? and ag.group_g_idx=? order by (ag.g_score/ag.g_game) desc',
@@ -371,6 +388,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query group rank me',err2);
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    return;
                                 }
                                 else{
                                     groupRank = results[0].cnt+1;
