@@ -449,8 +449,8 @@ exports.groupMake = function(req,res){
                                                 return;
                                             }//error on connection pool
                                             else {
-                                                connection.query('INSERT into groups(g_name,g_pwd,g_master)values(?,?,?)',
-                                                    [groupmakeData.gname, groupmakeData.gpwd, groupmakeData.aidx],
+                                                connection.query('INSERT into groups(g_name,g_pwd,g_master,g_date)values(?,?,?,?)',
+                                                    [groupmakeData.gname, groupmakeData.gpwd, groupmakeData.aidx,groupmakeData.gdate],
                                                     function (err2, result) {
                                                         if (err2) {
                                                             console.log('error on query makegrp on make', err2);
@@ -535,7 +535,7 @@ exports.groupMake = function(req,res){
                                             }
                                             else{//photo null
                                                 console.log('file not exist');
-                                                res.json({result:"SUCCESS",resultmsg:"BUT NO FILE"})
+                                                res.json({result:"SUCCESS",resultmsg:"BUT NO FILE",gidx:results.gidx,gname:groupmakeData.gname,gdate:groupmakeData.gdate});
                                             }
                                         }
                                     }//last waterfall
