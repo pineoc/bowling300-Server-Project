@@ -8,8 +8,8 @@ content : user
 
 var async = require('async');
 
-//var db = require('./localDB.js');
-var db = require('./clouluDB.js');
+var db = require('./localDB.js');
+//var db = require('./clouluDB.js');
 
 var path = require('path');
 var fs = require('fs');
@@ -693,7 +693,7 @@ exports.groupList = function(req,res){
                             for(var i=0;i<results.length;i++){
                                 arr[i] = {
                                     gname:results[i].gname,
-                                    gphoto:"http://bowling.pineoc.cloulu.com/uploads/group/"+gidx+"/"+results[i].gphoto,
+                                    gphoto:"http://bowling.pineoc.cloulu.com/uploads/group/"+results[i].gidx+"/"+results[i].gphoto,
                                     gdate:results[i].gdate
                                 };
                             }//for
