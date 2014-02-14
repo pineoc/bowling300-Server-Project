@@ -907,35 +907,85 @@ exports.groupDelete = function(req,res){
 exports.groupsearch = function(req,res){
     var grpsearchData = req.body;
     var arr=[];
-    db.pool.getConnection(function(err,connection){
-        if(err){
-            console.log('error on grp search conn pool');
-            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-            return;
-        }else{
-            connection.query('SELECT g_name,g_photo from groups where g_name=?',[grpsearchData.gname],
-                function(err2,result){
-                    if(err2){
-                        console.log('error on grp search query');
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                        return;
-                    }
-                    else if(result.length!=0){
-                        for(var i=0;i<result.length;i++){
-                            console.log('search result : ',result);
-                            console.log('search name : ',result[i].g_name);
-                            arr[i] = {result:"SUCCESS",gname:result[i].g_name,gphoto:result[i].g_photo};
-                        }//for arr
-                        res.json(arr);
-                    }
-                    else{
-                        console.log('nothing on grp search : ',result);
-                        res.json({result:"FAIL",resultmsg:"NO SEARCH GROUP"});
-                    }
-                    connection.release();
-            });//query
+    async.waterfall([
+        function(callback){
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on grp search conn pool w1');
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return;
+                }else{
+                    connection.query('SELECT g_name,g_photo,g_master from groups where g_name=?',[grpsearchData.gname],
+                        function(err2,result){
+                            if(err2){
+                                console.log('error on grp search query');
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                return;
+                            }
+                            else if(result.length!=0){
+                                for(var i=0;i<result.length;i++){
+                                    arr[i] = {result:"SUCCESS",gname:result[i].g_name,gphoto:result[i].g_photo,gmaster:result[i].g_master};
+                                }//for arr
+                                console.log('result of w1 : ',arr);
+                                callback(null,arr);
+                            }
+                            else{
+                                console.log('nothing on grp search : ',result);
+                                res.json({result:"FAIL",resultmsg:"NO SEARCH GROUP"});
+                            }
+                            connection.release();
+                        });//query
+                }
+            });//connection pool
+        },
+        function(arg1,callback){
+            var arr2 = []; // g_master name arr
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on grp search conn pool w2');
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return;
+                }else{
+                    connection.query('select name from account left outer join groups on account.a_idx=groups.g_master where groups.g_idx is not null and groups.g_name=?',
+                        [grpsearchData.gname],function(err2,result){
+                            if(err2){
+                                console.log('error on grp search query w2');
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                return;
+                            }
+                            else if(result.length!=0){
+                                for(var i=0;i<result.length;i++){
+                                    arr2[i] = {
+                                        result:"SUCCESS",
+                                        gname:arg1[i].gname,
+                                        gphoto:arg1[i].gphoto,
+                                        gmaster:result[i].name
+                                    };
+                                }//for arr
+                                callback(null,arr2);
+                            }
+                            else{
+                                console.log('nothing on grp search w2: ',result);
+                                res.json({result:"FAIL",resultmsg:"NO SEARCH GROUP"});
+                            }
+                            connection.release();
+                        });//query
+                }
+            });//connection pool
         }
-    });//connection pool
+    ],
+        function(err,result){
+            if(err){
+                console.log('error on grp search waterfall',err);
+                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                return;
+            }
+            else{
+                console.log('result of search : ',result);
+                res.json(result);
+            }
+        }
+    );//waterfall
 };//group search
 
 exports.deletePhoto = function(req,res){
