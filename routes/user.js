@@ -309,7 +309,7 @@ exports.insertScore = function(req,res){
     console.log('recv data insert Score: ',insData);
     console.log('datalength: ',dataLength);
     console.log('data : ',insData.data);
-    console.log('data.type : ',insData.data[0].type);
+    console.log('data.type : ',data[0].type,data[1].type,data[2].type);
     if(dataLength!=0){
         for(var i=0;i<dataLength;i++){
             if(data[i].type==-1){//solo data
@@ -1042,24 +1042,22 @@ exports.groupmember = function(req,res){
                         else{
                             link = "http://bowling.pineoc.cloulu.com/uploads/user/"+result[i].a_idx+"/"+result[i].prophoto;
                         }
-
-                            arr[i]={
-                                name : result[i].name,
-                                country : result[i].country,
-                                proPhoto : link,
-                                ballPhoto : result[i].ballphoto,
-                                avg : (result[i].allscore/result[i].allgame).toFixed(1),
-                                allhighScore : result[i].all_highscore,//지금까지의 최고점수
-                                highscore : result[i].highscore,//그주의 최고점수
-                                hand : result[i].hand,
-                                style : result[i].style,
-                                step : result[i].step,
-                                series300 : result[i].series300,
-                                series800 : result[i].series800
+                        arr[i]={
+                            name : result[i].name,
+                            country : result[i].country,
+                            proPhoto : link,
+                            ballPhoto : result[i].ballphoto,
+                            avg : (result[i].allscore/result[i].allgame).toFixed(1),
+                            allhighScore : result[i].all_highscore,//지금까지의 최고점수
+                            highscore : result[i].highscore,//그주의 최고점수
+                            hand : result[i].hand,
+                            style : result[i].style,
+                            step : result[i].step,
+                            series300 : result[i].series300,
+                            series800 : result[i].series800
                             };
                     }
                     res.json({result:"SUCCESS",resultmsg:"SUCCESS GRPMEM",member:arr});
-
                 }
                 connection.release();
             });//query
