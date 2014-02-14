@@ -308,7 +308,7 @@ exports.insertScore = function(req,res){
     var s_allGame = 0;
     console.log('recv data insert Score: ',insData);
     console.log('datalength: ',dataLength);
-    console.log('data : ',insData.data);
+    console.log('data : ',data);
     //console.log('data.type : ',data[0].type,data[1].type,data[2].type);
     if(dataLength!=0){
         for(var i=0;i<dataLength;i++){
@@ -352,9 +352,11 @@ exports.insertScore = function(req,res){
                 var grpIdx = data[i].type;
                 var grpScore = data[i].allScore;
                 var grpGame = data[i].allGame;
+                console.log('insertScore, grp data : ',grpIdx,grpScore,grpGame);
                 if(grpScore/grpGame>300){//check valid
                     console.log('INVALID data over 300 avg in grp, gidx : ',grpIdx);
                     res.json({result:"FAIL",resultmsg:"INVALID OVER 300"});
+                    return;
                 }
                 else{
                     db.pool.getConnection(function(err,connection){
@@ -369,6 +371,7 @@ exports.insertScore = function(req,res){
                                     if(err2){
                                         console.log('error on query insert grp',err2);
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                        return;
                                     }//error on query
                                     else if(result.affectedRows==1){
                                         console.log('success, result : ',result);
