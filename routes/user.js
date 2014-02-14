@@ -574,7 +574,7 @@ exports.groupMake = function(req,res){
 exports.groupJoin = function(req,res){
     var grpjoinData = req.body;
     console.log('recv data grpJoin : ',grpjoinData);
-    if(grpjoinData.aidx==null||grpjoinData.gname==null||grpjoinData.gpwd){
+    if(grpjoinData.aidx==null||grpjoinData.gname==null||grpjoinData.gpwd==null){
         console.log('invalid data of null at grpJoin');
         res.json({result:"FAIL",resultmsg:"INVALID NULL"});
         return;
