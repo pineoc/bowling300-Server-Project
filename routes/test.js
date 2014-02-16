@@ -32,7 +32,7 @@ if(process.env.UPLOAD_PATH == undefined)
     var uploadData = req.files.upfile;
     var a_idx = req.body.aidx;
     if(uploadData.originalFilename!=''){
-        var userfolder = path.resolve(process.env.UPLOAD_PATH,'test',a_idx);
+        var userfolder = path.resolve(process.env.UPLOAD_PATH,'country');
         console.log('userfolder : ',userfolder);
         if(!fs.existsSync(userfolder)){
             mkdirp(userfolder,function(err){
@@ -64,28 +64,6 @@ if(process.env.UPLOAD_PATH == undefined)
                 var idx = destpath.lastIndexOf('.');
                 var ext = destpath.substring(idx); // .jpg
                 var filename = destpath.substring(0,idx);
-                var destimg = filename + '-thumnail'+ext;
-                //c:~\public\lee\koala + '-thumnail'+.jpg
-                easyimage.thumbnail(
-                    {
-                        src:srcimg,
-                        dst:destimg,
-                        width:100,
-                        height:100,
-                        x:0,
-                        y:0
-                    },
-                    function(err){
-                        if(err){
-                            console.log(err);
-                            res.json(err);
-                        }
-                        else{
-                            console.log('path : ',srcimg,'/ thumnail : ',destimg);
-                            res.json("success");
-                        }
-                    }
-                );
             });//is.on callback function
             console.log('success',{result:"SUCCESS",resultmsg:"FILE UPLOAD SUCCESS"});
             res.json({result:"SUCCESS",resultmsg:"FILE UPLOAD SUCCESS"});

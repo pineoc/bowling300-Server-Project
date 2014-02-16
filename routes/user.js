@@ -229,7 +229,7 @@ exports.rankpoint = function(req,res){
                     function(err2,result){
                     if(err2){
                         console.log('error on query sign check dup',err2);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                         return;
                     }
                     else{
@@ -250,7 +250,8 @@ exports.rankpoint = function(req,res){
                                         [signData.email, signData.name, signData.pwd,signData.sex,signData.country,signData.hand,photo_name,0,0], function (err2, result) {
                                             if (err2) {
                                                 console.log('error on query sign', err2);
-                                                res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                                                res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                                return;
                                             }
                                             else if (result.affectedRows == 1) {
                                                 console.log('sign result : ', result);
@@ -262,7 +263,7 @@ exports.rankpoint = function(req,res){
                                                 }
                                                 else{
                                                     console.log(result_upload);
-                                                    res.json(result_upload);
+                                                    res.json({result:"SUCCESS",resultmsg:"BUT UPLOAD FAIL"});
                                                 }
                                             }
                                             connection.release();
@@ -321,6 +322,11 @@ exports.insertScore = function(req,res){
                     res.json({result:"FAIL",resultmsg:"INVALID OVER 300"});
                     return;
                 }
+                else if(s_allGame==0){
+                    console.log('INVALID data allgame 0 solo');
+                    res.json({result:"FAIL",resultmsg:"INVALID GAME ZERO"});
+                    return;
+                }
                 else{
                     //update to db-------------------------------------------------
                     db.pool.getConnection(function(err,connection){
@@ -356,6 +362,11 @@ exports.insertScore = function(req,res){
                 if(grpScore/grpGame>300){//check valid
                     console.log('INVALID data over 300 avg in grp, gidx : ',grpIdx);
                     res.json({result:"FAIL",resultmsg:"INVALID OVER 300"});
+                    return;
+                }
+                else if(grpGame==0){
+                    console.log('INVALID data allgame 0 grp, gidx:',grpIdx);
+                    res.json({result:"FAIL",resultmsg:"INVALID GAME ZERO"});
                     return;
                 }
                 else{
@@ -622,7 +633,7 @@ exports.groupJoin = function(req,res){
                                 [grpjoinData.aidx,arg1.gidx,0,0],function(err2,results){
                                     if(err2){
                                         console.log('error on query grp join',err2);
-                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                         return;
                                     }
                                     else if(results.affectedRows==1){
@@ -641,12 +652,14 @@ exports.groupJoin = function(req,res){
                 else{
                     console.log('error, not equal gpwd',arg1.gpwd,grpjoinData.gpwd);
                     res.json({result:"FAIL",resultmsg:"PWD NOT EQUAL"});
+                    return;
                 }
             }
         ],function(err,result){
             if(err){
                 console.log('error on grp join waterfall',err);
-                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
+                return;
             }
             else{
                 console.log('success grp join');
@@ -685,7 +698,7 @@ exports.groupList = function(req,res){
                     [grplistData.aidx],function(err2,results){
                         if(err2){
                             console.log('error on query grp list',err2);
-                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                             return;
                         }
                         else if(results){
@@ -737,7 +750,7 @@ exports.groupDelete = function(req,res){
                         [grpdelData.aidx,grpdelData.gidx],function(err2,result){
                             if(err2){
                                 console.log('error on query chk grp member',err2);
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                 return;
                             }
                             else{
@@ -761,7 +774,7 @@ exports.groupDelete = function(req,res){
                         [grpdelData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on query chk grp master account',err2);
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                 return;
                             }
                             else{
@@ -792,7 +805,7 @@ exports.groupDelete = function(req,res){
                                 [grpdelData.aidx,grpdelData.gidx],function(err2,result){
                                     if(err2){
                                         console.log('error on query grp master del',err2);
-                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                         return;
                                     }
                                     else{
@@ -800,14 +813,14 @@ exports.groupDelete = function(req,res){
                                         db.pool.getConnection(function(err,connection){
                                             if(err){
                                                 console.log('error on pool grp master change select',err);
-                                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                                res.json({result:"FAIL",resultmsg:"NETWORK ERR "});
                                                 return;
                                             }else{
                                                 connection.query('SELECT account_a_idx FROM account_has_group where group_g_idx=?',
                                                     [grpdelData.gidx],function(err2,result){
                                                         if(err2){
                                                             console.log('error on query grp master change select',err2);
-                                                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                                             return;
                                                         }
                                                         else{
@@ -824,7 +837,7 @@ exports.groupDelete = function(req,res){
                                                                         [updateAidx,grpdelData.gidx],function(err2,result){
                                                                             if(err2){
                                                                                 console.log('error on query grp member del update',err2);
-                                                                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                                                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                                                                 return;
                                                                             }
                                                                             else{
@@ -859,7 +872,7 @@ exports.groupDelete = function(req,res){
                                 [grpdelData.aidx,grpdelData.gidx],function(err2,result){
                                     if(err2){
                                         console.log('error on query grp member del',err2);
-                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                         return;
                                     }
                                     else{
@@ -888,7 +901,7 @@ exports.groupDelete = function(req,res){
                             [grpdelData.aidx,grpdelData.gidx],function(err2,result){
                                 if(err2){
                                     console.log('error on query grp member del',err2);
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                     return;
                                 }
                                 else{
@@ -934,7 +947,7 @@ exports.groupsearch = function(req,res){
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     return;
                 }else{
-                    connection.query('SELECT g_idx,g_name,g_photo,g_master,g_date from groups where g_name=?',[grpsearchData.gname],
+                    connection.query('SELECT g_idx,g_name,g_photo,g_master,DATE_FORMAT(g_date,"%Y-%m-%d") g_date from groups where g_name=?',[grpsearchData.gname],
                         function(err2,result){
                             if(err2){
                                 console.log('error on grp search query');
@@ -1002,7 +1015,7 @@ exports.groupsearch = function(req,res){
         function(err,result){
             if(err){
                 console.log('error on grp search waterfall',err);
-                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
                 return;
             }
             else{
