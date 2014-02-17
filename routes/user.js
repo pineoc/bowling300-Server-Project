@@ -694,7 +694,7 @@ exports.groupList = function(req,res){
                 return;
             }//error on conn pool
             else{
-                connection.query('SELECT g_name gname, g_photo gphoto,g_idx gidx,DATE_FORMAT(g_date,"%Y-%m-%d") gdate FROM groups WHERE g_idx IN (SELECT group_g_idx FROM account_has_group WHERE account_a_idx=?) ',
+                connection.query('select g.g_name gname, g.g_photo gphoto,g.g_idx gidx,DATE_FORMAT(g.g_date,"%Y-%m-%d") gdate,ag.g_joindate joindate from groups as g left outer join account_has_group as ag on g.g_idx = ag.group_g_idx where ag.group_g_idx is not null and ag.account_a_idx=? order by DATE(joindate),HOUR(joindate), MINUTE(joindate), joindate ',
                     [grplistData.aidx],function(err2,results){
                         if(err2){
                             console.log('error on query grp list',err2);
