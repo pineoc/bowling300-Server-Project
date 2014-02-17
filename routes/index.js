@@ -131,7 +131,7 @@ exports.ranking = function(req,res){
                                         arr[i]={
                                             rank : i+1,
                                             name : arg1.results[i].name,
-                                            country : arg1.results[i].country,
+                                            country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
                                             avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
@@ -267,7 +267,7 @@ exports.ranking = function(req,res){
                                         arr[i]={
                                             rank : i+1,
                                             name : arg1.results[i].name,
-                                            country : arg1.results[i].country,
+                                            country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
                                             avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
@@ -403,7 +403,7 @@ exports.ranking = function(req,res){
                                         arr[i]={
                                             rank : i+1,
                                             name : arg1.results[i].name,
-                                            country : arg1.results[i].country,
+                                            country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
                                             avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
