@@ -705,6 +705,7 @@ exports.groupList = function(req,res){
                             console.log('success list grp : ',results);
                             for(var i=0;i<results.length;i++){
                                 arr[i] = {
+                                    gidx :results[i].gidx,
                                     gname:results[i].gname,
                                     gphoto:"http://bowling.pineoc.cloulu.com/uploads/group/"+results[i].gidx+"/"+results[i].gphoto,
                                     gdate:results[i].gdate
