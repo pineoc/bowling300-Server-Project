@@ -15,14 +15,24 @@ exports.index = function(req, res){
   res.render('index', { title: 'Express' });
 };
 
+/*
+ * 랭킹 데이터
+ * 최초 생성 날짜 : 2014.02.02
+ * 최종 수정 날짜 : 2014.02.17
+ *
+ * 받는 데이터 allscore, allgame, type, limit
+ * editor : pineoc
+ * */
 exports.login = function(req,res){
+    var loginData = req.body;
+
 
 };
 
 /*
  * 랭킹 데이터
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.12
+ * 최종 수정 날짜 : 2014.02.17
  *
  * 받는 데이터 allscore, allgame, type, limit
  * editor : pineoc

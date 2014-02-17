@@ -107,8 +107,6 @@ var uploadfunction = function(userid,type,upfile){
 //        var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
 //        var destpath = path.resolve(__dirname,'..',userfolder,name);
 //        //public/1/이미지.jpg
-
-
         var checkext = path.extname(name);
         checkext=checkext.toLowerCase();
         //check image ext
@@ -122,28 +120,6 @@ var uploadfunction = function(userid,type,upfile){
                 var idx = destpath.lastIndexOf('.');
                 var ext = destpath.substring(idx); // .jpg
                 var filename = destpath.substring(0,idx);
-                //var destimg = filename + '-thumnail'+ext;
-                //c:~\public\lee\koala + '-thumnail'+.jpg
-//                easyimage.thumbnail(
-//                    {
-//                        src:srcimg,
-//                        dst:destimg,
-//                        width:32,
-//                        height:32,
-//                        x:0,
-//                        y:0
-//                    },
-//                    function(err){
-//                        if(err){
-//                            console.log(err);
-//                            res.json(err);
-//                        }
-//                        else{
-//                            console.log('path : ',srcimg,'/ thumnail : ',destimg);
-//                            res.json("success");
-//                        }
-//                    }
-//                );
             });//is.on callback function
             console.log('success');
             //res.json({result:"SUCCESS",resultmsg:"FILE UPLOAD SUCCESS"});
@@ -161,6 +137,112 @@ var uploadfunction = function(userid,type,upfile){
     }
 };//upload function
 
+/*
+ * delete function
+ * 최초 생성 날짜 : 2014.02.17
+ * 최종 수정 날짜 : 2014.02.17
+ *
+ * 받는 데이터 aidx, type
+ * editor : pineoc
+ * */
+
+function deletePhoto(aidx,type){
+    if(type=="pro"){
+        var proPhoto;
+        db.pool.getConnection(function(err,connection){
+            if(err){
+                console.log('error on conn pool del prophoto',err);
+                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+            }else{
+                connection.query('SELECT prophoto from account where a_idx=?',[aidx],function(err2,result){
+                    if(err2){
+                        console.log('error on query del prophoto',err2);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        return;
+                    }
+                    else{
+                        console.log('success prophoto:',result[0].prophoto);
+                        proPhoto =result[0].prophoto;
+                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
+                        fs.unlink(userfolder+proPhoto, function (err) {
+                            if (err){
+                                console.log('error on delete file',err);
+                                return;
+                            }else{
+                                console.log('successfully deleted',userfolder);
+
+                            }
+                        });
+
+                    }
+                });//query
+            }
+        });//connection pool
+
+    }
+    else if(type=="ball"){
+        db.pool.getConnection(function(err,connection){
+            if(err){
+                console.log('error on conn pool del ballphoto',err);
+                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                return;
+            }else{
+                connection.query('SELECT * from ',[],function(err2,result){
+                    if(err2){
+                        console.log('error on query del ballphoto',err);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        return;
+                    }
+                    else{
+                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
+                        fs.unlink(userfolder+proPhoto, function (err) {
+                            if (err){
+                                console.log('error on delete file',err);
+                                return;
+                            }else{
+                                console.log('successfully deleted',userfolder);
+
+                            }
+                        });
+
+                    }
+                });//query
+            }
+        });//connection pool
+
+    }
+    else if(type=="group"){
+        db.pool.getConnection(function(err,connection){
+            if(err){
+                console.log('error on conn pool del grpphoto',err);
+                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                return;
+            }else{
+                connection.query('SELECT * from ',[],function(err2,result){
+                    if(err2){
+                        console.log('error on query del grpphoto',err);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        return;
+                    }
+                    else{
+                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
+                        fs.unlink(userfolder+proPhoto, function (err) {
+                            if (err){
+                                console.log('error on delete file',err);
+                                return;
+                            }else{
+                                console.log('successfully deleted',userfolder);
+
+                            }
+                        });
+                    }
+                });//query
+            }
+        });//connection pool
+
+    }
+
+};
 
 
 function formatDate(date) {
@@ -672,7 +754,7 @@ exports.groupJoin = function(req,res){
 /*
  * 그룹 리스트 불러오기
  * 최초 생성 날짜 : 2014.02.06
- * 최종 수정 날짜 : 2014.02.11
+ * 최종 수정 날짜 : 2014.02.17
  *
  * 받는 데이터 aidx
  * editor : pineoc
@@ -889,6 +971,7 @@ exports.groupDelete = function(req,res){
                 else{
                     console.log('not master or member');
                     res.json({result:"FAIL",resultmsg:"UNEXPECTED ERR"});
+                    return;
                 }
             }
             else{// count =1, 그룹 삭제
