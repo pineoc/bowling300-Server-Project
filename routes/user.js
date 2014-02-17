@@ -490,7 +490,7 @@ exports.groupMake = function(req,res){
                                                 return;
                                             }//error on connection pool
                                             else {
-                                                connection.query('INSERT into account_has_group(account_a_idx,group_g_idx,g_score,g_game)values(?,?,?,?)',
+                                                connection.query('INSERT into account_has_group(account_a_idx,group_g_idx,g_score,g_game,g_joindate)values(?,?,?,?,now())',
                                                     [groupmakeData.aidx, arg1.gidx, 0, 0], function (err2, result) {
                                                         if (err2) {
                                                             console.log('error on query makegrp on insert account has group', err2);
@@ -629,7 +629,7 @@ exports.groupJoin = function(req,res){
                             return;
                         }//error on conn pool
                         else{
-                            connection.query('INSERT INTO account_has_group(account_a_idx,group_g_idx,g_score,g_game)values(?,?,?,?)',
+                            connection.query('INSERT INTO account_has_group(account_a_idx,group_g_idx,g_score,g_game,g_joindate)values(?,?,?,?,now())',
                                 [grpjoinData.aidx,arg1.gidx,0,0],function(err2,results){
                                     if(err2){
                                         console.log('error on query grp join',err2);
@@ -694,7 +694,7 @@ exports.groupList = function(req,res){
                 return;
             }//error on conn pool
             else{
-                connection.query('SELECT g_name gname, g_photo gphoto,g_idx gidx,DATE_FORMAT(g_date,"%Y-%m-%d") gdate FROM groups WHERE g_idx IN (SELECT group_g_idx FROM account_has_group WHERE account_a_idx=?)',
+                connection.query('SELECT g_name gname, g_photo gphoto,g_idx gidx,DATE_FORMAT(g_date,"%Y-%m-%d") gdate FROM groups WHERE g_idx IN (SELECT group_g_idx FROM account_has_group WHERE account_a_idx=?) ',
                     [grplistData.aidx],function(err2,results){
                         if(err2){
                             console.log('error on query grp list',err2);
@@ -928,6 +928,7 @@ exports.groupDelete = function(req,res){
     });//waterfall
 
 };//그룹 삭제
+
     /*
      * 그룹 찾기
      * 최초 생성 날짜 : 2014.02.09

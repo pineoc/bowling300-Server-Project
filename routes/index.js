@@ -350,7 +350,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT * FROM account a, account_has_group ag where ag.group_g_idx=? order by (ag.g_score/ag.g_game) desc limit ?,30',
+                        connection.query('select * from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? order by (ag.g_score/ag.g_game) desc limit ?,30',
                             [groupidx,limit],
                             function(err2,results){
                                 if(err2){
@@ -390,11 +390,11 @@ exports.ranking = function(req,res){
                                     res.json({result:"FAIL",resultmsg:"SORTING ERR"});
                                     return;
                                 }
-                                else{
+                                else if(results.length){
                                     groupRank = results[0].cnt+1;
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
-                                        if(arg1[i].results.prophoto==null){
+                                        if(arg1.results[i].prophoto==null){
                                             link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{
@@ -406,7 +406,7 @@ exports.ranking = function(req,res){
                                             country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
-                                            avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
+                                            avg : (arg1.results[i].g_score/arg1.results[i].g_game).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             hand : arg1.results[i].hand,
@@ -418,6 +418,11 @@ exports.ranking = function(req,res){
                                     }//for
                                     resultData = {myrank:groupRank,myproPhoto:arr[groupRank-1].proPhoto,arr:arr};
                                     callback(null,resultData);
+                                }
+                                else{
+                                    console.log('no data',results);
+                                    res.json({result:"SUCCESS",resultmsg:"NO DATA"});
+                                    return;
                                 }
                                 connection.release();
                             });//query
