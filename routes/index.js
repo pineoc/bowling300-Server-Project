@@ -230,7 +230,7 @@ exports.ranking = function(req,res){
                                     return;
                                 }
                                 else if(results.length){
-                                    console.log('avg : ',result[0].allscore/result[0].allgame);
+                                    console.log('avg : ',results[0].allscore/results[0].allgame);
                                     //console.log(result);
                                     callback(null,{results:results,avg:arg.avg,prophoto:arg.prophoto});
                                 }
