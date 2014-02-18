@@ -152,14 +152,14 @@ function deletePhoto(aidx,type){
         db.pool.getConnection(function(err,connection){
             if(err){
                 console.log('error on conn pool del prophoto',err);
-                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                 retval=-1;
                 return;
             }else{
                 connection.query('SELECT prophoto from account where a_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del prophoto',err2);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                         retval=-1;
                         return;
                     }
@@ -187,14 +187,14 @@ function deletePhoto(aidx,type){
         db.pool.getConnection(function(err,connection){
             if(err){
                 console.log('error on conn pool del ballphoto',err);
-                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                 retval=-1;
                 return;
             }else{
                 connection.query('SELECT ballphoto from account where a_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del ballphoto',err);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                         retval=-1;
                         return;
                     }
@@ -221,14 +221,14 @@ function deletePhoto(aidx,type){
         db.pool.getConnection(function(err,connection){
             if(err){
                 console.log('error on conn pool del grpphoto',err);
-                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                 retval=-1;
                 return;
             }else{
                 connection.query('SELECT g_photo from groups where g_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del grpphoto',err);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                         retval=-1;
                         return;
                     }
@@ -394,7 +394,9 @@ exports.addsign = function(req,res){
 exports.insertScore = function(req,res){
     var insData = req.body; // 입력할 데이터를 받음
     var data = insData.myscoredata;
+    var dataL = insData.leaguedata;
     var dataLength = insData.myscoredata.length;
+    var dataLengthL = insData.leaguedata.length;
     var aidx = insData.aidx;
     var s_allScore = 0;
     var s_allGame = 0;
@@ -436,7 +438,7 @@ exports.insertScore = function(req,res){
                                     }
                                     else if(result.affectedRows==1){
                                         console.log('success, result',result);
-                                        res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
+                                        //res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
                                     }//insert success
                                     connection.release();
                             });//query
@@ -477,7 +479,7 @@ exports.insertScore = function(req,res){
                                     }//error on query
                                     else if(result.affectedRows==1){
                                         console.log('success, result : ',result);
-                                        res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
+                                        //res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
                                     }//insert success
                                     connection.release();
                                 });//query
@@ -488,13 +490,68 @@ exports.insertScore = function(req,res){
             else{
                 console.log('type error',insData);
                 res.json({result:"FAIL",resultmsg:"TYPE ERR"});
+                return;
             }
         }//for
+        console.log('success normal data all');
+        res.json({result:"SUCCESS",resultmsg:data}); // result_msg에 대한 부분은 차후 수정
     }//if end
-    else{
+    else if(data.length==0){
         console.log('error, no data ');
         res.json({result:"FAIL",resultmsg:"NO DATA"});
     }//no data
+    if(dataLengthL!=0){
+        for(var i=0;i<dataLengthL;i++){
+            if(dataL[i].type>0){
+                console.log('league data : ',dataL[i]);
+                if(dataL[i].allScore/dataL[i].allGame>300){
+                    console.log('INVALID data over 300 avg league');
+                    res.json({result:"FAIL",resultmsg:"INVALID OVER 300 LEAGUE"});
+                    return;
+                }
+                else if(dataL[i].allGame==0){
+                    console.log('INVALID data allgame 0 league');
+                    res.json({result:"FAIL",resultmsg:"INVALID GAME ZERO LEAGUE"});
+                    return;
+                }
+                else{
+                    db.pool.getConnection(function(err,connection){
+                        if(err){
+                            console.log('error on conn pool league insert');
+                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                            return;
+                        }else{
+                            connection.query('UPDATE account_has_group SET league_avg=?,league_date=now() WHERE account_a_idx=? AND group_g_idx=?',
+                                [(dataL[i].allScore/dataL[i].allGame).toFixed(4),insData.aidx,dataL[i].type],function(err2,result){
+                                if(err2){
+                                    console.log('error on query league insert');
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    return;
+                                }
+                                else if(result.affectedRows==1){
+                                    console.log('success, result',result);
+                                }
+                                connection.release();
+                            });//query
+                        }
+                    });//conn pool
+                }
+            }
+            else{
+                console.log('error type on league data');
+                res.json({result:"FAIL",resultmsg:"TYPE ERR LEAGUE"});
+                return;
+            }
+
+        }
+        console.log('success on league data all');
+        res.json({result:"SUCESS",resultmsg:dataL});
+    }
+    else if(dataL.length==0){
+        console.log('no data on league');
+        res.json({result:"FAIL LEAGUE",resulmsg:"NO DATA LEAGUE"});
+    }
+
 };//insertScore
 
 /*
@@ -1120,7 +1177,7 @@ exports.groupsearch = function(req,res){
 };//group search
 
 /*
- * 그룹 찾기
+ * 그룹 멤버
  * 최초 생성 날짜 : 2014.02.14
  * 최종 수정 날짜 : 2014.02.14
  *
@@ -1178,7 +1235,77 @@ exports.groupmember = function(req,res){
     });//connection pool
 };
 
+/*
+ * 그룹 찾기
+ * 최초 생성 날짜 : 2014.02.18
+ * 최종 수정 날짜 : 2014.02.18
+ *
+ * 받는 데이터 gidx
+ * editor : pineoc
+ * */
+exports.groupLeague = function(req,res){
+    var leagueData = req.body;
+    console.log('recv data on league : ',leagueData);
+    async.waterfall([
+        function(callback){
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on connection pool group rank',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return;
+                }//error on connection pool
+                else{
+                    connection.query('select a.a_idx,a.name,a.prophoto,ag.league_avg l_avg from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? order by l_avg desc',
+                        [leagueData.gidx],
+                        function(err2,results){
+                            if(err2){
+                                console.log('error on query league rank',err2);
+                                res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                return;
+                            }
+                            else if(results.length){
+                                callback(null,{results:results});//data
+                            }
+                            else{
+                                console.log('no data');
+                                res.json({result:"FAIL",resultmsg:"NO DATA"});
+                                return;
+                            }
+                            connection.release();
+                        });//query
+                }
+            });//connection pool
+        },
+        function(arg,callback){
+            var arr = [];
+            for(var i=0;i<arg.results.length;i++){
+                var link;
+                if(arg.results[i].prophoto==null){
+                    link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
+                }
+                else{
+                    link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg.results[i].a_idx+"/"+arg.results[i].prophoto;
+                }
+                arr[i] = {
+                    name : arg.results[i].name,
+                    prophoto : link,
+                    avg : (arg.results[i].l_avg).toFixed(1)
+                };
+            }
+            callback(null,{arr:arr});
 
+        }
+    ],function(err,result){
+        if(err){
+            console.log('error on waterfall on league',err);
+            res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
+        }
+        else{
+            console.log('last waterfall on league',result);
+            res.json({result:"SUCCESS",resultmsg:"SUCCESS LEAGUE",leaguedata:result.arr});
+        }
+    });//waterfall
+};//group league
 
 exports.deletePhoto = function(req,res){
 

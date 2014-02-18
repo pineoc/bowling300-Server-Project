@@ -16,11 +16,11 @@ exports.index = function(req, res){
 };
 
 /*
- * 랭킹 데이터
+ * 로그인
  * 최초 생성 날짜 : 2014.02.02
  * 최종 수정 날짜 : 2014.02.17
  *
- * 받는 데이터 allscore, allgame, type, limit
+ * 받는 데이터 email, pwd
  * editor : pineoc
  * */
 exports.login = function(req,res){
@@ -32,7 +32,7 @@ exports.login = function(req,res){
 /*
  * 랭킹 데이터
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.17
+ * 최종 수정 날짜 : 2014.02.18
  *
  * 받는 데이터 allscore, allgame, type, limit
  * editor : pineoc
@@ -147,6 +147,7 @@ exports.ranking = function(req,res){
                                             avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
+                                            handi : arg1.results[i].handi,
                                             hand : arg1.results[i].hand,
                                             style : arg1.results[i].style,
                                             step : arg1.results[i].step,
@@ -188,7 +189,7 @@ exports.ranking = function(req,res){
                         return;
                     }
                     else{
-                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
+                        connection.query('SELECT allscore,allgame,prophoto,country from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
@@ -202,7 +203,8 @@ exports.ranking = function(req,res){
                                     avg=0;
                                 }
                                 console.log('avg : ',avg);
-                                callback(null,{avg:avg,prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+rankData.aidx+"/"+result[0].prophoto});
+                                callback(null,{avg:avg,country:result[0].country,
+                                    prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+rankData.aidx+"/"+result[0].prophoto});
                             }
                             else{
                                 console.log('no data');
@@ -221,8 +223,8 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT * FROM account where locale=? order by (allscore/allgame) desc limit ?,30',
-                            [rankData.locale,limit],
+                        connection.query('SELECT * FROM account where country=? order by (allscore/allgame) desc limit ?,30',
+                            [arg.country,limit],
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query local rank',err2);
@@ -283,6 +285,7 @@ exports.ranking = function(req,res){
                                             avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
+                                            handi : arg1.results[i].handi,
                                             hand : arg1.results[i].hand,
                                             style : arg1.results[i].style,
                                             step : arg1.results[i].step,
@@ -297,7 +300,6 @@ exports.ranking = function(req,res){
                             });//query
                     }
                 });//connection pool
-
             }
         ],
             function(err,results){
@@ -419,6 +421,7 @@ exports.ranking = function(req,res){
                                             avg : (arg1.results[i].g_score/arg1.results[i].g_game).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
+                                            handi : arg1.results[i].handi,
                                             hand : arg1.results[i].hand,
                                             style : arg1.results[i].style,
                                             step : arg1.results[i].step,
