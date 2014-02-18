@@ -268,7 +268,7 @@ exports.ranking = function(req,res){
                                     localRank = results2[0].cnt+1;
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
-                                        if(arg1[i].results.prophoto==null){
+                                        if(arg1.results[i].prophoto==null){
                                             link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{
