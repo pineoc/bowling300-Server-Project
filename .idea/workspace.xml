@@ -32,19 +32,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="index.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/routes/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="9" column="2" selection-start="119" selection-end="119" vertical-scroll-proportion="0.09883721" vertical-offset="0" max-vertical-offset="7905">
+            <state line="9" column="2" selection-start="119" selection-end="119" vertical-scroll-proportion="0.0" vertical-offset="823" max-vertical-offset="7905">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="user.js" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="user.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/user.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="2" selection-start="104" selection-end="104" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="24106">
+            <state line="10" column="2" selection-start="104" selection-end="104" vertical-scroll-proportion="0.12592593" vertical-offset="0" max-vertical-offset="24123">
               <folding />
             </state>
           </provider>
@@ -651,16 +651,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/routes/user.js">
+    <entry file="file://$PROJECT_DIR$/routes/index.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="2" selection-start="104" selection-end="104" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="24106">
+        <state line="9" column="2" selection-start="119" selection-end="119" vertical-scroll-proportion="0.0" vertical-offset="823" max-vertical-offset="7905">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/routes/index.js">
+    <entry file="file://$PROJECT_DIR$/routes/user.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="2" selection-start="119" selection-end="119" vertical-scroll-proportion="0.09883721" vertical-offset="0" max-vertical-offset="7905">
+        <state line="10" column="2" selection-start="104" selection-end="104" vertical-scroll-proportion="0.12592593" vertical-offset="0" max-vertical-offset="24123">
           <folding />
         </state>
       </provider>

@@ -1285,7 +1285,7 @@ exports.groupmember = function(req,res){
 };
 
 /*
- * 그룹 찾기
+ * 그룹 리그
  * 최초 생성 날짜 : 2014.02.18
  * 최종 수정 날짜 : 2014.02.18
  *
@@ -1383,7 +1383,7 @@ exports.groupLeague = function(req,res){
                     return;
                 }//error on connection pool
                 else{
-                    connection.query('select a.prophoto prophoto from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and ag.account_a_idx=? ',
+                    connection.query('select a.prophoto prophoto,ag.league_avg l_avg from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and ag.account_a_idx=? ',
                         [leagueData.gidx,leagueData.aidx],
                         function(err2,results){
                             if(err2){
@@ -1397,6 +1397,7 @@ exports.groupLeague = function(req,res){
                                     result:"SUCCESS",
                                     resultmsg:"SUCCESS LEAGUE",
                                     proPhoto:results[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+leagueData.aidx+"/"+results[0].prophoto,
+                                    myavg : results[0].l_avg,
                                     allavg:result.allavg,
                                     leaguedata:result.arr});
                             }
