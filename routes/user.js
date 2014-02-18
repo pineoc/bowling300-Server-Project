@@ -1259,8 +1259,9 @@ exports.groupmember = function(req,res){
                                 callback(null,{
                                     result:"SUCCESS",
                                     resultmsg:"SUCCESS GRPMEM",
-                                    proPhoto: result[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+grpmemData.aidx+"/"+result[0].prophoto,
-                                    member:arg.member});
+                                    proPhoto: (result[0].prophoto==null) ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+grpmemData.aidx+"/"+result[0].prophoto,
+                                    member:arg.member
+                                });
                             }
                             connection.release();
                         });//query
