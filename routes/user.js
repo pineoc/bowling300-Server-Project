@@ -1182,60 +1182,106 @@ exports.groupsearch = function(req,res){
 /*
  * 그룹 멤버
  * 최초 생성 날짜 : 2014.02.14
- * 최종 수정 날짜 : 2014.02.14
+ * 최종 수정 날짜 : 2014.02.18
  *
- * 받는 데이터 gidx
+ * 받는 데이터 aidx,gidx
  * editor : pineoc
  * */
 exports.groupmember = function(req,res){
     var grpmemData = req.body;
     var arr = [];
     console.log('recv data grpMem : ',grpmemData);
-    db.pool.getConnection(function(err,connection){
-        if(err){
-            console.log('error on connection pool on grpmem',err);
-            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-            return;
-        }
-        else{
-            connection.query('SELECT * from account where a_idx in (select account_a_idx from account_has_group where group_g_idx=?)',
-                [grpmemData.gidx],function(err2,result){
-                if(err2){
-                    console.log('error on query on grpmem',err);
-                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+    async.waterfall([
+        function(callback){
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on connection pool on grpmem',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     return;
                 }
                 else{
-                    console.log('success on grpmem result : ',result);
-                    for(var i=0;i<result.length;i++){
-                        var link;
-                        if(result[i].prophoto==null){
-                            link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
-                        }
-                        else{
-                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+result[i].a_idx+"/"+result[i].prophoto;
-                        }
-                        arr[i]={
-                            name : result[i].name,
-                            country : result[i].country,
-                            proPhoto : link,
-                            ballPhoto : result[i].ballphoto,
-                            avg : (result[i].allscore/result[i].allgame).toFixed(1),
-                            allhighScore : result[i].all_highscore,//지금까지의 최고점수
-                            highscore : result[i].highscore,//그주의 최고점수
-                            hand : result[i].hand,
-                            style : result[i].style,
-                            step : result[i].step,
-                            series300 : result[i].series300,
-                            series800 : result[i].series800
-                            };
-                    }
-                    res.json({result:"SUCCESS",resultmsg:"SUCCESS GRPMEM",member:arr});
+                    connection.query('SELECT * from account where a_idx in (select account_a_idx from account_has_group where group_g_idx=?)',
+                        [grpmemData.gidx],function(err2,result){
+                            if(err2){
+                                console.log('error on query on grpmem',err);
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                return;
+                            }
+                            else{
+                                console.log('success on grpmem result : ',result);
+                                for(var i=0;i<result.length;i++){
+                                    var link;
+                                    if(result[i].prophoto==null){
+                                        link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
+                                    }
+                                    else{
+                                        link = "http://bowling.pineoc.cloulu.com/uploads/user/"+result[i].a_idx+"/"+result[i].prophoto;
+                                    }
+                                    arr[i]={
+                                        name : result[i].name,
+                                        country : result[i].country,
+                                        proPhoto : link,
+                                        ballPhoto : result[i].ballphoto,
+                                        avg : (result[i].allscore/result[i].allgame).toFixed(1),
+                                        allhighScore : result[i].all_highscore,//지금까지의 최고점수
+                                        highscore : result[i].highscore,//그주의 최고점수
+                                        hand : result[i].hand,
+                                        style : result[i].style,
+                                        step : result[i].step,
+                                        series300 : result[i].series300,
+                                        series800 : result[i].series800
+                                    };
+                                }
+                                callback(null,{member:arr});
+                            }
+                            connection.release();
+                        });//query
                 }
-                connection.release();
-            });//query
+            });//connection pool
+        },
+        function(arg,callback){
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on connection pool on grpmem take me',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return;
+                }
+                else{
+                    connection.query('SELECT prophoto from account where a_idx=?',
+                        [grpmemData.aidx],function(err2,result){
+                            if(err2){
+                                console.log('error on query on grpmem take me',err);
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                return;
+                            }
+                            else{
+                                console.log('success on grpmem result : ',result);
+                                callback(null,{
+                                    result:"SUCCESS",
+                                    resultmsg:"SUCCESS GRPMEM",
+                                    proPhoto: result[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+leagueData.aidx+"/"+result[0].prophoto,
+                                    member:arg.member});
+                            }
+                            connection.release();
+                        });//query
+                }
+            });//connection pool
+
         }
-    });//connection pool
+    ],
+        function(err,result){
+            if(err){
+                console.log('error on waterfall grpmem',err);
+                res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
+            }
+            else{
+                console.log('success,',result);
+                res.json(result);
+            }
+
+        }
+    );//waterfall
+
 };
 
 /*
@@ -1258,7 +1304,7 @@ exports.groupLeague = function(req,res){
                     return;
                 }//error on connection pool
                 else{
-                    connection.query('select a.a_idx,a.name,a.prophoto,ag.league_avg l_avg from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? order by l_avg desc',
+                    connection.query('SELECT a.a_idx,a.name,a.prophoto,ag.league_avg l_avg from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? order by l_avg desc',
                         [leagueData.gidx],
                         function(err2,results){
                             if(err2){
@@ -1295,7 +1341,33 @@ exports.groupLeague = function(req,res){
                     avg : (arg.results[i].l_avg==null || arg.results[i].l_avg==0) ? 0 : (arg.results[i].l_avg).toFixed(1)
                 };
             }
-            callback(null,{arr:arr});
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on connection pool group rank all avg',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return;
+                }//error on connection pool
+                else{
+                    connection.query('select AVG(league_avg) allavg from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=?',
+                        [leagueData.gidx],
+                        function(err2,results){
+                            if(err2){
+                                console.log('error on query league rank all avg',err2);
+                                res.json({result:"FAIL",resultmsg:"SORTING ERR Q"});
+                                return;
+                            }
+                            else if(results.length){
+                                callback(null,{arr:arr,allavg:(results[0].allavg==null || results[0].allavg==null) ? 0 : (results[0].allavg).toFixed(1)});
+                            }
+                            else{
+                                console.log('no data');
+                                res.json({result:"FAIL",resultmsg:"NO DATA"});
+                                return;
+                            }
+                            connection.release();
+                        });//query
+                }
+            });//connection pool
 
         }
     ],function(err,result){
@@ -1304,8 +1376,39 @@ exports.groupLeague = function(req,res){
             res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
         }
         else{
-            console.log('last waterfall on league',result);
-            res.json({result:"SUCCESS",resultmsg:"SUCCESS LEAGUE",leaguedata:result.arr});
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on connection pool group rank',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return;
+                }//error on connection pool
+                else{
+                    connection.query('select a.prophoto prophoto from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and ag.account_a_idx=? ',
+                        [leagueData.gidx,leagueData.aidx],
+                        function(err2,results){
+                            if(err2){
+                                console.log('error on query league rank',err2);
+                                res.json({result:"FAIL",resultmsg:"SORTING ERR Q"});
+                                return;
+                            }
+                            else if(results.length){
+                                console.log('last waterfall on league',result);
+                                res.json({
+                                    result:"SUCCESS",
+                                    resultmsg:"SUCCESS LEAGUE",
+                                    proPhoto:results[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+leagueData.aidx+"/"+results[0].prophoto,
+                                    allavg:result.allavg,
+                                    leaguedata:result.arr});
+                            }
+                            else{
+                                console.log('no data');
+                                res.json({result:"FAIL",resultmsg:"NO DATA"});
+                                return;
+                            }
+                            connection.release();
+                        });//query
+                }
+            });//connection pool
         }
     });//waterfall
 };//group league
