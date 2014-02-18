@@ -1292,7 +1292,7 @@ exports.groupLeague = function(req,res){
                 arr[i] = {
                     name : arg.results[i].name,
                     prophoto : link,
-                    avg : arg.results[i].l_avg==null ? 0 : (arg.results[i].l_avg).toFixed(1)
+                    avg : (arg.results[i].l_avg==null || arg.results[i].l_avg==0) ? 0 : (arg.results[i].l_avg).toFixed(1)
                 };
             }
             callback(null,{arr:arr});
