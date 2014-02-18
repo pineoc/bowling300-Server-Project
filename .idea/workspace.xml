@@ -23,19 +23,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="app.js" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="app.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/app.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="61" column="64" selection-start="1730" selection-end="1730" vertical-scroll-proportion="0.50581396" vertical-offset="689" max-vertical-offset="1377">
+            <state line="48" column="6" selection-start="1285" selection-end="1285" vertical-scroll-proportion="0.0" vertical-offset="689" max-vertical-offset="1377">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="index.js" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="index.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/index.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="331" column="84" selection-start="16498" selection-end="16498" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7752">
+            <state line="237" column="59" selection-start="11343" selection-end="11343" vertical-scroll-proportion="0.66715115" vertical-offset="3485" max-vertical-offset="7752">
               <folding />
             </state>
           </provider>
@@ -44,7 +44,7 @@
       <file leaf-file-name="user.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/routes/user.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="573" column="38" selection-start="24075" selection-end="24075" vertical-scroll-proportion="0.0" vertical-offset="9554" max-vertical-offset="20145">
+            <state line="573" column="38" selection-start="24075" selection-end="24075" vertical-scroll-proportion="0.0" vertical-offset="8993" max-vertical-offset="20145">
               <folding />
             </state>
           </provider>
@@ -86,8 +86,8 @@
         <option value="$PROJECT_DIR$/routes/clouluDB.js" />
         <option value="$PROJECT_DIR$/app.js" />
         <option value="$PROJECT_DIR$/routes/test.js" />
-        <option value="$PROJECT_DIR$/routes/index.js" />
         <option value="$PROJECT_DIR$/routes/user.js" />
+        <option value="$PROJECT_DIR$/routes/index.js" />
       </list>
     </option>
   </component>
@@ -626,13 +626,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/routes/user.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="573" column="38" selection-start="24075" selection-end="24075" vertical-scroll-proportion="0.0" vertical-offset="9554" max-vertical-offset="20145">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/routes/board.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="75" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="697">
@@ -640,16 +633,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/routes/index.js">
+    <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="331" column="84" selection-start="16498" selection-end="16498" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7752">
+        <state line="48" column="6" selection-start="1285" selection-end="1285" vertical-scroll-proportion="0.0" vertical-offset="689" max-vertical-offset="1377">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app.js">
+    <entry file="file://$PROJECT_DIR$/routes/user.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="61" column="64" selection-start="1730" selection-end="1730" vertical-scroll-proportion="0.50581396" vertical-offset="689" max-vertical-offset="1377">
+        <state line="573" column="38" selection-start="24075" selection-end="24075" vertical-scroll-proportion="0.0" vertical-offset="9554" max-vertical-offset="20145">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/routes/index.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="237" column="59" selection-start="11343" selection-end="11343" vertical-scroll-proportion="0.66715115" vertical-offset="3485" max-vertical-offset="7752">
           <folding />
         </state>
       </provider>
