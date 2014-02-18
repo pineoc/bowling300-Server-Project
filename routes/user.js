@@ -8,8 +8,8 @@ content : user
 
 var async = require('async');
 
-//var db = require('./localDB.js');
-var db = require('./clouluDB.js');
+var db = require('./localDB.js');
+//var db = require('./clouluDB.js');
 
 var path = require('path');
 var fs = require('fs');
@@ -1184,7 +1184,7 @@ exports.groupsearch = function(req,res){
  * 최초 생성 날짜 : 2014.02.14
  * 최종 수정 날짜 : 2014.02.14
  *
- * 받는 데이터 groupname ( gname )
+ * 받는 데이터 gidx
  * editor : pineoc
  * */
 exports.groupmember = function(req,res){
@@ -1198,8 +1198,8 @@ exports.groupmember = function(req,res){
             return;
         }
         else{
-            connection.query('SELECT * from account where a_idx in (select account_a_idx from account_has_group where group_g_idx in (select g_idx from groups where g_name=?))',
-                [grpmemData.gname],function(err2,result){
+            connection.query('SELECT * from account where a_idx in (select account_a_idx from account_has_group where group_g_idx=?)',
+                [grpmemData.gidx],function(err2,result){
                 if(err2){
                     console.log('error on query on grpmem',err);
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});

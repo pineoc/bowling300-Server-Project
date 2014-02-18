@@ -36,7 +36,18 @@
         <entry file="file://$PROJECT_DIR$/routes/index.js">
           <provider selected="true" editor-type-id="text-editor">
             <state line="9" column="2" selection-start="119" selection-end="119" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7905">
-              <folding />
+              <folding>
+                <marker date="1392709268192" expanded="true" signature="622:24147" placeholder="{...}" />
+                <marker date="1392709268192" expanded="true" signature="784:8275" placeholder="{...}" />
+                <marker date="1392709268192" expanded="true" signature="828:7886" placeholder="[...]" />
+                <marker date="1392709268192" expanded="true" signature="4036:7876" placeholder="{...}" />
+                <marker date="1392709268192" expanded="true" signature="4304:7843" placeholder="{...}" />
+                <marker date="1392709268192" expanded="true" signature="4597:7825" placeholder="{...}" />
+                <marker date="1392709268192" expanded="true" signature="4851:7794" placeholder="{...}" />
+                <marker date="1392709268192" expanded="true" signature="5182:7710" placeholder="{...}" />
+                <marker date="1392709268192" expanded="true" signature="5463:7496" placeholder="{...}" />
+                <marker date="1392709268192" expanded="true" signature="6056:7437" placeholder="{...}" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -44,7 +55,7 @@
       <file leaf-file-name="user.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/user.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="10" column="2" selection-start="104" selection-end="104" vertical-scroll-proportion="0.12592593" vertical-offset="0" max-vertical-offset="22355">
+            <state line="11" column="2" selection-start="138" selection-end="138" vertical-scroll-proportion="0.15111111" vertical-offset="0" max-vertical-offset="22355">
               <folding />
             </state>
           </provider>
@@ -348,7 +359,18 @@
     <entry file="file://$PROJECT_DIR$/routes/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="51" column="38" selection-start="1678" selection-end="1678" vertical-scroll-proportion="0.0" vertical-offset="816" max-vertical-offset="4352">
-          <folding />
+          <folding>
+            <marker date="1392709268192" expanded="true" signature="622:24147" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="784:8275" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="828:7886" placeholder="[...]" />
+            <marker date="1392709268192" expanded="true" signature="4036:7876" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4304:7843" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4597:7825" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4851:7794" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5182:7710" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5463:7496" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="6056:7437" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -383,7 +405,18 @@
     <entry file="file://$PROJECT_DIR$/routes/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="11" column="2" selection-start="154" selection-end="154" vertical-scroll-proportion="0.0" vertical-offset="176" max-vertical-offset="4384">
-          <folding />
+          <folding>
+            <marker date="1392709268192" expanded="true" signature="622:24147" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="784:8275" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="828:7886" placeholder="[...]" />
+            <marker date="1392709268192" expanded="true" signature="4036:7876" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4304:7843" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4597:7825" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4851:7794" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5182:7710" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5463:7496" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="6056:7437" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -418,7 +451,18 @@
     <entry file="file://$PROJECT_DIR$/routes/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="11" column="2" selection-start="154" selection-end="154" vertical-scroll-proportion="0.0" vertical-offset="176" max-vertical-offset="4384">
-          <folding />
+          <folding>
+            <marker date="1392709268192" expanded="true" signature="622:24147" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="784:8275" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="828:7886" placeholder="[...]" />
+            <marker date="1392709268192" expanded="true" signature="4036:7876" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4304:7843" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4597:7825" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4851:7794" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5182:7710" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5463:7496" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="6056:7437" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -453,7 +497,18 @@
     <entry file="file://$PROJECT_DIR$/routes/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="27" column="44" selection-start="530" selection-end="530" vertical-scroll-proportion="0.0" vertical-offset="432" max-vertical-offset="4400">
-          <folding />
+          <folding>
+            <marker date="1392709268192" expanded="true" signature="622:24147" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="784:8275" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="828:7886" placeholder="[...]" />
+            <marker date="1392709268192" expanded="true" signature="4036:7876" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4304:7843" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4597:7825" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4851:7794" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5182:7710" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5463:7496" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="6056:7437" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -488,7 +543,18 @@
     <entry file="file://$PROJECT_DIR$/routes/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="15" column="3" selection-start="270" selection-end="270" vertical-scroll-proportion="0.0" vertical-offset="240" max-vertical-offset="4224">
-          <folding />
+          <folding>
+            <marker date="1392709268192" expanded="true" signature="622:24147" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="784:8275" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="828:7886" placeholder="[...]" />
+            <marker date="1392709268192" expanded="true" signature="4036:7876" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4304:7843" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4597:7825" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4851:7794" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5182:7710" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5463:7496" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="6056:7437" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -523,7 +589,18 @@
     <entry file="file://$PROJECT_DIR$/routes/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="86" column="47" selection-start="3198" selection-end="3198" vertical-scroll-proportion="0.0" vertical-offset="1634" max-vertical-offset="5016">
-          <folding />
+          <folding>
+            <marker date="1392709268192" expanded="true" signature="622:24147" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="784:8275" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="828:7886" placeholder="[...]" />
+            <marker date="1392709268192" expanded="true" signature="4036:7876" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4304:7843" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4597:7825" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4851:7794" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5182:7710" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5463:7496" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="6056:7437" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -558,7 +635,18 @@
     <entry file="file://$PROJECT_DIR$/routes/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="230" column="28" selection-start="10197" selection-end="10197" vertical-scroll-proportion="0.0" vertical-offset="1008" max-vertical-offset="4224">
-          <folding />
+          <folding>
+            <marker date="1392709268192" expanded="true" signature="622:24147" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="784:8275" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="828:7886" placeholder="[...]" />
+            <marker date="1392709268192" expanded="true" signature="4036:7876" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4304:7843" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4597:7825" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4851:7794" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5182:7710" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5463:7496" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="6056:7437" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -640,7 +728,18 @@
     <entry file="file://$PROJECT_DIR$/routes/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state line="9" column="2" selection-start="119" selection-end="119" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7905">
-          <folding />
+          <folding>
+            <marker date="1392709268192" expanded="true" signature="622:24147" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="784:8275" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="828:7886" placeholder="[...]" />
+            <marker date="1392709268192" expanded="true" signature="4036:7876" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4304:7843" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4597:7825" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="4851:7794" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5182:7710" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="5463:7496" placeholder="{...}" />
+            <marker date="1392709268192" expanded="true" signature="6056:7437" placeholder="{...}" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -660,7 +759,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/user.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="10" column="2" selection-start="104" selection-end="104" vertical-scroll-proportion="0.12592593" vertical-offset="0" max-vertical-offset="22355">
+        <state line="11" column="2" selection-start="138" selection-end="138" vertical-scroll-proportion="0.15111111" vertical-offset="0" max-vertical-offset="22355">
           <folding />
         </state>
       </provider>
