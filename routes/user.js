@@ -8,8 +8,8 @@ content : user
 
 var async = require('async');
 
-//var db = require('./localDB.js');
-var db = require('./clouluDB.js');
+var db = require('./localDB.js');
+//var db = require('./clouluDB.js');
 
 var path = require('path');
 var fs = require('fs');
@@ -373,13 +373,16 @@ exports.rankpoint = function(req,res){
 /*
  * 기능 : 회원 정보 추가 입력
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.05
+ * 최종 수정 날짜 : 2014.02.18
+ *
+ * 받는 데이터 : year, ballweight, style, step, 800series, 300series, ballphoto
  *
  * editor : pineoc
- * 미구현 부분 : 사진 파일 업로드 부분
  * */
 exports.addsign = function(req,res){
     var addSignData = req.body; // json data
+
+
 };
 
 /*
@@ -1289,7 +1292,7 @@ exports.groupLeague = function(req,res){
                 arr[i] = {
                     name : arg.results[i].name,
                     prophoto : link,
-                    avg : (arg.results[i].l_avg).toFixed(1)
+                    avg : arg.results[i].l_avg==null ? 0 : (arg.results[i].l_avg).toFixed(1)
                 };
             }
             callback(null,{arr:arr});
