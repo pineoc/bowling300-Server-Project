@@ -147,102 +147,111 @@ var uploadfunction = function(userid,type,upfile){
  * */
 
 function deletePhoto(aidx,type){
+    var retval;
     if(type=="pro"){
-        var proPhoto;
         db.pool.getConnection(function(err,connection){
             if(err){
                 console.log('error on conn pool del prophoto',err);
                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                retval=-1;
+                return;
             }else{
                 connection.query('SELECT prophoto from account where a_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del prophoto',err2);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        retval=-1;
                         return;
                     }
                     else{
                         console.log('success prophoto:',result[0].prophoto);
-                        proPhoto =result[0].prophoto;
                         var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
-                        fs.unlink(userfolder+proPhoto, function (err) {
+                        fs.unlink(userfolder+"/"+result[0].prophoto, function (err) {
                             if (err){
                                 console.log('error on delete file',err);
+                                retval=-1;
                                 return;
                             }else{
                                 console.log('successfully deleted',userfolder);
-
+                                retval=1;
                             }
                         });
-
+                        connection.release();
                     }
                 });//query
             }
         });//connection pool
-
+        return retval;
     }
     else if(type=="ball"){
         db.pool.getConnection(function(err,connection){
             if(err){
                 console.log('error on conn pool del ballphoto',err);
                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                retval=-1;
                 return;
             }else{
-                connection.query('SELECT * from ',[],function(err2,result){
+                connection.query('SELECT ballphoto from account where a_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del ballphoto',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        retval=-1;
                         return;
                     }
                     else{
                         var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
-                        fs.unlink(userfolder+proPhoto, function (err) {
+                        fs.unlink(userfolder+"/"+result[0].ballphoto, function (err) {
                             if (err){
                                 console.log('error on delete file',err);
+                                retval=-1;
                                 return;
                             }else{
                                 console.log('successfully deleted',userfolder);
-
+                                retval=1;
                             }
                         });
-
                     }
+                    connection.release();
                 });//query
             }
         });//connection pool
-
+        return retval;
     }
     else if(type=="group"){
         db.pool.getConnection(function(err,connection){
             if(err){
                 console.log('error on conn pool del grpphoto',err);
                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                retval=-1;
                 return;
             }else{
-                connection.query('SELECT * from ',[],function(err2,result){
+                connection.query('SELECT g_photo from groups where g_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del grpphoto',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        retval=-1;
                         return;
                     }
                     else{
                         var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
-                        fs.unlink(userfolder+proPhoto, function (err) {
+                        fs.unlink(userfolder+"/"+result[0].g_photo, function (err) {
                             if (err){
                                 console.log('error on delete file',err);
+                                retval=-1;
                                 return;
                             }else{
                                 console.log('successfully deleted',userfolder);
-
+                                retval=1;
                             }
                         });
                     }
+                    connection.release();
                 });//query
             }
         });//connection pool
-
+        return retval;
     }
-
-};
+}
 
 
 function formatDate(date) {
@@ -487,7 +496,6 @@ exports.insertScore = function(req,res){
         res.json({result:"FAIL",resultmsg:"NO DATA"});
     }//no data
 };//insertScore
-
 
 /*
  * 그룹 생성

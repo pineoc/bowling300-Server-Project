@@ -54,7 +54,7 @@ exports.ranking = function(req,res){
                         return;
                     }
                     else{
-                        connection.query('SELECT allscore,allgame from account where a_idx=?',[rankData.aidx],function(err2,result){
+                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
@@ -69,7 +69,7 @@ exports.ranking = function(req,res){
                                 }
                                 console.log('avg : ',avg);
                                 //console.log(result);
-                                callback(null,avg);
+                                callback(null,{avg:avg,prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+rankData.aidx+"/"+result[0].prophoto});
                             }
                             else{
                                 console.log('no data');
@@ -97,7 +97,7 @@ exports.ranking = function(req,res){
                                 }
                                 else{
                                     console.log('avg on query : ',arg);
-                                    callback(null,{results:results,avg:arg});//data
+                                    callback(null,{results:results,avg:arg.avg,prophoto:arg.prophoto});//data
                                 }
                                 connection.release();
                             });//query
@@ -154,7 +154,7 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myrank:worldRank,myproPhoto:arr[worldRank-1].proPhoto,arr:arr};
+                                    resultData = {myrank:worldRank,myproPhoto:arg1.prophoto,arr:arr};
                                     callback(null,resultData);
                                 }
                                 connection.release();
@@ -188,7 +188,7 @@ exports.ranking = function(req,res){
                         return;
                     }
                     else{
-                        connection.query('SELECT allscore,allgame from account where a_idx=?',[rankData.aidx],function(err2,result){
+                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
@@ -202,7 +202,7 @@ exports.ranking = function(req,res){
                                     avg=0;
                                 }
                                 console.log('avg : ',avg);
-                                callback(null,avg);
+                                callback(null,{avg:avg,prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+rankData.aidx+"/"+result[0].prophoto});
                             }
                             else{
                                 console.log('no data');
@@ -232,7 +232,7 @@ exports.ranking = function(req,res){
                                 else if(results.length){
                                     console.log('avg : ',result[0].allscore/result[0].allgame);
                                     //console.log(result);
-                                    callback(null,{results:results,avg:arg});
+                                    callback(null,{results:results,avg:arg.avg,prophoto:arg.prophoto});
                                 }
                                 else{
                                     console.log('no data');
@@ -290,7 +290,7 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myrank:localRank,myproPhoto:arr[localRank-1].proPhoto.proPhoto,arr:arr};
+                                    resultData = {myrank:localRank,myproPhoto:arg1.prophoto,arr:arr};
                                     callback(null,resultData);
                                 }
                                 connection.release();
@@ -326,7 +326,7 @@ exports.ranking = function(req,res){
                         return;
                     }
                     else{
-                        connection.query('SELECT allscore,allgame from account where a_idx=?',[rankData.aidx],function(err2,result){
+                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
@@ -341,7 +341,7 @@ exports.ranking = function(req,res){
                                 }
                                 console.log('avg : ',result[0].allscore/result[0].allgame);
                                 //console.log(result);
-                                callback(null,avg);
+                                callback(null,{avg:avg,prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+rankData.aidx+"/"+result[0].prophoto});
                             }
                             else{
                                 console.log('no data');
@@ -369,7 +369,7 @@ exports.ranking = function(req,res){
                                     return;
                                 }
                                 else if(results.length){
-                                    callback(null,{results:results,avg:arg});//data
+                                    callback(null,{results:results,avg:arg.avg,prophoto:arg.prophoto});//data
                                 }
                                 else{
                                     console.log('no data');
@@ -426,7 +426,7 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myrank:groupRank,myproPhoto:arr[groupRank-1].proPhoto,arr:arr};
+                                    resultData = {myrank:groupRank,myproPhoto:arg1.prophoto,arr:arr};
                                     callback(null,resultData);
                                 }
                                 else{
