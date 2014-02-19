@@ -278,7 +278,7 @@ exports.ranking = function(req,res){
             }
         );
     }
-    else if(rankData.type=="local"){//점수를 입력한 데이터
+    else if(rankData.type=="local" && rankData.aidx!=0){//점수를 입력한 데이터
         async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
             function(callback){
                 var avg;
@@ -417,7 +417,7 @@ exports.ranking = function(req,res){
             }
         );
     }//local data ranking
-    else if(rankData.type!=0){//그룹에 대한 랭킹
+    else if(rankData.type>0 && rankData.aidx!=0){//그룹에 대한 랭킹
         var groupidx = rankData.type;
         var groupRank=0;
         async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
@@ -561,4 +561,9 @@ exports.ranking = function(req,res){
             }
         );
     }//group data ranking
+    else{
+        console.log('error on aidx=0 not world');
+        res.json({result:"FAIL",resultmsg:"AIDX ZERO"});
+        return;
+    }
 };//랭킹 출력
