@@ -1325,7 +1325,7 @@ exports.groupLeague = function(req,res){
             for(var i=0;i<arg.results.length;i++){
                 var link;
                 if(arg.results[i].prophoto==null){
-                    link = "http://testbowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
+                    link = "http://testbowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png";
                 }
                 else{
                     link = "http://testbowling.pineoc.cloulu.com/uploads/user/"+arg.results[i].a_idx+"/"+arg.results[i].prophoto;
@@ -1348,7 +1348,7 @@ exports.groupLeague = function(req,res){
                         function(err2,results){
                             if(err2){
                                 console.log('error on query league rank all avg',err2);
-                                res.json({result:"FAIL",resultmsg:"SORTING ERR Q"});
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                 return;
                             }
                             else if(results.length){
@@ -1383,7 +1383,7 @@ exports.groupLeague = function(req,res){
                         function(err2,results){
                             if(err2){
                                 console.log('error on query league rank',err2);
-                                res.json({result:"FAIL",resultmsg:"SORTING ERR Q"});
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                 return;
                             }
                             else if(results.length){
