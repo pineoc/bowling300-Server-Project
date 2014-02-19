@@ -13,7 +13,7 @@ var crypto = require('crypto');
  * */
 
 var encryption = function (idx) {
-    var key = 'salt_from_the_user_document';
+    var key = 'jung_jung_park_han_lee';
     var plaintext = idx;
     var cipher = crypto.createCipher('aes-256-cbc', key);
     var decipher = crypto.createDecipher('aes-256-cbc', key);

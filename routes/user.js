@@ -382,7 +382,7 @@ exports.rankpoint = function(req,res){
 /*
  * 기능 : 회원 정보 추가 입력
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.18
+ * 최종 수정 날짜 : 2014.02.19
  *
  * 받는 데이터 : year, ballweight, style, step, 800series, 300series, ballphoto
  *
@@ -390,8 +390,28 @@ exports.rankpoint = function(req,res){
  * */
 exports.addsign = function(req,res){
     var addSignData = req.body; // json data
-
-
+    db.pool.getConnection(function(err,connection){
+        if(err){
+            console.log('error on connection pool addsign',err);
+            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+            return;
+        }//error on connection pool
+        else{
+            connection.query('UPDATE account SET year=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                [addSignData.year,addSignData.ballweight,addSignData.style,addSignData.step,addSignData.series800,addSignData.series300,addSignData.aidx],function(err2,result){
+                    if(err2){
+                        console.log('error on query addsign',err2);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        return;
+                    }//error on query
+                    else if(result.affectedRows==1){
+                        console.log('success, result : ',result);
+                        res.json({result:"SUCCESS",resultmsg:result}); // result_msg에 대한 부분은 차후 수정
+                    }//insert success
+                    connection.release();
+                });//query
+        }//no error on connection pool
+    });//connection pool
 };
 
 /*
@@ -424,7 +444,7 @@ exports.userinfo = function(req,res){
                         email : result[0].email,
                         name : result[0].name,
                         pwd : result[0].pwd,
-                        proPhoto : result[0].prophoto,
+                        proPhoto : result[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+infoData.aidx+"/"+result[0].prophoto,
                         ballPhoto : result[0].ballphoto,
                         sex : result[0].sex,
                         hand : result[0].hand,
