@@ -254,37 +254,6 @@ function deletePhoto(aidx,type){
     }
 }
 
-/*
- * aidx, gidx 암호화(hashing)
- * 최초 생성 날짜 : 2014.02.19
- * 최종 수정 날짜 : 2014.02.19
- *
- * 받는 데이터
- * editor : pineoc
- * */
-
-function encryption(idx){
-
-    var key = 'salt_from_the_user_document';
-    var plaintext = 'password';
-    var cipher = crypto.createCipher('aes-256-cbc', key);
-    var decipher = crypto.createDecipher('aes-256-cbc', key);
-    cipher.update(plaintext, 'utf8', 'base64');
-    var encryptedPassword = cipher.final('base64');
-
-}
-
-/*
- * aidx, gidx 복호화(hashing)
- * 최초 생성 날짜 : 2014.02.19
- * 최종 수정 날짜 : 2014.02.19
- *
- * 받는 데이터
- * editor : pineoc
- * */
-function decryption(hash){
-
-}
 
 /*
  * 날짜 스트링 연산
@@ -421,6 +390,41 @@ exports.rankpoint = function(req,res){
  * */
 exports.addsign = function(req,res){
     var addSignData = req.body; // json data
+
+
+};
+
+/*
+ * 유저정보
+ * 최초 생성 날짜 : 2014.02.19
+ * 최종 수정 날짜 : 2014.02.19
+ *
+ * 받는 데이터 aidx
+ * editor : pineoc
+ * 미구현 부분 : 사진 파일 업로드 부분
+ * */
+
+exports.userinfo = function(req,res){
+    var infoData = req.body;
+
+    db.pool.getConnection(function(err,connection){
+        if(err){
+            console.log('error on conn pool userinfo',err);
+            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+            return;
+        }else{
+            connection.query('SELECT * FROM account where a_idx=?',[infoData.aidx],function(err2,result){
+                if(err2){
+                    console.log('error on Query userinfo',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                    return;
+                }else{
+                    console.log('Success on query : ',result);
+                    res.json(result);
+                }
+            });//query
+        }
+    });//conn pool
 
 
 };

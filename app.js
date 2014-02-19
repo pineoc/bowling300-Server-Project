@@ -43,6 +43,7 @@ app.post('/ranking',routes.ranking);
 app.post('/login',routes.login);
 app.post('/user/sign',user.sign);
 app.post('/user/addsign',user.addsign);
+app.post('/user/userinfo',user.userinfo);
 app.get('/user/rankpoint',user.rankpoint);
 
 //insert data function( 점수 입력 함수 )
