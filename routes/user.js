@@ -4,8 +4,6 @@ pineoc@naver.com
 content : user
 2014.02.03 - start
 * */
-
-
 var async = require('async');
 
 //var db = require('./localDB.js');
@@ -461,8 +459,6 @@ exports.userinfo = function(req,res){
             });//query
         }
     });//conn pool
-
-
 };
 
 /*

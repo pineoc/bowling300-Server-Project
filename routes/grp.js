@@ -13,6 +13,86 @@ var util = require('util');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 
+var uploadfunction = function(userid,type,upfile){
+    //var type = req.body.type;
+    //var upfile = req.files.upfile;
+    //var userid = req.body.aidx;
+    var name=upfile.name;//upload file name ex>file.jpg
+    var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
+    var destpath;
+
+    if(upfile.originalFilename!=''){
+        if(type=="profile"){
+            var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',userid.toString());//aidx를 이용
+            console.log('userfolder : ',userfolder);
+            if(!fs.existsSync(userfolder)){
+                //fs.mkdirSync(userfolder);
+                mkdirp(userfolder,function(err){
+                    if(err){
+                        console.log('error on mkdirp make userdir',err);
+                        res.json({result:"FAIL",resultmsg:"FAIL MKDIR"});
+                    }else{
+                        console.log('success');
+                    }
+                });//mkdirp
+            }
+            var destpath = path.resolve(__dirname,'..',userfolder,name);
+        }
+        else if(type=="group"){
+            var groupfolder = path.resolve(process.env.UPLOAD_PATH,'group',userid.toString());//gidx를 이용
+            console.log('groupfolder : ',groupfolder);
+            if(!fs.existsSync(groupfolder)){
+                //fs.mkdirSync(userfolder);
+                mkdirp(groupfolder,function(err){
+                    if(err){
+                        console.log('error on mkdirp make groupdir',err);
+                        res.json({result:"FAIL",resultmsg:"FAIL MKDIR"});
+                    }else{
+                        console.log('success');
+                    }
+                });//mkdirp
+            }
+            var destpath = path.resolve(__dirname,'..',groupfolder,name);
+        }
+//        else if(type=="board"){
+//
+//        }
+//        else if(type=="ball"){
+//
+//        }
+//        var name=upfile.name;//upload file name ex>file.jpg
+//        var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
+//        var destpath = path.resolve(__dirname,'..',userfolder,name);
+//        //public/1/이미지.jpg
+        var checkext = path.extname(name);
+        checkext=checkext.toLowerCase();
+        //check image ext
+        if(checkext=='.jpg' || checkext=='.jpeg' || checkext=='.png'){
+            var is = fs.createReadStream(srcpath); //소스로부터 스트림을 입력받음
+            var os = fs.createWriteStream(destpath);//읽어온 스트림을 통해서 사진파일 생성
+            is.pipe(os);
+            is.on('end',function(){
+                fs.unlinkSync(srcpath);
+                var srcimg = destpath;
+                var idx = destpath.lastIndexOf('.');
+                var ext = destpath.substring(idx); // .jpg
+                var filename = destpath.substring(0,idx);
+            });//is.on callback function
+            console.log('success');
+            //res.json({result:"SUCCESS",resultmsg:"FILE UPLOAD SUCCESS"});
+            return {result:"SUCCESS",resultmsg:"UPLOAD SUCCESS"};
+        }
+        else{//invalid data type
+            console.log('invalid file image');
+            //res.json({result:"FAIL",resultmsg:"INVALID"});
+            return {result:"FAIL",resultmsg:"INVALID"};
+        }
+    }
+    else{//no file
+        console.log('no file');
+        return {result:"FAIL",resultmsg:"NO FILE"};
+    }
+};//upload function
 
 /*
  * 그룹 생성
