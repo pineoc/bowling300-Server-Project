@@ -6,8 +6,8 @@ content : user
 * */
 var async = require('async');
 
-//var db = require('./localDB.js');
-var db = require('./clouluDB.js');
+var db = require('./localDB.js');
+//var db = require('./clouluDB.js');
 
 var path = require('path');
 var fs = require('fs');
@@ -471,16 +471,19 @@ exports.userinfo = function(req,res){
  * 미구현 부분 : 사진 파일 업로드 부분
  * */
 exports.insertScore = function(req,res){
+
     var insData = req.body; // 입력할 데이터를 받음
+    console.log('recv data insert Score: ',insData);
     var data = insData.myscoredata;
     var dataL = insData.leaguedata;
     var dataLength = insData.myscoredata.length;
-    var dataLengthL = insData.leaguedata.length;
+    //var dataLengthL = insData.leaguedata.length;
     var aidx = insData.aidx;
     var s_allScore = 0;
     var s_allGame = 0;
-    console.log('recv data insert Score: ',insData);
+
     console.log('datalength: ',dataLength);
+    console.log('datalengthL : ',insData.leaguedata.length);
     console.log('data : ',data);
     //console.log('data.type : ',data[0].type,data[1].type,data[2].type);
     if(dataLength!=0){
@@ -516,7 +519,7 @@ exports.insertScore = function(req,res){
                                         return;
                                     }
                                     else if(result.affectedRows==1){
-                                        console.log('success, result',result);
+                                        console.log('success solo, result',result);
                                         //res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
                                     }//insert success
                                     connection.release();
@@ -557,7 +560,7 @@ exports.insertScore = function(req,res){
                                         return;
                                     }//error on query
                                     else if(result.affectedRows==1){
-                                        console.log('success, result : ',result);
+                                        console.log('success grp, result : ',result);
                                         //res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
                                     }//insert success
                                     connection.release();
@@ -572,15 +575,16 @@ exports.insertScore = function(req,res){
                 return;
             }
         }//for
-        console.log('success normal data all');
+        console.log('success normal data all', data);
         res.json({result:"SUCCESS",resultmsg:data}); // result_msg에 대한 부분은 차후 수정
     }//if end
-    else if(data.length==0){
+    if(data.length==0){
         console.log('error, no data ');
         res.json({result:"FAIL",resultmsg:"NO DATA"});
     }//no data
-    if(dataLengthL!=0){
-        for(var i=0;i<dataLengthL;i++){
+    if(insData.leaguedata.length!=0){
+        console.log('insData.leaguedata : ',dataL);
+        for(var i=0;i<insData.leaguedata.length;i++){
             if(dataL[i].type>0){
                 console.log('league data : ',dataL[i]);
                 if(dataL[i].allScore/dataL[i].allGame>300){
@@ -600,6 +604,7 @@ exports.insertScore = function(req,res){
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                             return;
                         }else{
+                            console.log('dataL : ',dataL);
                             connection.query('UPDATE account_has_group SET league_avg=?,league_date=now() WHERE account_a_idx=? AND group_g_idx=?',
                                 [(dataL[i].allScore/dataL[i].allGame).toFixed(4),insData.aidx,dataL[i].type],function(err2,result){
                                 if(err2){
@@ -608,7 +613,7 @@ exports.insertScore = function(req,res){
                                     return;
                                 }
                                 else if(result.affectedRows==1){
-                                    console.log('success, result',result);
+                                    console.log('success league , result',result);
                                 }
                                 connection.release();
                             });//query
@@ -624,9 +629,8 @@ exports.insertScore = function(req,res){
 
         }
         console.log('success on league data all');
-        res.json({result:"SUCESS",resultmsg:dataL});
     }
-    else if(dataL.length==0){
+    if(insData.leaguedata.length==0){
         console.log('no data on league');
         res.json({result:"FAIL LEAGUE",resulmsg:"NO DATA LEAGUE"});
     }

@@ -251,7 +251,6 @@ exports.groupMake = function(req,res){
                                             }
                                             else{//photo null
                                                 console.log('file not exist');
-
                                                 res.json({
                                                     result:"SUCCESS",
                                                     resultmsg:"BUT NO FILE",
