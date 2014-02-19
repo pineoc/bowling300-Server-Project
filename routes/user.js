@@ -35,23 +35,17 @@ var job = new cronJob({
         // Runs every weekday (Monday)
         // at 00:00:00 AM.
         rankPointDateStart.setDate(rankPointDateStart.getDate());//start point
-        cosole.log(rankPointDateStart,rankPointDateEnd);
+        console.log(rankPointDateStart,rankPointDateEnd);
     },
     start: false,
     timeZone: "Asia/Seoul"
 });
 job.start();
 
-
-if(process.env.UPLOAD_PATH == undefined)
-{
-    process.env.UPLOAD_PATH = 'public';
-}//if =local
-
 /*
  * upload function
  * 최초 생성 날짜 : 2014.02.09
- * 최종 수정 날짜 : 2014.02.11
+ * 최종 수정 날짜 : 2014.02.18
  *
  * 받는 데이터 aidx, upfile, type
  * editor : pineoc
@@ -857,7 +851,7 @@ exports.groupList = function(req,res){
                                 arr[i] = {
                                     gidx :results[i].gidx,
                                     gname:results[i].gname,
-                                    gphoto:"http://bowling.pineoc.cloulu.com/uploads/group/"+results[i].gidx+"/"+results[i].gphoto,
+                                    gphoto:"http://testbowling.pineoc.cloulu.com/uploads/group/"+results[i].gidx+"/"+results[i].gphoto,
                                     gdate:results[i].gdate
                                 };
                             }//for
@@ -1148,7 +1142,7 @@ exports.groupsearch = function(req,res){
                                 for(var i=0;i<result.length;i++){
                                     arr2[i] = {
                                         gname:arg1[i].gname,
-                                        gphoto:"http://bowling.pineoc.cloulu.com/uploads/group/"+arg1[i].gidx+"/"+arg1[i].gphoto,
+                                        gphoto:"http://testbowling.pineoc.cloulu.com/uploads/group/"+arg1[i].gidx+"/"+arg1[i].gphoto,
                                         gmaster:result[i].name,
                                         gdate:arg1[i].gdate
                                     };
@@ -1212,10 +1206,10 @@ exports.groupmember = function(req,res){
                                 for(var i=0;i<result.length;i++){
                                     var link;
                                     if(result[i].prophoto==null){
-                                        link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
+                                        link = "http://testbowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                                     }
                                     else{
-                                        link = "http://bowling.pineoc.cloulu.com/uploads/user/"+result[i].a_idx+"/"+result[i].prophoto;
+                                        link = "http://testbowling.pineoc.cloulu.com/uploads/user/"+result[i].a_idx+"/"+result[i].prophoto;
                                     }
                                     arr[i]={
                                         name : result[i].name,
@@ -1259,7 +1253,7 @@ exports.groupmember = function(req,res){
                                 callback(null,{
                                     result:"SUCCESS",
                                     resultmsg:"SUCCESS GRPMEM",
-                                    proPhoto: (result[0].prophoto==null) ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+grpmemData.aidx+"/"+result[0].prophoto,
+                                    proPhoto: (result[0].prophoto==null) ? "http://testbowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://testbowling.pineoc.cloulu.com/uploads/user/"+grpmemData.aidx+"/"+result[0].prophoto,
                                     member:arg.member
                                 });
                             }
@@ -1331,10 +1325,10 @@ exports.groupLeague = function(req,res){
             for(var i=0;i<arg.results.length;i++){
                 var link;
                 if(arg.results[i].prophoto==null){
-                    link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
+                    link = "http://testbowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
                 }
                 else{
-                    link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg.results[i].a_idx+"/"+arg.results[i].prophoto;
+                    link = "http://testbowling.pineoc.cloulu.com/uploads/user/"+arg.results[i].a_idx+"/"+arg.results[i].prophoto;
                 }
                 arr[i] = {
                     name : arg.results[i].name,
@@ -1397,7 +1391,7 @@ exports.groupLeague = function(req,res){
                                 res.json({
                                     result:"SUCCESS",
                                     resultmsg:"SUCCESS LEAGUE",
-                                    proPhoto:results[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+leagueData.aidx+"/"+results[0].prophoto,
+                                    proPhoto:results[0].prophoto==null ? "http://testbowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://testbowling.pineoc.cloulu.com/uploads/user/"+leagueData.aidx+"/"+results[0].prophoto,
                                     myavg : (results[0].l_avg).toFixed(1),
                                     allavg:result.allavg,
                                     leaguedata:result.arr});
