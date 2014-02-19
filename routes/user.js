@@ -406,7 +406,7 @@ exports.addsign = function(req,res){
 
 exports.userinfo = function(req,res){
     var infoData = req.body;
-
+    var resultData;
     db.pool.getConnection(function(err,connection){
         if(err){
             console.log('error on conn pool userinfo',err);
@@ -420,7 +420,23 @@ exports.userinfo = function(req,res){
                     return;
                 }else{
                     console.log('Success on query : ',result);
-                    res.json(result);
+                    resultData = {
+                        email : result[0].email,
+                        name : result[0].name,
+                        pwd : result[0].pwd,
+                        proPhoto : result[0].prophoto,
+                        ballPhoto : result[0].ballphoto,
+                        sex : result[0].sex,
+                        hand : result[0].hand,
+                        locale : result[0].locale,
+                        allhighscore : result[0].all_highscore,
+                        country : result[0].country,
+                        style : result[0].style,
+                        step : result[0].step,
+                        series300 : result[0].series300,
+                        series800 : result[0].series800
+                    };
+                    res.json(resultData);
                 }
             });//query
         }
