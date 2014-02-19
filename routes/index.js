@@ -42,7 +42,7 @@ exports.ranking = function(req,res){
     var limit = 0;
     console.log('recv data ranking : ',rankData);
     //limit = req.params.limit;
-    if(rankData.type=="world"){//개인 데이터에 따른 월드 랭킹
+    if(rankData.type=="world" && rankData.aidx!=0){//개인 데이터에 따른 월드 랭킹
         async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
             function(callback){
                 var avg;
@@ -57,7 +57,7 @@ exports.ranking = function(req,res){
                         connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
-                                res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                 return;
                             }
                             else if(result.length){
@@ -92,7 +92,7 @@ exports.ranking = function(req,res){
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query world rank',err2);
-                                    res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                     return;
                                 }
                                 else{
@@ -123,7 +123,7 @@ exports.ranking = function(req,res){
                             function(err2,results2){
                                 if(err2){
                                     console.log('error on query world rank me',err2);
-                                    res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                     return;
                                 }
                                 else{
@@ -157,7 +157,7 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myavg:avg,myrank:worldRank,myproPhoto:arg1.prophoto,arr:arr};
+                                    resultData = {myavg:avg.toFixed(1),myrank:worldRank,myproPhoto:arg1.prophoto,arr:arr};
                                     callback(null,resultData);
                                 }
                                 connection.release();
@@ -169,7 +169,7 @@ exports.ranking = function(req,res){
             function(err,results){
                 if(err){
                     console.log('error on sort async waterfall world',err);
-                    res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
                 }
                 else{
                     console.log('data : ',results);
@@ -178,6 +178,105 @@ exports.ranking = function(req,res){
             }
         );
 
+    }
+    else if(rankData.type=="world" && rankData.aidx==0){
+        async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
+            function (callback){
+                db.pool.getConnection(function(err,connection){
+                    if(err){
+                        console.log('error on connection pool world rank aidx=0',err);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
+                    }//error on connection pool
+                    else{
+                        connection.query('SELECT * FROM account order by (allscore/allgame) desc limit ?,30',[limit],
+                            function(err2,results){
+                                if(err2){
+                                    console.log('error on query world rank aidx=0',err2);
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    return;
+                                }
+                                else{
+                                    callback(null,{results:results});//data
+                                }
+                                connection.release();
+                            });//query
+                    }
+                });//connection pool
+            },
+            function (arg1,callback){
+                //console.log('arg1 : ',arg1,arg1.allscore,arg1.allgame);
+                var arr=[];
+                var avg = arg1.avg;
+                var resultData;
+                var worldRank=0;
+
+                db.pool.getConnection(function(err,connection){
+                    if(err){
+                        console.log('error on connection pool world rank me',err);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
+                    }//error on connection pool
+                    else{
+                        connection.query('SELECT count(*) cnt FROM account a where (a.allscore/a.allgame)>=? order by (a.allscore/a.allgame) desc',
+                            [avg],//평균 값, 해당 아이디 idx
+                            function(err2,results2){
+                                if(err2){
+                                    console.log('error on query world rank me',err2);
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    return;
+                                }
+                                else{
+                                    worldRank = results2[0].cnt+1;
+                                    console.log(worldRank,avg);
+                                    //console.log(worldRank,avg,results);
+                                    for(var i=0;i<arg1.results.length;i++){
+                                        var link;
+                                        if(arg1.results[i].prophoto==null){
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png";
+                                        }
+                                        else{
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
+                                        }
+                                        arr[i]={
+                                            rank : i+1,
+                                            name : arg1.results[i].name,
+                                            country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
+                                            proPhoto : link,
+                                            ballPhoto : arg1.results[i].ballphoto,
+                                            avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
+                                            allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
+                                            highscore : arg1.results[i].highscore,//그주의 최고점수
+                                            handi : arg1.results[i].handi,
+                                            hand : arg1.results[i].hand,
+                                            year : arg1.results[i].year,
+                                            ballweight : arg1.results[i].ballweight,
+                                            style : arg1.results[i].style,
+                                            step : arg1.results[i].step,
+                                            series300 : arg1.results[i].series300,
+                                            series800 : arg1.results[i].series800
+                                        };//arr에 정보를 객체 형태로 저장
+                                    }//for
+                                    resultData = {arr:arr};
+                                    callback(null,resultData);
+                                }
+                                connection.release();
+                            });//query
+                    }
+                });//connection pool
+            }
+        ],
+            function(err,results){
+                if(err){
+                    console.log('error on sort async waterfall world',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
+                }
+                else{
+                    console.log('data : ',results);
+                    res.json(results);
+                }
+            }
+        );
     }
     else if(rankData.type=="local"){//점수를 입력한 데이터
         async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
@@ -194,7 +293,7 @@ exports.ranking = function(req,res){
                         connection.query('SELECT allscore,allgame,prophoto,country from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
-                                res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                 return;
                             }
                             else if(result.length){
@@ -230,7 +329,7 @@ exports.ranking = function(req,res){
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query local rank',err2);
-                                    res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                     return;
                                 }
                                 else if(results.length){
@@ -265,7 +364,7 @@ exports.ranking = function(req,res){
                             function(err2,results2){
                                 if(err2){
                                     console.log('error on query local rank me',err2);
-                                    res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                     return;
                                 }
                                 else{
@@ -297,7 +396,7 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myavg:avg,myrank:localRank,myproPhoto:arg1.prophoto,arr:arr};
+                                    resultData = {myavg:avg.toFixed(1),myrank:localRank,myproPhoto:arg1.prophoto,arr:arr};
                                     callback(null,resultData);
                                 }
                                 connection.release();
@@ -309,7 +408,7 @@ exports.ranking = function(req,res){
             function(err,results){
                 if(err){
                     console.log('error on sort async waterfall local',err);
-                    res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
                 }
                 else{
                     console.log('data : ',results);
@@ -335,7 +434,7 @@ exports.ranking = function(req,res){
                         connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[rankData.aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
-                                res.json({result:"FAIL",resultmsg:"INVALID QUERY"});
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                 return;
                             }
                             else if(result.length){
@@ -347,7 +446,7 @@ exports.ranking = function(req,res){
                                 }
                                 console.log('avg : ',result[0].allscore/result[0].allgame);
                                 //console.log(result);
-                                callback(null,{avg:avg,prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+rankData.aidx+"/"+result[0].prophoto});
+                                callback(null,{avg:avg.toFixed(1),prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+rankData.aidx+"/"+result[0].prophoto});
                             }
                             else{
                                 console.log('no data');
@@ -371,7 +470,7 @@ exports.ranking = function(req,res){
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query group rank',err2);
-                                    res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                     return;
                                 }
                                 else if(results.length){
@@ -403,7 +502,7 @@ exports.ranking = function(req,res){
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query group rank me',err2);
-                                    res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                     return;
                                 }
                                 else if(results.length){
@@ -435,7 +534,7 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myavg:avg,myrank:groupRank,myproPhoto:arg1.prophoto,arr:arr};
+                                    resultData = {myavg:avg.toFixed(1),myrank:groupRank,myproPhoto:arg1.prophoto,arr:arr};
                                     callback(null,resultData);
                                 }
                                 else{
@@ -453,7 +552,7 @@ exports.ranking = function(req,res){
             function(err,results){
                 if(err){
                     console.log('error on sort async waterfall group',err);
-                    res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
                 }
                 else{
                     console.log('data : ',results);
