@@ -13,6 +13,14 @@ var util = require('util');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 
+function formatDate(date) {
+    var year = date.getFullYear();
+    var month = date.getMonth() + 1;
+    var day = date.getDate();
+    console.log((year.toString() +'-'+ month.toString() +'-'+ day.toString()));
+    return (year.toString() +'-'+ month.toString() +'-'+ day.toString());
+}
+
 var uploadfunction = function(userid,type,upfile){
     //var type = req.body.type;
     //var upfile = req.files.upfile;
