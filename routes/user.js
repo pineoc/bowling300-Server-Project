@@ -1392,7 +1392,7 @@ exports.groupLeague = function(req,res){
                                     result:"SUCCESS",
                                     resultmsg:"SUCCESS LEAGUE",
                                     proPhoto:results[0].prophoto==null ? "http://testbowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://testbowling.pineoc.cloulu.com/uploads/user/"+leagueData.aidx+"/"+results[0].prophoto,
-                                    myavg : (results[0].l_avg).toFixed(1),
+                                    myavg : (results[0].l_avg==null || results[0].l_avg==0 ) ? 0 : (results[0].l_avg).toFixed(1),
                                     allavg:result.allavg,
                                     leaguedata:result.arr});
                             }
