@@ -26,7 +26,33 @@ exports.index = function(req, res){
 exports.login = function(req,res){
     var loginData = req.body;
 
-
+    db.pool.getConnection(function(err,connection){
+        if(err){
+            console.log('error on conn pool login',err);
+            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+            return ;
+        }
+        else{
+            connection.query('SELECT count(*) cnt,a_idx FROM account WHERE email=? AND pwd=?',[loginData.email,loginData.pwd],function(err2,result){
+                if(err2){
+                    console.log('error on query login',err2);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                    return;
+                }
+                else{
+                    if(result[0].cnt==0){
+                        console.log('no account on DB',result[0].cnt);
+                        res.json({result:"FAIL",resultmsg:"NO ACCOUNT"});
+                    }
+                    else{
+                        console.log('Success on login',result[0]);
+                        res.json({result:"SUCCESS",resultmsg:"SUCCESS ON LOGIN",aidx:result[0].a_idx});
+                    }
+                }
+                connection.release();
+            });//query
+        }
+    });//conn pool
 };
 
 /*

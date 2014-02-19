@@ -2,6 +2,7 @@
 var express = require('express');
 var routes = require('./routes');
 var user = require('./routes/user');
+var grp = require('./routes/grp');
 var board = require('./routes/board');
 var test = require('./routes/test');
 var http = require('http');
@@ -50,13 +51,13 @@ app.post('/user/score',user.insertScore);
 app.post('/test/upload',test.upload);
 
 //group function ( 그룹 관련 함수)
-app.post('/user/groupmake',user.groupMake);
-app.post('/user/groupjoin',user.groupJoin);
-app.post('/user/grouplist',user.groupList);
-app.post('/user/groupdel',user.groupDelete);
-app.post('/user/groupsearch',user.groupsearch);
-app.post('/user/groupmember',user.groupmember);
-app.post('/user/groupleague',user.groupLeague);
+app.post('/user/groupmake',grp.groupMake);
+app.post('/user/groupjoin',grp.groupJoin);
+app.post('/user/grouplist',grp.groupList);
+app.post('/user/groupdel',grp.groupDelete);
+app.post('/user/groupsearch',grp.groupsearch);
+app.post('/user/groupmember',grp.groupmember);
+app.post('/user/groupleague',grp.groupLeague);
 //test
 
 //board function ( 게시판 관련 함수 )
