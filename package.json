@@ -13,6 +13,7 @@
     "easyimage": "~0.1.6",
     "mkdirp" : "*",
     "cron":"*",
-    "crypto":"*"
+    "crypto":"*",
+    "hash-int":"*"
   }
 }

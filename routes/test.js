@@ -13,6 +13,7 @@ var path = require('path');
 var fs = require('fs');
 var easyimage = require('easyimage');
 var mkdirp = require('mkdirp');
+var hash_int = require('hash-int');
 var uploadFunc = function(data){
 
 };
@@ -84,6 +85,10 @@ if(process.env.UPLOAD_PATH == undefined)
 exports.testenc = function(req,res){
     var data = req.body;
     var enc = cry.encryption(data.idx);
+    console.log('enc, hex to integer : ',parseInt(enc,16));
     var dec = cry.decryption(enc);
-    res.json({enc:enc,dec:dec});
+    var hash_enc = hash_int(enc);
+    var hash_dec = hash_int(dec);
+    var b = cry.encB(data.idx);
+    res.json({enc:enc,dec:dec,henc:hash_enc,denc:hash_dec,encB:b,decB:cry.decB(b)});
 }

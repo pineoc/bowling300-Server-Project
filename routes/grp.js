@@ -239,6 +239,7 @@ exports.groupMake = function(req,res){
     var groupmakeData = req.body; // json data get
     var grp_photo = req.files.grpPhoto;
     var grpfilename;
+    var aidx = cry.decB(groupmakeData.aidx);
     console.log('recv data grpMake : ',groupmakeData);
     var date = new Date();
     if(grp_photo!=null){
@@ -249,7 +250,7 @@ exports.groupMake = function(req,res){
 
     var grp_id;
     var chkDup; // check duplication
-    if(groupmakeData==null || groupmakeData.aidx==null|| groupmakeData.gname==null || groupmakeData.gpwd==null || groupmakeData.aidx==0 ){
+    if(groupmakeData==null || groupmakeData.aidx==null|| groupmakeData.gname==null || groupmakeData.gpwd==null || aidx==0 ){
         console.log('INVALID DATA of grpmake data, NULL',groupmakeData);
         res.json({result:"FAIL",resultmsg:"INVALID NULL"});
     }
@@ -286,7 +287,7 @@ exports.groupMake = function(req,res){
                                             }//error on connection pool
                                             else {
                                                 connection.query('INSERT into groups(g_name,g_pwd,g_master,g_date)values(?,?,?,now())',
-                                                    [groupmakeData.gname, groupmakeData.gpwd, groupmakeData.aidx],
+                                                    [groupmakeData.gname, groupmakeData.gpwd, aidx],
                                                     function (err2, result) {
                                                         if (err2) {
                                                             console.log('error on query makegrp on make', err2);
@@ -311,7 +312,7 @@ exports.groupMake = function(req,res){
                                             }//error on connection pool
                                             else {
                                                 connection.query('INSERT into account_has_group(account_a_idx,group_g_idx,g_score,g_game,g_joindate)values(?,?,?,?,now())',
-                                                    [groupmakeData.aidx, arg1.gidx, 0, 0], function (err2, result) {
+                                                    [aidx, arg1.gidx, 0, 0], function (err2, result) {
                                                         if (err2) {
                                                             console.log('error on query makegrp on insert account has group', err2);
                                                             res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
@@ -407,8 +408,9 @@ exports.groupMake = function(req,res){
  * */
 exports.groupJoin = function(req,res){
     var grpjoinData = req.body;
+    var aidx = cry.decB(grpjoinData.aidx);
     console.log('recv data grpJoin : ',grpjoinData);
-    if(grpjoinData.aidx==null||grpjoinData.gname==null||grpjoinData.gpwd==null){
+    if(aidx==null||grpjoinData.gname==null||grpjoinData.gpwd==null){
         console.log('invalid data of null at grpJoin');
         res.json({result:"FAIL",resultmsg:"INVALID NULL"});
         return;
@@ -449,7 +451,7 @@ exports.groupJoin = function(req,res){
                         }//error on conn pool
                         else{
                             connection.query('INSERT INTO account_has_group(account_a_idx,group_g_idx,g_score,g_game,g_joindate)values(?,?,?,?,now())',
-                                [grpjoinData.aidx,arg1.gidx,0,0],function(err2,results){
+                                [aidx,arg1.gidx,0,0],function(err2,results){
                                     if(err2){
                                         console.log('error on query grp join',err2);
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
@@ -499,6 +501,7 @@ exports.groupJoin = function(req,res){
 
 exports.groupList = function(req,res){
     var grplistData = req.body;
+    var aidx = cry.decB(grplistData.aidx);
     var arr=[];
     console.log('recv data grplist : ',grplistData);
     if(grplistData==null){
@@ -514,7 +517,7 @@ exports.groupList = function(req,res){
             }//error on conn pool
             else{
                 connection.query('select g.g_name gname, g.g_photo gphoto,g.g_idx gidx,DATE_FORMAT(g.g_date,"%Y-%m-%d") gdate,ag.g_joindate joindate from groups as g left outer join account_has_group as ag on g.g_idx = ag.group_g_idx where ag.group_g_idx is not null and ag.account_a_idx=? order by DATE(joindate),HOUR(joindate), MINUTE(joindate), joindate ',
-                    [grplistData.aidx],function(err2,results){
+                    [aidx],function(err2,results){
                         if(err2){
                             console.log('error on query grp list',err2);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
@@ -558,8 +561,9 @@ exports.groupDelete = function(req,res){
      * 3. 그룹원이 없을경우 그룹테이블에서 그룹을 지운다.
      * */
     var grpdelData = req.body; // aidx, gidx 를 받아온다
+    var aidx = cry.decB(grpdelData.aidx);
     console.log('recv data grpdel : ',grpdelData);
-    if(grpdelData==null || grpdelData.aidx==null || grpdelData.gidx==null){
+    if(grpdelData==null || aidx==null || grpdelData.gidx==null){
         console.log('error on null recv data');
         res.json({result:"FAIL",resultmsg:"NO DATA(NULL)"});
         return;
@@ -598,7 +602,7 @@ exports.groupDelete = function(req,res){
                         return;
                     }else{
                         connection.query('SELECT count(*) cnt from groups where g_master=? and g_idx=?',
-                            [grpdelData.aidx,grpdelData.gidx],function(err2,result){
+                            [aidx,grpdelData.gidx],function(err2,result){
                                 if(err2){
                                     console.log('error on query chk grp master account',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
@@ -629,7 +633,7 @@ exports.groupDelete = function(req,res){
                                 return;
                             }else{
                                 connection.query('DELETE FROM account_has_group where a_idx=? and g_idx=?',
-                                    [grpdelData.aidx,grpdelData.gidx],function(err2,result){
+                                    [aidx,grpdelData.gidx],function(err2,result){
                                         if(err2){
                                             console.log('error on query grp master del',err2);
                                             res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
@@ -696,7 +700,7 @@ exports.groupDelete = function(req,res){
                                 return;
                             }else{
                                 connection.query('DELETE FROM account_has_group where account_a_idx=? and group_g_idx=?',
-                                    [grpdelData.aidx,grpdelData.gidx],function(err2,result){
+                                    [aidx,grpdelData.gidx],function(err2,result){
                                         if(err2){
                                             console.log('error on query grp member del',err2);
                                             res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
@@ -726,7 +730,7 @@ exports.groupDelete = function(req,res){
                             return;
                         }else{
                             connection.query('DELETE FROM account_has_group where account_a_idx=? and group_g_idx=?',
-                                [grpdelData.aidx,grpdelData.gidx],function(err2,result){
+                                [aidx,grpdelData.gidx],function(err2,result){
                                     if(err2){
                                         console.log('error on query grp member del acc_grp',err2);
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
@@ -895,6 +899,7 @@ exports.groupsearch = function(req,res){
  * */
 exports.groupmember = function(req,res){
     var grpmemData = req.body;
+    var aidx = cry.decB(grpmemData.aidx);
     var arr = [];
     console.log('recv data grpMem : ',grpmemData);
     async.waterfall([
@@ -965,7 +970,7 @@ exports.groupmember = function(req,res){
                                 callback(null,{
                                     result:"SUCCESS",
                                     resultmsg:"SUCCESS GRPMEM",
-                                    proPhoto: (result[0].prophoto==null) ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+grpmemData.aidx+"/"+result[0].prophoto,
+                                    proPhoto: (result[0].prophoto==null) ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+result[0].prophoto,
                                     member:arg.member
                                 });
                             }
@@ -1001,6 +1006,7 @@ exports.groupmember = function(req,res){
  * */
 exports.groupLeague = function(req,res){
     var leagueData = req.body;
+    var aidx = cry.decB(leagueData.aidx);
     console.log('recv data on league : ',leagueData);
     async.waterfall([
         function(callback){
@@ -1091,7 +1097,7 @@ exports.groupLeague = function(req,res){
                 }//error on connection pool
                 else{
                     connection.query('select a.prophoto prophoto,ag.league_avg l_avg from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and ag.account_a_idx=? ',
-                        [leagueData.gidx,leagueData.aidx],
+                        [leagueData.gidx,aidx],
                         function(err2,results){
                             if(err2){
                                 console.log('error on query league rank',err2);
@@ -1103,7 +1109,7 @@ exports.groupLeague = function(req,res){
                                 res.json({
                                     result:"SUCCESS",
                                     resultmsg:"SUCCESS LEAGUE",
-                                    proPhoto:results[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+leagueData.aidx+"/"+results[0].prophoto,
+                                    proPhoto:results[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+results[0].prophoto,
                                     myavg : (results[0].l_avg==null || results[0].l_avg==0 ) ? 0 : (results[0].l_avg).toFixed(1),
                                     allavg:result.allavg,
                                     leaguedata:result.arr});

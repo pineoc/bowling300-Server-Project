@@ -358,7 +358,7 @@ exports.rankpoint = function(req,res){
                                             }
                                             else if (result.affectedRows == 1) {
                                                 console.log('sign result : ', result);
-                                                returnData = {result: "SUCCESS", aidx: result.insertId};
+                                                returnData = {result: "SUCCESS", aidx: cry.encB(result.insertId)};
                                                 var result_upload = uploadfunction(result.insertId,"profile",proPhoto_file);
                                                 if(result_upload.result=="SUCCESS"){
                                                     console.log(result_upload);
@@ -366,7 +366,7 @@ exports.rankpoint = function(req,res){
                                                 }
                                                 else{
                                                     console.log(result_upload);
-                                                    res.json({result:"SUCCESS",resultmsg:"BUT UPLOAD FAIL"});
+                                                    res.json({result:"FAIL",resultmsg:"BUT UPLOAD FAIL"});
                                                 }
                                             }
                                             connection.release();
@@ -387,12 +387,13 @@ exports.rankpoint = function(req,res){
  * 최초 생성 날짜 : 2014.02.02
  * 최종 수정 날짜 : 2014.02.19
  *
- * 받는 데이터 : year, ballweight, style, step, 800series, 300series, ballphoto
+ * 받는 데이터 : year, ballweight, style, step, series800, series300, ballphoto
  *
  * editor : pineoc
  * */
 exports.addsign = function(req,res){
     var addSignData = req.body; // json data
+    var aidx = cry.decB(req.body.aidx);
     db.pool.getConnection(function(err,connection){
         if(err){
             console.log('error on connection pool addsign',err);
@@ -401,7 +402,7 @@ exports.addsign = function(req,res){
         }//error on connection pool
         else{
             connection.query('UPDATE account SET year=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
-                [addSignData.year,addSignData.ballweight,addSignData.style,addSignData.step,addSignData.series800,addSignData.series300,addSignData.aidx],function(err2,result){
+                [addSignData.year,addSignData.ballweight,addSignData.style,addSignData.step,addSignData.series800,addSignData.series300,aidx],function(err2,result){
                     if(err2){
                         console.log('error on query addsign',err2);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
@@ -429,6 +430,7 @@ exports.addsign = function(req,res){
 
 exports.userinfo = function(req,res){
     var infoData = req.body;
+    var aidx = cry.decB(infoData.aidx);
     var resultData;
     db.pool.getConnection(function(err,connection){
         if(err){
@@ -481,7 +483,7 @@ exports.insertScore = function(req,res){
     console.log('recv data insert Score: ',insData);
     var data = insData.myscoredata;
     var dataLength = insData.myscoredata.length;
-    var aidx = insData.aidx;
+    var aidx = cry.decB(insData.aidx);
     var s_allScore = 0;
     var s_allGame = 0;
 
