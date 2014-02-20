@@ -31,10 +31,11 @@ var rankPointDateEnd = new Date();
 var job = new cronJob({
     cronTime: '00 00 00 * * 1',
     onTick: function() {
+
         // Runs every weekday (Monday)
         // at 00:00:00 AM.
         rankPointDateStart.setDate(rankPointDateStart.getDate());//start point
-        cosole.log(rankPointDateStart,rankPointDateEnd);
+        console.log(rankPointDateStart);
     },
     start: false,
     timeZone: "Asia/Seoul"
@@ -278,6 +279,9 @@ function formatDate(date) {
  * */
 exports.rankpoint = function(req,res){
     //res.send("respond with a resource");
+    if(rankPointDateStart.getDay()!=1){
+        rankPointDateStart.setDate(rankPointDateStart.getDate()-(rankPointDateStart.getDay()-1));
+    }
     rankPointDateEnd.setDate(rankPointDateStart.getDate()+7);
     var point = {
         startPoint:formatDate(rankPointDateStart),
@@ -545,28 +549,53 @@ exports.insertScore = function(req,res){
                     return;
                 }
                 else{
-                    db.pool.getConnection(function(err,connection){
-                        if(err){
-                            console.log('error on connection pool group',err);
-                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                            return;
-                        }//error on connection pool
-                        else{
-                            connection.query('UPDATE account_has_group SET g_score=?,g_game=? WHERE account_a_idx=? AND group_g_idx=?',
-                                [grpScore,grpGame,aidx,grpIdx],function(err2,result){
+                    if(data[i].league==0){ // no league
+                        db.pool.getConnection(function(err,connection){
+                            if(err){
+                                console.log('error on connection pool group',err);
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                return;
+                            }//error on connection pool
+                            else{
+                                connection.query('UPDATE account_has_group SET g_score=?,g_game=? WHERE account_a_idx=? AND group_g_idx=?',
+                                    [grpScore,grpGame,aidx,grpIdx],function(err2,result){
+                                        if(err2){
+                                            console.log('error on query insert grp',err2);
+                                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                            return;
+                                        }//error on query
+                                        else if(result.affectedRows==1){
+                                            console.log('success grp, result : ',result);
+                                            //res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
+                                        }//insert success
+                                        connection.release();
+                                    });//query
+                            }//no error on connection pool
+                        });//connection pool
+                    }
+                    else{ //league data
+                            db.pool.getConnection(function(err,connection){
+                            if(err){
+                                console.log('error on conn pool league insert');
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                return;
+                            }else{
+                                console.log('data[',i,'] : ',data[i]);
+                                connection.query('UPDATE account_has_group SET league_avg=?,league_date=now() WHERE account_a_idx=? AND group_g_idx=?',
+                                    [(data[i].allScore/data[i].allGame).toFixed(4),insData.aidx,data[i].type],function(err2,result){
                                     if(err2){
-                                        console.log('error on query insert grp',err2);
+                                        console.log('error on query league insert');
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                         return;
-                                    }//error on query
+                                    }
                                     else if(result.affectedRows==1){
-                                        console.log('success grp, result : ',result);
-                                        //res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
-                                    }//insert success
+                                        console.log('success league , result',result);
+                                    }
                                     connection.release();
                                 });//query
-                        }//no error on connection pool
-                    });//connection pool
+                            }
+                        });//conn pool
+                    }
                 }
             }//group data
             else{
@@ -578,62 +607,62 @@ exports.insertScore = function(req,res){
         console.log('success normal data all', data);
         res.json({result:"SUCCESS",resultmsg:data}); // result_msg에 대한 부분은 차후 수정
     }//if end
-    if(data.length==0){
+    else if(data.length==0){
         console.log('error, no data ');
         res.json({result:"FAIL",resultmsg:"NO DATA"});
     }//no data
-    if(insData.leaguedata.length!=0){
-        console.log('insData.leaguedata : ',dataL);
-        for(var i=0;i<insData.leaguedata.length;i++){
-            if(dataL[i].type>0){
-                console.log('league data : ',dataL[i]);
-                if(dataL[i].allScore/dataL[i].allGame>300){
-                    console.log('INVALID data over 300 avg league');
-                    res.json({result:"FAIL",resultmsg:"INVALID OVER 300 LEAGUE"});
-                    return;
-                }
-                else if(dataL[i].allGame==0){
-                    console.log('INVALID data allgame 0 league');
-                    res.json({result:"FAIL",resultmsg:"INVALID GAME ZERO LEAGUE"});
-                    return;
-                }
-                else{
-                    db.pool.getConnection(function(err,connection){
-                        if(err){
-                            console.log('error on conn pool league insert');
-                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                            return;
-                        }else{
-                            console.log('dataL : ',dataL);
-                            connection.query('UPDATE account_has_group SET league_avg=?,league_date=now() WHERE account_a_idx=? AND group_g_idx=?',
-                                [(dataL[i].allScore/dataL[i].allGame).toFixed(4),insData.aidx,dataL[i].type],function(err2,result){
-                                if(err2){
-                                    console.log('error on query league insert');
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                                    return;
-                                }
-                                else if(result.affectedRows==1){
-                                    console.log('success league , result',result);
-                                }
-                                connection.release();
-                            });//query
-                        }
-                    });//conn pool
-                }
-            }
-            else{
-                console.log('error type on league data');
-                res.json({result:"FAIL",resultmsg:"TYPE ERR LEAGUE"});
-                return;
-            }
-
-        }
-        console.log('success on league data all');
-    }
-    if(insData.leaguedata.length==0){
-        console.log('no data on league');
-        res.json({result:"FAIL LEAGUE",resulmsg:"NO DATA LEAGUE"});
-    }
+//    if(insData.leaguedata.length!=0){
+//        console.log('insData.leaguedata : ',dataL);
+//        for(var i=0;i<insData.leaguedata.length;i++){
+//            if(dataL[i].type>0){
+//                console.log('league data : ',dataL[i]);
+//                if(dataL[i].allScore/dataL[i].allGame>300){
+//                    console.log('INVALID data over 300 avg league');
+//                    res.json({result:"FAIL",resultmsg:"INVALID OVER 300 LEAGUE"});
+//                    return;
+//                }
+//                else if(dataL[i].allGame==0){
+//                    console.log('INVALID data allgame 0 league');
+//                    res.json({result:"FAIL",resultmsg:"INVALID GAME ZERO LEAGUE"});
+//                    return;
+//                }
+//                else{
+//                    db.pool.getConnection(function(err,connection){
+//                        if(err){
+//                            console.log('error on conn pool league insert');
+//                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+//                            return;
+//                        }else{
+//                            console.log('dataL : ',dataL);
+//                            connection.query('UPDATE account_has_group SET league_avg=?,league_date=now() WHERE account_a_idx=? AND group_g_idx=?',
+//                                [(dataL[i].allScore/dataL[i].allGame).toFixed(4),insData.aidx,dataL[i].type],function(err2,result){
+//                                if(err2){
+//                                    console.log('error on query league insert');
+//                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+//                                    return;
+//                                }
+//                                else if(result.affectedRows==1){
+//                                    console.log('success league , result',result);
+//                                }
+//                                connection.release();
+//                            });//query
+//                        }
+//                    });//conn pool
+//                }
+//            }
+//            else{
+//                console.log('error type on league data');
+//                res.json({result:"FAIL",resultmsg:"TYPE ERR LEAGUE"});
+//                return;
+//            }
+//
+//        }
+//        console.log('success on league data all');
+//    }
+//    if(insData.leaguedata.length==0){
+//        console.log('no data on league');
+//        res.json({result:"FAIL LEAGUE",resulmsg:"NO DATA LEAGUE"});
+//    }
 
 };//insertScore
 
