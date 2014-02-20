@@ -234,7 +234,7 @@ function deletePhoto(aidx,type){
                         return;
                     }
                     else{
-                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
+                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'group',aidx);
                         fs.unlink(userfolder+"/"+result[0].g_photo, function (err) {
                             if (err){
                                 console.log('error on delete file',err);

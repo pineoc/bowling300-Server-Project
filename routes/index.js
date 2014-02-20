@@ -387,7 +387,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT count(*) cnt FROM account a where (a.allscore/a.allgame)>=? and a.locale=? order by (a.allscore/a.allgame) desc',
+                        connection.query('SELECT count(*) cnt FROM account a where (a.allscore/a.allgame)>=? and a.country=? order by (a.allscore/a.allgame) desc',
                             [avg,rankData.locale],//평균 값, 해당 아이디 idx
                             function(err2,results2){
                                 if(err2){
@@ -400,7 +400,7 @@ exports.ranking = function(req,res){
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
                                         if(arg1.results[i].prophoto==null){
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{
                                             link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;

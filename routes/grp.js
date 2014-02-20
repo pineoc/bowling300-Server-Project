@@ -104,6 +104,130 @@ var uploadfunction = function(userid,type,upfile){
 };//upload function
 
 /*
+ * delete function
+ * 최초 생성 날짜 : 2014.02.17
+ * 최종 수정 날짜 : 2014.02.17
+ *
+ * 받는 데이터 aidx, type
+ * editor : pineoc
+ * */
+
+function deletePhoto(aidx,type){
+    var retval;
+    if(type=="pro"){
+        db.pool.getConnection(function(err,connection){
+            if(err){
+                console.log('error on conn pool del prophoto',err);
+                //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                retval=-1;
+                return;
+            }else{
+                connection.query('SELECT prophoto from account where a_idx=?',[aidx],function(err2,result){
+                    if(err2){
+                        console.log('error on query del prophoto',err2);
+                        //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        retval=-1;
+                        return;
+                    }
+                    else{
+                        console.log('success prophoto:',result[0].prophoto);
+                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
+                        fs.unlink(userfolder+"/"+result[0].prophoto, function (err) {
+                            if (err){
+                                console.log('error on delete file',err);
+                                retval=-1;
+                                return;
+                            }else{
+                                console.log('successfully deleted',userfolder);
+                                retval=1;
+                            }
+                        });
+                        connection.release();
+                    }
+                });//query
+            }
+        });//connection pool
+        return retval;
+    }
+    else if(type=="ball"){
+        db.pool.getConnection(function(err,connection){
+            if(err){
+                console.log('error on conn pool del ballphoto',err);
+                //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                retval=-1;
+                return;
+            }else{
+                connection.query('SELECT ballphoto from account where a_idx=?',[aidx],function(err2,result){
+                    if(err2){
+                        console.log('error on query del ballphoto',err);
+                        //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        retval=-1;
+                        return;
+                    }
+                    else{
+                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
+                        fs.unlink(userfolder+"/"+result[0].ballphoto, function (err) {
+                            if (err){
+                                console.log('error on delete file',err);
+                                retval=-1;
+                                return;
+                            }else{
+                                console.log('successfully deleted',userfolder);
+                                retval=1;
+                            }
+                        });
+                    }
+                    connection.release();
+                });//query
+            }
+        });//connection pool
+        return retval;
+    }
+    else if(type=="group"){
+        db.pool.getConnection(function(err,connection){
+            if(err){
+                console.log('error on conn pool del grpphoto',err);
+                //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                retval=-1;
+                return;
+            }else{
+                connection.query('SELECT g_photo from groups where g_idx=?',[aidx],function(err2,result){
+                    if(err2){
+                        console.log('error on query del grpphoto',err);
+                        //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        retval=-1;
+                        return;
+                    }
+                    else{
+                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'group',aidx);
+                        fs.unlink(userfolder+"/"+result[0].g_photo, function (err) {
+                            if (err){
+                                console.log('error on delete file',err);
+                                retval=-1;
+                            }else{
+                                console.log('successfully deleted',userfolder);
+                                retval=1;
+                                fs.rmdir(userfolder,function(err){
+                                    if(err){
+                                        console.log('error on rmdir',err);
+                                        retval = -1;
+                                    }
+                                    else{
+                                        retval = 1;
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    connection.release();
+                });//query
+            }
+        });//connection pool
+        return retval;
+    }
+}
+
+/*
  * 그룹 생성
  * 최초 생성 날짜 : 2014.02.02
  * 최종 수정 날짜 : 2014.02.11
@@ -597,22 +721,52 @@ exports.groupDelete = function(req,res){
                 else{// count =1, 그룹 삭제
                     db.pool.getConnection(function(err,connection){
                         if(err){
-                            console.log('error on pool grp member del',err);
+                            console.log('error on pool grp member del acc_grp',err);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                             return;
                         }else{
                             connection.query('DELETE FROM account_has_group where account_a_idx=? and group_g_idx=?',
                                 [grpdelData.aidx,grpdelData.gidx],function(err2,result){
                                     if(err2){
-                                        console.log('error on query grp member del',err2);
+                                        console.log('error on query grp member del acc_grp',err2);
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                         return;
                                     }
                                     else{
-                                        console.log('success grp meber del : ',result);//그룹원 수 출력
-                                        res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
+                                        console.log('success grp meber del last acc_grp: ',result);//그룹원 수 출력
+                                        //res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
+                                        db.pool.getConnection(function(err,connection){
+                                            if(err){
+                                                console.log('error on pool grp member del',err);
+                                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                                return;
+                                            }else{
+                                                connection.query('DELETE FROM groups WHERE g_idx=?',
+                                                    [grpdelData.gidx],function(err2,result){
+                                                        if(err2){
+                                                            console.log('error on query grp member del last',err2);
+                                                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                                            return;
+                                                        }
+                                                        else{
+                                                            console.log('success grp meber del last : ',result);//그룹원 수 출력
+                                                            //res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
+                                                            callback(null,{result:"SUCCESS"});
+                                                            var ret = deletePhoto(grpdelData.gidx,"group");
+//                                                            if(ret==1){
+//                                                                callback(null,{result:"SUCCESS"});
+//                                                            }
+//                                                            else{
+//                                                                console.log('error on delete function',ret);
+//                                                                res.json({result:"FAIL",resultmsg:"FAIL DEL FILE"});
+//                                                                return;
+//                                                            }
+                                                        }
+                                                        connection.release();
+                                                    });//query
+                                            }
+                                        });//connection pool
                                     }
-                                    callback(null,{result:"SUCCESS"});
                                     connection.release();
                                 });//query
                         }
@@ -630,7 +784,6 @@ exports.groupDelete = function(req,res){
             }
         });//waterfall
     }
-
 };//그룹 삭제
 
 /*
