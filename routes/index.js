@@ -10,6 +10,7 @@ var async = require('async');
 //var db = require('./localDB.js');
 var db = require('./clouluDB.js');
 var cry = require('./crypto_pineoc.js');
+var date = new Date();
 
 
 exports.index = function(req, res){
@@ -176,7 +177,7 @@ exports.ranking = function(req,res){
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             handi : arg1.results[i].handi,
                                             hand : arg1.results[i].hand,
-                                            year : arg1.results[i].year,
+                                            year : date.getFullYear()-arg1.results[i].year+1,
                                             ballweight : arg1.results[i].ballweight,
                                             style : arg1.results[i].style,
                                             step : arg1.results[i].step,
@@ -276,7 +277,7 @@ exports.ranking = function(req,res){
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             handi : arg1.results[i].handi,
                                             hand : arg1.results[i].hand,
-                                            year : arg1.results[i].year,
+                                            year : date.getFullYear()-arg1.results[i].year+1,
                                             ballweight : arg1.results[i].ballweight,
                                             style : arg1.results[i].style,
                                             step : arg1.results[i].step,
@@ -415,7 +416,7 @@ exports.ranking = function(req,res){
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             handi : arg1.results[i].handi,
                                             hand : arg1.results[i].hand,
-                                            year : arg1.results[i].year,
+                                            year : date.getFullYear()-arg1.results[i].year+1,
                                             ballweight : arg1.results[i].ballweight,
                                             style : arg1.results[i].style,
                                             step : arg1.results[i].step,

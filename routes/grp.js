@@ -645,10 +645,10 @@ exports.groupsearch = function(req,res){
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     return;
                 }else{
-                    connection.query('SELECT g_idx,g_name,g_photo,g_master,DATE_FORMAT(g_date,"%Y-%m-%d") g_date from groups where g_name=?',[grpsearchData.gname],
+                    connection.query('SELECT g_idx,g_name,g_photo,g_master,DATE_FORMAT(g_date,"%Y-%m-%d") g_date from groups WHERE g_name LIKE ?',[grpsearchData.gname+"%"],
                         function(err2,result){
                             if(err2){
-                                console.log('error on grp search query');
+                                console.log('error on grp search query',err2);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                 return;
                             }
@@ -682,8 +682,8 @@ exports.groupsearch = function(req,res){
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     return;
                 }else{
-                    connection.query('select name from account left outer join groups on account.a_idx=groups.g_master where groups.g_idx is not null and groups.g_name=?',
-                        [grpsearchData.gname],function(err2,result){
+                    connection.query('select name from account left outer join groups on account.a_idx=groups.g_master where groups.g_idx is not null AND groups.g_name LIKE ?',
+                        [grpsearchData.gname+"%"],function(err2,result){
                             if(err2){
                                 console.log('error on grp search query w2');
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
