@@ -7,6 +7,7 @@
 
 //var db = require('./localDB');
 var db = require('./clouluDB');
+var cry = require('./crypto_pineoc');
 
 var path = require('path');
 var fs = require('fs');
@@ -79,3 +80,10 @@ if(process.env.UPLOAD_PATH == undefined)
         res.json({result:"FAIL",resultmsg:"NO FILE EXISTS"});
     }
 };
+
+exports.testenc = function(req,res){
+    var data = req.body;
+    var enc = cry.encryption(data.idx);
+    var dec = cry.decryption(enc);
+    res.json({enc:enc,dec:dec});
+}

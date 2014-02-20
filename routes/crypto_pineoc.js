@@ -12,7 +12,8 @@ var crypto = require('crypto');
  * editor : pineoc
  * */
 
-var encryption = function (idx) {
+var encryption;
+encryption = function (idx) {
     var key = 'jung_jung_park_han_lee';
     var plaintext = idx;
     var cipher = crypto.createCipher('aes-256-cbc', key);
@@ -30,10 +31,11 @@ var encryption = function (idx) {
  * 받는 데이터
  * editor : pineoc
  * */
-function decryption(hash){
-    var key = 'salt_from_the_user_document';
+var decryption;
+decryption = function (hash) {
+    var key = 'jung_jung_park_han_lee';
     var decipher = crypto.createDecipher('aes-256-cbc', key);
-    decipher.update(encryptedPassword, 'base64', 'utf8');
+    decipher.update(hash, 'base64', 'utf8');
     var decryptedPassword = decipher.final('utf8');
     return decryptedPassword;
 };

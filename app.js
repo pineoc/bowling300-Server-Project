@@ -60,6 +60,7 @@ app.post('/user/groupsearch',grp.groupsearch);
 app.post('/user/groupmember',grp.groupmember);
 app.post('/user/groupleague',grp.groupLeague);
 //test
+app.post('/test/cry',test.testenc);
 
 //board function ( 게시판 관련 함수 )
 app.get('/user/group/board/:groupidx',board.boardList);//그룹 글 목록
