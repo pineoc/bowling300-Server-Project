@@ -5,6 +5,7 @@ var async = require('async');
 
 //var db = require('./localDB.js');
 var db = require('./clouluDB.js');
+var cry = require('./crypto_pineoc.js');
 
 var path = require('path');
 var fs = require('fs');

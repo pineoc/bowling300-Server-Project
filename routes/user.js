@@ -8,6 +8,7 @@ var async = require('async');
 
 //var db = require('./localDB.js');
 var db = require('./clouluDB.js');
+var cry = require('./crypto_pineoc.js');
 
 var path = require('path');
 var fs = require('fs');
@@ -479,17 +480,13 @@ exports.insertScore = function(req,res){
     var insData = req.body; // 입력할 데이터를 받음
     console.log('recv data insert Score: ',insData);
     var data = insData.myscoredata;
-    var dataL = insData.leaguedata;
     var dataLength = insData.myscoredata.length;
-    //var dataLengthL = insData.leaguedata.length;
     var aidx = insData.aidx;
     var s_allScore = 0;
     var s_allGame = 0;
 
     console.log('datalength: ',dataLength);
-    console.log('datalengthL : ',insData.leaguedata.length);
     console.log('data : ',data);
-    //console.log('data.type : ',data[0].type,data[1].type,data[2].type);
     if(dataLength!=0){
         for(var i=0;i<dataLength;i++){
             if(data[i].type==-1){//solo data

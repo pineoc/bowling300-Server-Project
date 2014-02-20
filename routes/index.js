@@ -9,6 +9,7 @@ var async = require('async');
 
 //var db = require('./localDB.js');
 var db = require('./clouluDB.js');
+var cry = require('./crypto_pineoc.js');
 
 
 exports.index = function(req, res){
