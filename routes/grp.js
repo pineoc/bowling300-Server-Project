@@ -752,7 +752,7 @@ exports.groupDelete = function(req,res){
                                                             console.log('success grp meber del last : ',result);//그룹원 수 출력
                                                             //res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
                                                             callback(null,{result:"SUCCESS"});
-                                                            var ret = deletePhoto(grpdelData.gidx,"group");
+                                                            //var ret = deletePhoto(grpdelData.gidx,"group");
 //                                                            if(ret==1){
 //                                                                callback(null,{result:"SUCCESS"});
 //                                                            }
