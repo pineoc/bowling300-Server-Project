@@ -695,7 +695,7 @@ exports.groupDelete = function(req,res){
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                                 return;
                             }else{
-                                connection.query('DELETE FROM account_has_group account_a_idx=? and group_g_idx=?',
+                                connection.query('DELETE FROM account_has_group where account_a_idx=? and group_g_idx=?',
                                     [grpdelData.aidx,grpdelData.gidx],function(err2,result){
                                         if(err2){
                                             console.log('error on query grp member del',err2);
