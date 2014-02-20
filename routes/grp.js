@@ -573,7 +573,7 @@ exports.groupDelete = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                         return;
                     }else{
-                        connection.query('SELECT count(*) cnt from account_has_group group_g_idx=?',
+                        connection.query('SELECT count(*) cnt from account_has_group WHERE group_g_idx=?',
                             [grpdelData.gidx],function(err2,result){
                                 if(err2){
                                     console.log('error on query chk grp member',err2);
