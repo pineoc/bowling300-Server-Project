@@ -434,137 +434,174 @@ exports.groupDelete = function(req,res){
      * 3. 그룹원이 없을경우 그룹테이블에서 그룹을 지운다.
      * */
     var grpdelData = req.body; // aidx, gidx 를 받아온다
-    async.waterfall([
-        function(callback){
-            db.pool.getConnection(function(err,connection){
-                if(err){
-                    console.log('error on pool chk grp member',err);
-                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                    return;
-                }else{
-                    connection.query('SELECT count(*) cnt from account_has_group where account_a_idx=? and group_g_idx=?',
-                        [grpdelData.aidx,grpdelData.gidx],function(err2,result){
-                            if(err2){
-                                console.log('error on query chk grp member',err2);
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                                return;
-                            }
-                            else{
-                                console.log('success chk grp member n : ',result[0].cnt);//그룹원 수 출력
-                                callback(null,result[0].cnt);
-                            }
-                            connection.release();
-                        });//query
-                }
-            });//connection pool
-        },
-        function(arg1,callback){//check master
-            var account_email;
-            db.pool.getConnection(function(err,connection){
-                if(err){
-                    console.log('error on pool chk grp master account',err);
-                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                    return;
-                }else{
-                    connection.query('SELECT count(*) cnt from groups where g_master=? ',
-                        [grpdelData.aidx],function(err2,result){
-                            if(err2){
-                                console.log('error on query chk grp master account',err2);
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                                return;
-                            }
-                            else{
-                                console.log('success chk grp g_master : ',result[0].cnt);//마스터 여부 출력
-                                if(result[0].cnt !=0){
-                                    callback(null,{cnt:arg1,result:"master"});
+    console.log('recv data grpdel : ',grpdelData);
+    if(grpdelData==null || grpdelData.aidx==null || grpdelData.gidx==null){
+        console.log('error on null recv data');
+        res.json({result:"FAIL",resultmsg:"NO DATA(NULL)"});
+        return;
+    }
+    else{
+        async.waterfall([
+            function(callback){
+                db.pool.getConnection(function(err,connection){
+                    if(err){
+                        console.log('error on pool chk grp member',err);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
+                    }else{
+                        connection.query('SELECT count(*) cnt from account_has_group where account_a_idx=? and group_g_idx=?',
+                            [grpdelData.aidx,grpdelData.gidx],function(err2,result){
+                                if(err2){
+                                    console.log('error on query chk grp member',err2);
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    return;
                                 }
                                 else{
-                                    callback(null,{cnt:arg1,result:"member"});
+                                    console.log('success chk grp member n : ',result[0].cnt);//그룹원 수 출력
+                                    callback(null,result[0].cnt);
                                 }
-                            }
-                            connection.release();
-                        });//query
-                }
-            });//connection pool
-        },
-        function(arg2,callback){
-            if(arg2.cnt!=1){
-                if(arg2.result=="master"){
-                    var updateAidx;
-                    db.pool.getConnection(function(err,connection){
-                        if(err){
-                            console.log('error on pool grp master del',err);
-                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                            return;
-                        }else{
-                            connection.query('DELETE FROM account_has_group a_idx=? and g_idx=?',
-                                [grpdelData.aidx,grpdelData.gidx],function(err2,result){
-                                    if(err2){
-                                        console.log('error on query grp master del',err2);
-                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                                        return;
+                                connection.release();
+                            });//query
+                    }
+                });//connection pool
+            },
+            function(arg1,callback){//check master
+                var account_email;
+                db.pool.getConnection(function(err,connection){
+                    if(err){
+                        console.log('error on pool chk grp master account',err);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
+                    }else{
+                        connection.query('SELECT count(*) cnt from groups where g_master=? ',
+                            [grpdelData.aidx],function(err2,result){
+                                if(err2){
+                                    console.log('error on query chk grp master account',err2);
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    return;
+                                }
+                                else{
+                                    console.log('success chk grp g_master : ',result[0].cnt);//마스터 여부 출력
+                                    if(result[0].cnt !=0){
+                                        callback(null,{cnt:arg1,result:"master"});
                                     }
                                     else{
-                                        console.log('success grp master email : ',result);//그룹원 수 출력
-                                        db.pool.getConnection(function(err,connection){
-                                            if(err){
-                                                console.log('error on pool grp master change select',err);
-                                                res.json({result:"FAIL",resultmsg:"NETWORK ERR "});
-                                                return;
-                                            }else{
-                                                connection.query('SELECT account_a_idx FROM account_has_group where group_g_idx=?',
-                                                    [grpdelData.gidx],function(err2,result){
-                                                        if(err2){
-                                                            console.log('error on query grp master change select',err2);
-                                                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                                                            return;
-                                                        }
-                                                        else{
-                                                            console.log('success grp master change select : ',result[0].account_a_idx);
-                                                            //res.json({result:"SUCCESS",resultmsg:"CHANGE SUCCESS"});
-                                                            updateAidx = result[0].account_a_idx;
-                                                            db.pool.getConnection(function(err,connection){
-                                                                if(err){
-                                                                    console.log('error on pool grp member del update',err);
-                                                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                                                                    return;
-                                                                }else{
-                                                                    connection.query('UPDATE groups set g_master=? where and g_idx=?',
-                                                                        [updateAidx,grpdelData.gidx],function(err2,result){
-                                                                            if(err2){
-                                                                                console.log('error on query grp member del update',err2);
-                                                                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                                                                                return;
-                                                                            }
-                                                                            else{
-                                                                                console.log('success grp master del update: ',result);//update
-                                                                                //res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
-                                                                                callback(null,{result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
-                                                                            }
-                                                                            connection.release();
-                                                                        });//query
-                                                                }
-                                                            });//connection pool
-                                                        }
-                                                        connection.release();
-                                                    });//query
-                                            }
-                                        });//connection pool
+                                        callback(null,{cnt:arg1,result:"member"});
                                     }
-                                    connection.release();
-                                });//query
-                        }
-                    });//connection pool
+                                }
+                                connection.release();
+                            });//query
+                    }
+                });//connection pool
+            },
+            function(arg2,callback){
+                if(arg2.cnt!=1){
+                    if(arg2.result=="master"){
+                        var updateAidx;
+                        db.pool.getConnection(function(err,connection){
+                            if(err){
+                                console.log('error on pool grp master del',err);
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                return;
+                            }else{
+                                connection.query('DELETE FROM account_has_group a_idx=? and g_idx=?',
+                                    [grpdelData.aidx,grpdelData.gidx],function(err2,result){
+                                        if(err2){
+                                            console.log('error on query grp master del',err2);
+                                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                            return;
+                                        }
+                                        else{
+                                            console.log('success grp master email : ',result);//그룹원 수 출력
+                                            db.pool.getConnection(function(err,connection){
+                                                if(err){
+                                                    console.log('error on pool grp master change select',err);
+                                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR "});
+                                                    return;
+                                                }else{
+                                                    connection.query('SELECT account_a_idx FROM account_has_group where group_g_idx=?',
+                                                        [grpdelData.gidx],function(err2,result){
+                                                            if(err2){
+                                                                console.log('error on query grp master change select',err2);
+                                                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                                                return;
+                                                            }
+                                                            else{
+                                                                console.log('success grp master change select : ',result[0].account_a_idx);
+                                                                //res.json({result:"SUCCESS",resultmsg:"CHANGE SUCCESS"});
+                                                                updateAidx = result[0].account_a_idx;
+                                                                db.pool.getConnection(function(err,connection){
+                                                                    if(err){
+                                                                        console.log('error on pool grp member del update',err);
+                                                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                                                        return;
+                                                                    }else{
+                                                                        connection.query('UPDATE groups set g_master=? where and g_idx=?',
+                                                                            [updateAidx,grpdelData.gidx],function(err2,result){
+                                                                                if(err2){
+                                                                                    console.log('error on query grp member del update',err2);
+                                                                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                                                                    return;
+                                                                                }
+                                                                                else{
+                                                                                    console.log('success grp master del update: ',result);//update
+                                                                                    //res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
+                                                                                    callback(null,{result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
+                                                                                }
+                                                                                connection.release();
+                                                                            });//query
+                                                                    }
+                                                                });//connection pool
+                                                            }
+                                                            connection.release();
+                                                        });//query
+                                                }
+                                            });//connection pool
+                                        }
+                                        connection.release();
+                                    });//query
+                            }
+                        });//connection pool
 
+                    }
+                    else if(arg2.result=="member"){
+                        db.pool.getConnection(function(err,connection){
+                            if(err){
+                                console.log('error on pool grp member del',err);
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                return;
+                            }else{
+                                connection.query('DELETE FROM account_has_group account_a_idx=? and group_g_idx=?',
+                                    [grpdelData.aidx,grpdelData.gidx],function(err2,result){
+                                        if(err2){
+                                            console.log('error on query grp member del',err2);
+                                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                            return;
+                                        }
+                                        else{
+                                            console.log('success grp member del : ',result);//그룹원 수 출력
+                                            res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
+                                        }
+                                        callback(null,{result:"SUCCESS"});
+                                        connection.release();
+                                    });//query
+                            }
+                        });//connection pool
+                    }
+                    else{
+                        console.log('not master or member');
+                        res.json({result:"FAIL",resultmsg:"UNEXPECTED ERR"});
+                        return;
+                    }
                 }
-                else if(arg2.result=="member"){
+                else{// count =1, 그룹 삭제
                     db.pool.getConnection(function(err,connection){
                         if(err){
                             console.log('error on pool grp member del',err);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                             return;
                         }else{
-                            connection.query('DELETE FROM account_has_group account_a_idx=? and group_g_idx=?',
+                            connection.query('DELETE FROM account_has_group where account_a_idx=? and group_g_idx=?',
                                 [grpdelData.aidx,grpdelData.gidx],function(err2,result){
                                     if(err2){
                                         console.log('error on query grp member del',err2);
@@ -572,7 +609,7 @@ exports.groupDelete = function(req,res){
                                         return;
                                     }
                                     else{
-                                        console.log('success grp member del : ',result);//그룹원 수 출력
+                                        console.log('success grp meber del : ',result);//그룹원 수 출력
                                         res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
                                     }
                                     callback(null,{result:"SUCCESS"});
@@ -581,47 +618,18 @@ exports.groupDelete = function(req,res){
                         }
                     });//connection pool
                 }
-                else{
-                    console.log('not master or member');
-                    res.json({result:"FAIL",resultmsg:"UNEXPECTED ERR"});
-                    return;
-                }
             }
-            else{// count =1, 그룹 삭제
-                db.pool.getConnection(function(err,connection){
-                    if(err){
-                        console.log('error on pool grp member del',err);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                        return;
-                    }else{
-                        connection.query('DELETE FROM account_has_group where account_a_idx=? and group_g_idx=?',
-                            [grpdelData.aidx,grpdelData.gidx],function(err2,result){
-                                if(err2){
-                                    console.log('error on query grp member del',err2);
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                                    return;
-                                }
-                                else{
-                                    console.log('success grp meber del : ',result);//그룹원 수 출력
-                                    res.json({result:"SUCCESS",resultmsg:"DELETE SUCCESS"});
-                                }
-                                callback(null,{result:"SUCCESS"});
-                                connection.release();
-                            });//query
-                    }
-                });//connection pool
+        ],function(err,result){
+            if(result.result=="SUCCESS"){
+                console.log('success on waterfall result',result);
+                res.json({result:"SUCCESS",resultmsg:"DEL SUCCESS"});
             }
-        }
-    ],function(err,result){
-        if(result.result=="SUCCESS"){
-            console.log('success on waterfall result',result);
-            res.json({result:"SUCCESS",resultmsg:"DEL SUCCESS"});
-        }
-        else{
-            console.log('fail on waterfall result',result);
-            res.json({result:"FAIL",resultmsg:"DEL FAIL"});
-        }
-    });//waterfall
+            else{
+                console.log('fail on waterfall result',result);
+                res.json({result:"FAIL",resultmsg:"DEL FAIL"});
+            }
+        });//waterfall
+    }
 
 };//그룹 삭제
 

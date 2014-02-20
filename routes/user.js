@@ -313,7 +313,7 @@ exports.rankpoint = function(req,res){
     else{
         photo_name = null;
     }
-    if(signData.email==null || signData.pwd==null || signData.name==null || signData.sex==null){
+    if(signData.email==null || signData.pwd==null || signData.name==null || signData.sex==null || signData.hand==null){
         console.log('error on invalid data');
         res.json({result:"FAIL",resultmsg:"INVALID DATA(NULL)"});
     }
