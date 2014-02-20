@@ -577,9 +577,8 @@ exports.insertScore = function(req,res){
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                                 return;
                             }else{
-                                console.log('data[',i,'] : ',data[i]);
                                 connection.query('UPDATE account_has_group SET league_avg=?,league_date=now() WHERE account_a_idx=? AND group_g_idx=?',
-                                    [(data[i].allScore/data[i].allGame).toFixed(4),insData.aidx,data[i].type],function(err2,result){
+                                    [(grpScore/grpGame).toFixed(4),aidx,grpIdx],function(err2,result){
                                     if(err2){
                                         console.log('error on query league insert');
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
@@ -608,59 +607,6 @@ exports.insertScore = function(req,res){
         console.log('error, no data ');
         res.json({result:"FAIL",resultmsg:"NO DATA"});
     }//no data
-//    if(insData.leaguedata.length!=0){
-//        console.log('insData.leaguedata : ',dataL);
-//        for(var i=0;i<insData.leaguedata.length;i++){
-//            if(dataL[i].type>0){
-//                console.log('league data : ',dataL[i]);
-//                if(dataL[i].allScore/dataL[i].allGame>300){
-//                    console.log('INVALID data over 300 avg league');
-//                    res.json({result:"FAIL",resultmsg:"INVALID OVER 300 LEAGUE"});
-//                    return;
-//                }
-//                else if(dataL[i].allGame==0){
-//                    console.log('INVALID data allgame 0 league');
-//                    res.json({result:"FAIL",resultmsg:"INVALID GAME ZERO LEAGUE"});
-//                    return;
-//                }
-//                else{
-//                    db.pool.getConnection(function(err,connection){
-//                        if(err){
-//                            console.log('error on conn pool league insert');
-//                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-//                            return;
-//                        }else{
-//                            console.log('dataL : ',dataL);
-//                            connection.query('UPDATE account_has_group SET league_avg=?,league_date=now() WHERE account_a_idx=? AND group_g_idx=?',
-//                                [(dataL[i].allScore/dataL[i].allGame).toFixed(4),insData.aidx,dataL[i].type],function(err2,result){
-//                                if(err2){
-//                                    console.log('error on query league insert');
-//                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-//                                    return;
-//                                }
-//                                else if(result.affectedRows==1){
-//                                    console.log('success league , result',result);
-//                                }
-//                                connection.release();
-//                            });//query
-//                        }
-//                    });//conn pool
-//                }
-//            }
-//            else{
-//                console.log('error type on league data');
-//                res.json({result:"FAIL",resultmsg:"TYPE ERR LEAGUE"});
-//                return;
-//            }
-//
-//        }
-//        console.log('success on league data all');
-//    }
-//    if(insData.leaguedata.length==0){
-//        console.log('no data on league');
-//        res.json({result:"FAIL LEAGUE",resulmsg:"NO DATA LEAGUE"});
-//    }
-
 };//insertScore
 
 exports.deletePhoto = function(req,res){
