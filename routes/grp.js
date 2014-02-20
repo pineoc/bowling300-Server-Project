@@ -597,8 +597,8 @@ exports.groupDelete = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                         return;
                     }else{
-                        connection.query('SELECT count(*) cnt from groups where g_master=? ',
-                            [grpdelData.aidx],function(err2,result){
+                        connection.query('SELECT count(*) cnt from groups where g_master=? and g_idx=?',
+                            [grpdelData.aidx,grpdelData.gidx],function(err2,result){
                                 if(err2){
                                     console.log('error on query chk grp master account',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
