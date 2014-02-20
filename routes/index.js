@@ -7,8 +7,8 @@
 
 var async = require('async');
 
-//var db = require('./localDB.js');
-var db = require('./clouluDB.js');
+var db = require('./localDB.js');
+//var db = require('./clouluDB.js');
 var cry = require('./crypto_pineoc.js');
 var date = new Date();
 
@@ -27,42 +27,95 @@ exports.index = function(req, res){
  * */
 exports.login = function(req,res){
     var loginData = req.body;
-
-    db.pool.getConnection(function(err,connection){
-        if(err){
-            console.log('error on conn pool login',err);
-            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-            return ;
-        }
-        else{
-            connection.query('SELECT count(*) cnt,* FROM account WHERE email=? AND pwd=?',[loginData.email,loginData.pwd],function(err2,result){
-                if(err2){
-                    console.log('error on query login',err2);
-                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                    return;
+    console.log('recv data login : ',loginData);
+    async.waterfall([
+        function(callback){
+            var ret;
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on conn pool login',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return ;
                 }
                 else{
-                    if(result[0].cnt==0){
-                        console.log('no account on DB',result[0].cnt);
-                        res.json({result:"FAIL",resultmsg:"NO ACCOUNT"});
-                    }
-                    else{
-                        console.log('Success on login',result);
-                        res.json({result:"SUCCESS",resultmsg:"SUCCESS ON LOGIN",
-                            aidx:cry.encB(result[0].a_idx),
-                            name:result[0].name,
-                            sex:result[0].sex,
-                            country:result[0].country,
-                            email:result[0].email,
-                            hand:result[0].hand,
-                            proPhoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+result[0].a_idx+"/"+result[0].prophoto
-                        });
-                    }
+                    connection.query('SELECT *,count(*) cnt FROM account WHERE email=? AND pwd=?',[loginData.email,loginData.pwd],function(err2,result){
+                        if(err2){
+                            console.log('error on query login',err2);
+                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                            return;
+                        }
+                        else{
+                            if(result[0].cnt==0){
+                                console.log('no account on DB',result[0].cnt);
+                                res.json({result:"FAIL",resultmsg:"NO ACCOUNT"});
+                            }
+                            else{
+                                console.log('Success on login, mydata : ',result);
+                                ret = {
+                                    result:"SUCCESS",resultmsg:"SUCCESS ON LOGIN",
+                                    aidx:cry.encB(result[0].a_idx),
+                                    name:result[0].name,
+                                    sex:result[0].sex,
+                                    country:result[0].country,
+                                    email:result[0].email,
+                                    hand:result[0].hand,
+                                    proPhoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+result[0].a_idx+"/"+result[0].prophoto
+                                }
+                                callback(null,ret);
+                            }
+                        }
+                        connection.release();
+                    });//query
                 }
-                connection.release();
-            });//query
+            });//conn pool
+        },
+        function(arg,callback){
+            var arr = [];
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on connection pool grp list',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return;
+                }//error on conn pool
+                else{
+                    connection.query('select g.g_name gname, g.g_photo gphoto,g.g_idx gidx,DATE_FORMAT(g.g_date,"%Y-%m-%d") gdate,ag.g_joindate joindate from groups as g left outer join account_has_group as ag on g.g_idx = ag.group_g_idx where ag.group_g_idx is not null and ag.account_a_idx=? order by DATE(joindate),HOUR(joindate), MINUTE(joindate), joindate ',
+                        [cry.decB(arg.aidx)],function(err2,results){
+                            if(err2){
+                                console.log('error on query grp list',err2);
+                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                return;
+                            }
+                            else if(results){
+                                console.log('success list grp : ',results);
+                                for(var i=0;i<results.length;i++){
+                                    arr[i] = {
+                                        gidx :results[i].gidx,
+                                        gname:results[i].gname
+                                    };
+                                }//for
+                                //res.json({result:"SUCCESS",group:arr});
+                                callback(null,{myval:arg,group:arr});
+                            }
+                            else{
+                                console.log('no group');
+                                callback(null,{myval:arg});
+                            }
+                            connection.release();
+                        });//query
+                }
+            });//connection pool
         }
-    });//conn pool
+    ],function(err,result){
+        if(err){
+            console.log('error on waterfall ',err);
+            res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
+            return;
+        }
+        else{
+            console.log('Success on login',result);
+            res.json(result);
+        }
+    });
 };
 
 /*
@@ -179,6 +232,7 @@ exports.ranking = function(req,res){
                                             rank : i+1,
                                             name : arg1.results[i].name,
                                             country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
+                                            infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
                                             avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
@@ -279,6 +333,7 @@ exports.ranking = function(req,res){
                                             rank : i+1,
                                             name : arg1.results[i].name,
                                             country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
+                                            infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
                                             avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
@@ -418,6 +473,7 @@ exports.ranking = function(req,res){
                                             rank : i+1,
                                             name : arg1.results[i].name,
                                             country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
+                                            infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
                                             avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
@@ -556,6 +612,7 @@ exports.ranking = function(req,res){
                                             rank : i+1,
                                             name : arg1.results[i].name,
                                             country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
+                                            infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
                                             avg : (arg1.results[i].g_score/arg1.results[i].g_game).toFixed(1),
