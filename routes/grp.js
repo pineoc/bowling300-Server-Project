@@ -628,7 +628,7 @@ exports.groupDelete = function(req,res){
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                                 return;
                             }else{
-                                connection.query('DELETE FROM account_has_group a_idx=? and g_idx=?',
+                                connection.query('DELETE FROM account_has_group where a_idx=? and g_idx=?',
                                     [grpdelData.aidx,grpdelData.gidx],function(err2,result){
                                         if(err2){
                                             console.log('error on query grp master del',err2);
