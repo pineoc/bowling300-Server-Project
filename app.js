@@ -29,9 +29,13 @@ app.use('/uploads', express.directory(path.join(__dirname, 'uploads')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
+process.on('uncaughtException',function(exception){
+    console.log('uncaughtException occurred: ' + exception.stack);
+});
+
 // development only
 if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
+  app.use(express.errorHandler({ dumpExceptions: true }));
 }
 
 app.get('/', routes.index);
