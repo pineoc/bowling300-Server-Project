@@ -42,6 +42,7 @@ exports.login = function(req,res){
                         if(err2){
                             console.log('error on query login',err2);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                            connection.release();
                             return;
                         }
                         else{
@@ -83,6 +84,7 @@ exports.login = function(req,res){
                             if(err2){
                                 console.log('error on query grp list',err2);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                connection.release();
                                 return;
                             }
                             else if(results){
@@ -154,6 +156,7 @@ exports.ranking = function(req,res){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                connection.release();
                                 return;
                             }
                             else if(result.length){
@@ -189,6 +192,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query world rank',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    connection.release();
                                     return;
                                 }
                                 else{
@@ -220,6 +224,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query world rank me',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    connection.release();
                                     return;
                                 }
                                 else{
@@ -291,6 +296,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query world rank aidx=0',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    connection.release();
                                     return;
                                 }
                                 else{
@@ -321,6 +327,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query world rank me',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    connection.release();
                                     return;
                                 }
                                 else{
@@ -392,6 +399,7 @@ exports.ranking = function(req,res){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                connection.release();
                                 return;
                             }
                             else if(result.length){
@@ -428,6 +436,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query local rank',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    connection.release();
                                     return;
                                 }
                                 else if(results.length){
@@ -463,6 +472,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query local rank me',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    connection.release();
                                     return;
                                 }
                                 else{
@@ -534,6 +544,7 @@ exports.ranking = function(req,res){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                connection.release();
                                 return;
                             }
                             else if(result.length){
@@ -570,6 +581,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query group rank',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    connection.release();
                                     return;
                                 }
                                 else if(results.length){
@@ -602,6 +614,7 @@ exports.ranking = function(req,res){
                                 if(err2){
                                     console.log('error on query group rank me',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    connection.release();
                                     return;
                                 }
                                 else if(results.length){

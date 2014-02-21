@@ -267,6 +267,7 @@ exports.groupMake = function(req,res){
                         if(err2){
                             console.log('error on query grp name check dup',err2);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                            connection.release();
                             return;
                         }
                         else{
@@ -292,6 +293,7 @@ exports.groupMake = function(req,res){
                                                         if (err2) {
                                                             console.log('error on query makegrp on make', err2);
                                                             res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                                            connection.release();
                                                             return;
                                                         }
                                                         else if (result.affectedRows == 1) {
@@ -308,6 +310,7 @@ exports.groupMake = function(req,res){
                                             if (err) {
                                                 console.log('error on connection pool makegrp on insert account_has_group', err);
                                                 res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                                                connection.release();
                                                 return;
                                             }//error on connection pool
                                             else {
@@ -316,6 +319,7 @@ exports.groupMake = function(req,res){
                                                         if (err2) {
                                                             console.log('error on query makegrp on insert account has group', err2);
                                                             res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                                            connection.release();
                                                             return;
                                                         }
                                                         else if (result.affectedRows == 1) {
@@ -344,6 +348,7 @@ exports.groupMake = function(req,res){
                                                         if (err) {
                                                             console.log('error on connection pool makegrp on make file upload', err);
                                                             res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+
                                                             return;
                                                         }//error on connection pool
                                                         else {
@@ -429,7 +434,8 @@ exports.groupJoin = function(req,res){
                             [grpjoinData.gname],function(err2,results){
                                 if(err2){
                                     console.log('error on query grp join chk gidx',err2);
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    connection.release();
                                     return;
                                 }
                                 else if(results){
@@ -455,6 +461,7 @@ exports.groupJoin = function(req,res){
                                     if(err2){
                                         console.log('error on query grp join',err2);
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                        connection.release();
                                         return;
                                     }
                                     else if(results.affectedRows==1){
@@ -521,6 +528,7 @@ exports.groupList = function(req,res){
                         if(err2){
                             console.log('error on query grp list',err2);
                             res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                            connection.release();
                             return;
                         }
                         else if(results){
@@ -582,6 +590,7 @@ exports.groupDelete = function(req,res){
                                 if(err2){
                                     console.log('error on query chk grp member',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    connection.release();
                                     return;
                                 }
                                 else{
@@ -606,6 +615,7 @@ exports.groupDelete = function(req,res){
                                 if(err2){
                                     console.log('error on query chk grp master account',err2);
                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    connection.release();
                                     return;
                                 }
                                 else{
@@ -637,6 +647,7 @@ exports.groupDelete = function(req,res){
                                         if(err2){
                                             console.log('error on query grp master del',err2);
                                             res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                            connection.release();
                                             return;
                                         }
                                         else{
@@ -652,6 +663,7 @@ exports.groupDelete = function(req,res){
                                                             if(err2){
                                                                 console.log('error on query grp master change select',err2);
                                                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                                                connection.release();
                                                                 return;
                                                             }
                                                             else{
@@ -669,6 +681,7 @@ exports.groupDelete = function(req,res){
                                                                                 if(err2){
                                                                                     console.log('error on query grp member del update',err2);
                                                                                     res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                                                                    connection.release();
                                                                                     return;
                                                                                 }
                                                                                 else{
@@ -704,6 +717,7 @@ exports.groupDelete = function(req,res){
                                         if(err2){
                                             console.log('error on query grp member del',err2);
                                             res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                            connection.release();
                                             return;
                                         }
                                         else{
@@ -734,6 +748,7 @@ exports.groupDelete = function(req,res){
                                     if(err2){
                                         console.log('error on query grp member del acc_grp',err2);
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                        connection.release();
                                         return;
                                     }
                                     else{
@@ -750,6 +765,7 @@ exports.groupDelete = function(req,res){
                                                         if(err2){
                                                             console.log('error on query grp member del last',err2);
                                                             res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                                            connection.release();
                                                             return;
                                                         }
                                                         else{
@@ -815,6 +831,7 @@ exports.groupsearch = function(req,res){
                             if(err2){
                                 console.log('error on grp search query',err2);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                connection.release();
                                 return;
                             }
                             else if(result.length!=0){
@@ -852,6 +869,7 @@ exports.groupsearch = function(req,res){
                             if(err2){
                                 console.log('error on grp search query w2');
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                connection.release();
                                 return;
                             }
                             else if(result.length!=0){
@@ -916,6 +934,7 @@ exports.groupmember = function(req,res){
                             if(err2){
                                 console.log('error on query on grpmem',err);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                connection.release();
                                 return;
                             }
                             else{
@@ -963,6 +982,7 @@ exports.groupmember = function(req,res){
                             if(err2){
                                 console.log('error on query on grpmem take me',err);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                connection.release();
                                 return;
                             }
                             else{
@@ -1022,7 +1042,8 @@ exports.groupLeague = function(req,res){
                         function(err2,results){
                             if(err2){
                                 console.log('error on query league rank',err2);
-                                res.json({result:"FAIL",resultmsg:"SORTING ERR"});
+                                res.json({result:"FAIL",resultmsg:"SORTING ERR Q"});
+                                connection.release();
                                 return;
                             }
                             else if(results.length){
@@ -1067,6 +1088,7 @@ exports.groupLeague = function(req,res){
                             if(err2){
                                 console.log('error on query league rank all avg',err2);
                                 res.json({result:"FAIL",resultmsg:"SORTING ERR Q"});
+                                connection.release();
                                 return;
                             }
                             else if(results.length){
@@ -1102,6 +1124,7 @@ exports.groupLeague = function(req,res){
                             if(err2){
                                 console.log('error on query league rank',err2);
                                 res.json({result:"FAIL",resultmsg:"SORTING ERR Q"});
+                                connection.release();
                                 return;
                             }
                             else if(results.length){

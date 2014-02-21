@@ -333,6 +333,7 @@ exports.rankpoint = function(req,res){
                     if(err2){
                         console.log('error on query sign check dup',err2);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        connection.release();
                         return;
                     }
                     else{
@@ -354,6 +355,7 @@ exports.rankpoint = function(req,res){
                                             if (err2) {
                                                 console.log('error on query sign', err2);
                                                 res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                                connection.release();
                                                 return;
                                             }
                                             else if (result.affectedRows == 1) {
@@ -407,6 +409,7 @@ exports.addsign = function(req,res){
                     if(err2){
                         console.log('error on query addsign',err2);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        connection.release();
                         return;
                     }//error on query
                     else if(result.affectedRows==1){
@@ -456,6 +459,7 @@ exports.userinfo = function(req,res){
                     if(err2){
                         console.log('error on Query userinfo',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        connection.release();
                         return;
                     }else if(result){
                         console.log('Success on query : ',result);
@@ -541,6 +545,7 @@ exports.insertScore = function(req,res){
                                         console.log('error on query insert solo',err2);
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                         errCount++;
+                                        connection.release();
                                         return;
                                     }
                                     else if(result.affectedRows==1){
@@ -584,6 +589,7 @@ exports.insertScore = function(req,res){
                                             console.log('error on query insert grp',err2);
                                             res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                                             errCount++;
+                                            connection.release();
                                             return;
                                         }//error on query
                                         else if(result.affectedRows==1){
@@ -606,8 +612,9 @@ exports.insertScore = function(req,res){
                                     [(grpScore/grpGame).toFixed(4),aidx,grpIdx],function(err2,result){
                                     if(err2){
                                         console.log('error on query league insert');
-                                        res.json({result:"FAIL",resultmsg:"ACCOUNT AND GROUP INCORRECT"});
+                                        res.json({result:"FAIL",resultmsg:"ACCOUNT AND GROUP INCORRECT Q"});
                                         errCount++;
+                                        connection.release();
                                         return;
                                     }
                                     else if(result.affectedRows==1){
