@@ -7,8 +7,8 @@
 
 var async = require('async');
 
-var db = require('./localDB.js');
-//var db = require('./clouluDB.js');
+//var db = require('./localDB.js');
+var db = require('./clouluDB.js');
 var cry = require('./crypto_pineoc.js');
 var date = new Date();
 
@@ -128,7 +128,13 @@ exports.login = function(req,res){
  * */
 exports.ranking = function(req,res){
     var rankData = req.body;
-    var aidx = cry.decB(rankData.aidx);
+    var aidx;
+    if(rankData.aidx!=0){
+        aidx = cry.decB(rankData.aidx);
+    }
+    else{
+        aidx=0;
+    }
     var limit = 0;
     console.log('recv data ranking : ',rankData);
     //limit = req.params.limit;

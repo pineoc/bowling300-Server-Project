@@ -401,8 +401,9 @@ exports.addsign = function(req,res){
             return;
         }//error on connection pool
         else{
-            connection.query('UPDATE account SET year=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
-                [addSignData.year,addSignData.ballweight,addSignData.style,addSignData.step,addSignData.series800,addSignData.series300,aidx],function(err2,result){
+            connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                [addSignData.name,addSignData.pwd,addSignData.sex,addSignData.hand,addSignData.year,
+                    addSignData.ballweight,addSignData.style,addSignData.step,addSignData.series800,addSignData.series300,aidx],function(err2,result){
                     if(err2){
                         console.log('error on query addsign',err2);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
@@ -430,42 +431,55 @@ exports.addsign = function(req,res){
 
 exports.userinfo = function(req,res){
     var infoData = req.body;
-    var aidx = cry.decB(infoData.aidx);
+    var aidx;
+    if(infoData.aidx!=0){
+        aidx = cry.decB(infoData.aidx);
+    }
+    else{
+        aidx=0;
+    }
     var resultData;
-    db.pool.getConnection(function(err,connection){
-        if(err){
-            console.log('error on conn pool userinfo',err);
-            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-            return;
-        }else{
-            connection.query('SELECT * FROM account where a_idx=?',[infoData.aidx],function(err2,result){
-                if(err2){
-                    console.log('error on Query userinfo',err);
-                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                    return;
-                }else{
-                    console.log('Success on query : ',result);
-                    resultData = {
-                        email : result[0].email,
-                        name : result[0].name,
-                        pwd : result[0].pwd,
-                        proPhoto : result[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+infoData.aidx+"/"+result[0].prophoto,
-                        ballPhoto : result[0].ballphoto,
-                        sex : result[0].sex,
-                        hand : result[0].hand,
-                        locale : result[0].locale,
-                        allhighscore : result[0].all_highscore,
-                        country : result[0].country,
-                        style : result[0].style,
-                        step : result[0].step,
-                        series300 : result[0].series300,
-                        series800 : result[0].series800
-                    };
-                    res.json(resultData);
-                }
-            });//query
-        }
-    });//conn pool
+    if(aidx==0){
+        console.log('No data, because no id');
+        res.json({result:"FAIL",resultmsg:"NO DATA"});
+        return;
+    }
+    else{
+        db.pool.getConnection(function(err,connection){
+            if(err){
+                console.log('error on conn pool userinfo',err);
+                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                return;
+            }else{
+                connection.query('SELECT * FROM account where a_idx=?',[aidx],function(err2,result){
+                    if(err2){
+                        console.log('error on Query userinfo',err);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        return;
+                    }else{
+                        console.log('Success on query : ',result);
+                        resultData = {
+                            email : result[0].email,
+                            name : result[0].name,
+                            proPhoto : result[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+infoData.aidx+"/"+result[0].prophoto,
+                            ballPhoto : result[0].ballphoto,
+                            sex : result[0].sex,
+                            hand : result[0].hand,
+                            locale : result[0].locale,
+                            allhighscore : result[0].all_highscore,
+                            country : result[0].country,
+                            style : result[0].style,
+                            step : result[0].step,
+                            series300 : result[0].series300,
+                            series800 : result[0].series800
+                        };
+                        res.json(resultData);
+                    }
+                });//query
+            }
+        });//conn pool
+    }
+
 };
 
 /*

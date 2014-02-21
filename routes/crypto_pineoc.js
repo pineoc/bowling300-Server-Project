@@ -50,12 +50,12 @@ hash_int_function = function(target){
 };
 
 encB = function(data){
-    var cryptbase1= -123456789098762;
-    var encrypted= (data^cryptbase1);
+    var cryptbase1= -1234567890987621302123321;
+    var encrypted= (data ^ cryptbase1);
     return encrypted;
 };
 decB = function(encData){
-    var cryptbase1= -123456789098762;
+    var cryptbase1= -1234567890987621302123321;
     var decrypted= (encData^cryptbase1);
     return decrypted;
 };
