@@ -259,7 +259,7 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myavg:avg.toFixed(1),myrank:worldRank,myproPhoto:arg1.prophoto,arr:arr};
+                                    resultData = {myavg:parseFloat(avg).toFixed(1),myrank:worldRank,myproPhoto:arg1.prophoto,arr:arr};
                                     callback(null,resultData);
                                 }
                                 connection.release();
@@ -505,7 +505,7 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myavg:avg.toFixed(1),myrank:localRank,myproPhoto:arg1.prophoto,arr:arr};
+                                    resultData = {myavg:parseFloat(avg).toFixed(1),myrank:localRank,myproPhoto:arg1.prophoto,arr:arr};
                                     callback(null,resultData);
                                 }
                                 connection.release();
@@ -647,7 +647,7 @@ exports.ranking = function(req,res){
                                             series800 : arg1.results[i].series800
                                         };//arr에 정보를 객체 형태로 저장
                                     }//for
-                                    resultData = {myavg:avg.toFixed(1),myrank:groupRank,myproPhoto:arg1.prophoto,arr:arr};
+                                    resultData = {myavg:parseFloat(avg).toFixed(1),myrank:groupRank,myproPhoto:arg1.prophoto,arr:arr};
                                     callback(null,resultData);
                                 }
                                 else{
