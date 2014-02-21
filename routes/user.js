@@ -506,6 +506,7 @@ exports.insertScore = function(req,res){
     var aidx = cry.decB(insData.aidx);
     var s_allScore = 0;
     var s_allGame = 0;
+    var errCount=0;
 
     console.log('datalength: ',dataLength);
     console.log('data : ',data);
@@ -539,6 +540,7 @@ exports.insertScore = function(req,res){
                                     if(err2){
                                         console.log('error on query insert solo',err2);
                                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                        errCount++;
                                         return;
                                     }
                                     else if(result.affectedRows==1){
@@ -581,6 +583,7 @@ exports.insertScore = function(req,res){
                                         if(err2){
                                             console.log('error on query insert grp',err2);
                                             res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                            errCount++;
                                             return;
                                         }//error on query
                                         else if(result.affectedRows==1){
@@ -603,7 +606,8 @@ exports.insertScore = function(req,res){
                                     [(grpScore/grpGame).toFixed(4),aidx,grpIdx],function(err2,result){
                                     if(err2){
                                         console.log('error on query league insert');
-                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                        res.json({result:"FAIL",resultmsg:"ACCOUNT AND GROUP INCORRECT"});
+                                        errCount++;
                                         return;
                                     }
                                     else if(result.affectedRows==1){
@@ -622,8 +626,14 @@ exports.insertScore = function(req,res){
                 return;
             }
         }//for
-        console.log('success normal data all', data);
-        res.json({result:"SUCCESS",resultmsg:data}); // result_msg에 대한 부분은 차후 수정
+        if(errCount==0){
+            console.log('success normal data all', data);
+            res.json({result:"SUCCESS",resultmsg:data}); // result_msg에 대한 부분은 차후 수정
+        }
+        else{
+            console.log('error occur on insert on solo or grp or league');
+            res.json({result:"FAIL",resultmsg:"ERROR ON INSERT",data:data});
+        }
     }//if end
     else if(data.length==0){
         console.log('error, no data ');
