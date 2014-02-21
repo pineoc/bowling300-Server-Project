@@ -431,6 +431,7 @@ exports.addsign = function(req,res){
 
 exports.userinfo = function(req,res){
     var infoData = req.body;
+    console.log('recv data userinfo : ',infoData);
     var aidx;
     if(infoData.aidx!=0){
         aidx = cry.decB(infoData.aidx);
