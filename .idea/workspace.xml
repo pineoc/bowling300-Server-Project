@@ -53,7 +53,7 @@
       <file leaf-file-name="user.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/user.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="433" column="50" selection-start="16475" selection-end="16475" vertical-scroll-proportion="3.7935843" vertical-offset="4641" max-vertical-offset="10812">
+            <state line="444" column="53" selection-start="16731" selection-end="16731" vertical-scroll-proportion="-0.20920502" vertical-offset="7698" max-vertical-offset="10897">
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -686,7 +686,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/user.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="433" column="50" selection-start="16475" selection-end="16475" vertical-scroll-proportion="3.7935843" vertical-offset="4641" max-vertical-offset="10812">
+        <state line="444" column="53" selection-start="16731" selection-end="16731" vertical-scroll-proportion="-0.20920502" vertical-offset="7698" max-vertical-offset="10897">
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>

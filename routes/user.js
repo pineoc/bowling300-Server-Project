@@ -442,7 +442,7 @@ exports.userinfo = function(req,res){
     var resultData;
     if(aidx==0){
         console.log('No data, because no id');
-        res.json({result:"FAIL",resultmsg:"NO DATA"});
+        res.json({result:"FAIL",resultmsg:"NO ACCOUNT"});
         return;
     }
     else{
@@ -457,7 +457,7 @@ exports.userinfo = function(req,res){
                         console.log('error on Query userinfo',err);
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                         return;
-                    }else{
+                    }else if(result){
                         console.log('Success on query : ',result);
                         resultData = {
                             email : result[0].email,
@@ -467,7 +467,7 @@ exports.userinfo = function(req,res){
                             sex : result[0].sex,
                             hand : result[0].hand,
                             locale : result[0].locale,
-                            allhighscore : result[0].all_highscore,
+                            allhighScore : result[0].all_highscore,
                             country : result[0].country,
                             style : result[0].style,
                             step : result[0].step,
@@ -476,6 +476,11 @@ exports.userinfo = function(req,res){
                         };
                         res.json(resultData);
                     }
+                    else{
+                        console.log('no data on query userinfo',result);
+                        res.json({result:"FAIL",resultmsg:"NO DATA"});
+                    }
+                    connection.release();
                 });//query
             }
         });//conn pool
