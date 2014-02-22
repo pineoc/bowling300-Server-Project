@@ -228,7 +228,7 @@ exports.ranking = function(req,res){
                                     return;
                                 }
                                 else{
-                                    worldRank = results2[0].cnt+1;
+                                    worldRank = results2[0].cnt;
                                     console.log(worldRank,avg);
                                     //console.log(worldRank,avg,results);
                                     for(var i=0;i<arg1.results.length;i++){
@@ -331,8 +331,6 @@ exports.ranking = function(req,res){
                                     return;
                                 }
                                 else{
-                                    worldRank = results2[0].cnt+1;
-                                    console.log(worldRank,avg);
                                     //console.log(worldRank,avg,results);
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
@@ -476,7 +474,7 @@ exports.ranking = function(req,res){
                                     return;
                                 }
                                 else{
-                                    localRank = results2[0].cnt+1;
+                                    localRank = results2[0].cnt;
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
                                         if(arg1.results[i].prophoto==null){
@@ -540,7 +538,8 @@ exports.ranking = function(req,res){
                         return;
                     }
                     else{
-                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[aidx],function(err2,result){
+                        connection.query('select * from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and a.a_idx=?',
+                            [groupidx,aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
@@ -548,15 +547,15 @@ exports.ranking = function(req,res){
                                 return;
                             }
                             else if(result.length){
-                                if(result[0].allgame!=0){
-                                    avg = result[0].allscore/result[0].allgame;
+                                if(result[0].g_game!=0){
+                                    avg = result[0].g_score/result[0].g_game;
                                 }
                                 else{
                                     avg=0;
                                 }
-                                console.log('avg : ',result[0].allscore/result[0].allgame);
+                                console.log('avg : ',avg);
                                 //console.log(result);
-                                callback(null,{avg:avg.toFixed(1),prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+result[0].prophoto});
+                                callback(null,{avg:avg,prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+result[0].prophoto});
                             }
                             else{
                                 console.log('no data');
@@ -608,8 +607,8 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT count(*) cnt FROM account a,account_has_group ag where (ag.g_score/ag.g_game)>=? and ag.group_g_idx=? order by (ag.g_score/ag.g_game) desc',
-                            [avg,groupidx],
+                        connection.query('select count(*) cnt from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and (ag.g_score/ag.g_game)>=? order by (ag.g_score/ag.g_game) desc',
+                            [groupidx,avg],
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query group rank me',err2);
@@ -618,7 +617,7 @@ exports.ranking = function(req,res){
                                     return;
                                 }
                                 else if(results.length){
-                                    groupRank = results[0].cnt+1;
+                                    groupRank = results[0].cnt;
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
                                         if(arg1.results[i].prophoto==null){
@@ -653,7 +652,6 @@ exports.ranking = function(req,res){
                                 else{
                                     console.log('no data',results);
                                     res.json({result:"SUCCESS",resultmsg:"NO DATA"});
-                                    return;
                                 }
                                 connection.release();
                             });//query
