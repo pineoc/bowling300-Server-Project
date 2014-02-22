@@ -58,9 +58,6 @@ if(process.env.UPLOAD_PATH == undefined)
  * editor : pineoc
  * */
 var uploadfunction = function(userid,type,upfile){
-    //var type = req.body.type;
-    //var upfile = req.files.upfile;
-    //var userid = req.body.aidx;
     var name=upfile.name;//upload file name ex>file.jpg
     var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
     var destpath;
@@ -313,7 +310,7 @@ exports.rankpoint = function(req,res){
     //사진 파일 업로드 부분 현재
     var proPhoto_file;
     var photo_name;
-    if(req.files && typeof req.files.proPhoto===undefined){
+    if(req.files && !(typeof req.files.proPhoto===undefined)){
         proPhoto_file = req.files.proPhoto;
         photo_name = proPhoto_file.name;
     }
