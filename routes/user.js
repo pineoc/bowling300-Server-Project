@@ -403,8 +403,8 @@ exports.addsign = function(req,res){
             return;
         }//error on connection pool
         else{
-            connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
-                [addSignData.name,addSignData.pwd,addSignData.sex,addSignData.hand,addSignData.year,
+            connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?,country=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                [addSignData.name,addSignData.pwd,addSignData.sex,addSignData.hand,addSignData.year,addSignData.country,
                     addSignData.ballweight,addSignData.style,addSignData.step,addSignData.series800,addSignData.series300,aidx],function(err2,result){
                     if(err2){
                         console.log('error on query addsign',err2);
