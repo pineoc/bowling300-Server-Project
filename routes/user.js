@@ -74,7 +74,7 @@ var uploadfunction = function(userid,type,upfile){
                 mkdirp(userfolder,function(err){
                     if(err){
                         console.log('error on mkdirp make userdir',err);
-                        res.json({result:"FAIL",resultmsg:"FAIL MKDIR"});
+                        return {result:"FAIL",resultmsg:"MKDIR FAIL"};
                     }else{
                         console.log('success');
                     }
@@ -90,7 +90,7 @@ var uploadfunction = function(userid,type,upfile){
                 mkdirp(groupfolder,function(err){
                     if(err){
                         console.log('error on mkdirp make groupdir',err);
-                        res.json({result:"FAIL",resultmsg:"FAIL MKDIR"});
+                        return {result:"FAIL",resultmsg:"FAIL MKDIR"};
                     }else{
                         console.log('success');
                     }
@@ -122,14 +122,13 @@ var uploadfunction = function(userid,type,upfile){
                 var ext = destpath.substring(idx); // .jpg
                 var filename = destpath.substring(0,idx);
             });//is.on callback function
-            console.log('success');
-            //res.json({result:"SUCCESS",resultmsg:"FILE UPLOAD SUCCESS"});
+            console.log('success on save file');
             return {result:"SUCCESS",resultmsg:"UPLOAD SUCCESS"};
         }
         else{//invalid data type
                 console.log('invalid file image');
                 //res.json({result:"FAIL",resultmsg:"INVALID"});
-            return {result:"FAIL",resultmsg:"INVALID"};
+            return {result:"FAIL",resultmsg:"INVALID EXT"};
         }
     }
     else{//no file
@@ -155,14 +154,15 @@ function deletePhoto(aidx,type){
                 console.log('error on conn pool del prophoto',err);
                 //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                 retval=-1;
-                return;
+                return retval;
             }else{
                 connection.query('SELECT prophoto from account where a_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del prophoto',err2);
                         //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        connection.release();
                         retval=-1;
-                        return;
+                        return retval;
                     }
                     else{
                         console.log('success prophoto:',result[0].prophoto);
@@ -171,7 +171,7 @@ function deletePhoto(aidx,type){
                             if (err){
                                 console.log('error on delete file',err);
                                 retval=-1;
-                                return;
+                                return retval;
                             }else{
                                 console.log('successfully deleted',userfolder);
                                 retval=1;
@@ -190,12 +190,13 @@ function deletePhoto(aidx,type){
                 console.log('error on conn pool del ballphoto',err);
                 //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                 retval=-1;
-                return;
+                return retval;
             }else{
                 connection.query('SELECT ballphoto from account where a_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del ballphoto',err);
                         //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        connection.release();
                         retval=-1;
                         return;
                     }
@@ -205,7 +206,7 @@ function deletePhoto(aidx,type){
                             if (err){
                                 console.log('error on delete file',err);
                                 retval=-1;
-                                return;
+                                return retval;
                             }else{
                                 console.log('successfully deleted',userfolder);
                                 retval=1;
@@ -224,14 +225,15 @@ function deletePhoto(aidx,type){
                 console.log('error on conn pool del grpphoto',err);
                 //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                 retval=-1;
-                return;
+                return retval;
             }else{
                 connection.query('SELECT g_photo from groups where g_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del grpphoto',err);
                         //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        connection.release();
                         retval=-1;
-                        return;
+                        return retval;
                     }
                     else{
                         var userfolder = path.resolve(process.env.UPLOAD_PATH,'group',aidx);
@@ -239,7 +241,7 @@ function deletePhoto(aidx,type){
                             if (err){
                                 console.log('error on delete file',err);
                                 retval=-1;
-                                return;
+                                return retval;
                             }else{
                                 console.log('successfully deleted',userfolder);
                                 retval=1;
@@ -251,6 +253,10 @@ function deletePhoto(aidx,type){
             }
         });//connection pool
         return retval;
+    }
+    else{
+        console.log('del function type error');
+        return -1;
     }
 }
 
@@ -303,16 +309,16 @@ exports.rankpoint = function(req,res){
 
  exports.sign = function(req,res){
     var signData = req.body; // 입력할 json 데이터 받을 변수
-    console.log(req.body);
+    console.log('recv data sign : ',signData);
     //사진 파일 업로드 부분 현재
-    var proPhoto_file = req.files.proPhoto;
-     var photo_name;
-    if(proPhoto_file!=null){
+    var proPhoto_file;
+    var photo_name;
+    if(req.files && typeof req.files.proPhoto===undefined){
+        proPhoto_file = req.files.proPhoto;
         photo_name = proPhoto_file.name;
     }
-    else{
-        photo_name = null;
-    }
+
+
     if(signData.email==null || signData.pwd==null || signData.name==null || signData.sex==null || signData.hand==null){
         console.log('error on invalid data');
         res.json({result:"FAIL",resultmsg:"INVALID DATA(NULL)"});
@@ -609,7 +615,7 @@ exports.insertScore = function(req,res){
                                 return;
                             }else{
                                 connection.query('UPDATE account_has_group SET league_avg=?,league_date=now() WHERE account_a_idx=? AND group_g_idx=?',
-                                    [(grpScore/grpGame).toFixed(4),aidx,grpIdx],function(err2,result){
+                                    [parseFloat(grpScore/grpGame).toFixed(4),aidx,grpIdx],function(err2,result){
                                     if(err2){
                                         console.log('error on query league insert');
                                         res.json({result:"FAIL",resultmsg:"ACCOUNT AND GROUP INCORRECT Q"});

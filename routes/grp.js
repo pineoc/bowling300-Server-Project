@@ -237,16 +237,18 @@ function deletePhoto(aidx,type){
  * */
 exports.groupMake = function(req,res){
     var groupmakeData = req.body; // json data get
-    var grp_photo = req.files.grpPhoto;
+    var grp_photo;
     var grpfilename;
     var aidx = cry.decB(groupmakeData.aidx);
+    if(req.files && typeof req.files.grpPhoto===undefined){
+        console.log('no file on data grpPhoto');
+    }
+    else{
+        grp_photo = req.files.grpPhoto;
+        grpfilename = grp_photo.name;
+    }
     console.log('recv data grpMake : ',groupmakeData);
     var date = new Date();
-    if(grp_photo!=null){
-        grpfilename=grp_photo.name;
-    }else{
-        grpfilename = null;
-    }
 
     var grp_id;
     var chkDup; // check duplication
@@ -348,7 +350,6 @@ exports.groupMake = function(req,res){
                                                         if (err) {
                                                             console.log('error on connection pool makegrp on make file upload', err);
                                                             res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
-
                                                             return;
                                                         }//error on connection pool
                                                         else {
@@ -358,6 +359,7 @@ exports.groupMake = function(req,res){
                                                                     if (err2) {
                                                                         console.log('error on query makegrp on make upload file', err2);
                                                                         res.json({result: "FAIL", resultmsg: "FAIL UPLOAD"});
+                                                                        connection.release();
                                                                         return;
                                                                     }
                                                                     else if (result.affectedRows == 1) {
@@ -1092,7 +1094,7 @@ exports.groupLeague = function(req,res){
                                 return;
                             }
                             else if(results.length){
-                                callback(null,{arr:arr,allavg:(results[0].allavg==null || results[0].allavg==null) ? 0 : (results[0].allavg).toFixed(1)});
+                                callback(null,{arr:arr,allavg:(results[0].allavg==null || results[0].allavg==null) ? 0 : parseFloat(results[0].allavg).toFixed(1)});
                             }
                             else{
                                 console.log('no data');
@@ -1133,7 +1135,7 @@ exports.groupLeague = function(req,res){
                                     result:"SUCCESS",
                                     resultmsg:"SUCCESS LEAGUE",
                                     proPhoto:results[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+results[0].prophoto,
-                                    myavg : (results[0].l_avg==null || results[0].l_avg==0 ) ? 0 : (results[0].l_avg).toFixed(1),
+                                    myavg : (results[0].l_avg==null || results[0].l_avg==0 ) ? 0 : parseFloat(results[0].l_avg).toFixed(1),
                                     allavg:result.allavg,
                                     leaguedata:result.arr});
                             }

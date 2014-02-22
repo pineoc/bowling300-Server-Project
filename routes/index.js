@@ -48,7 +48,7 @@ exports.login = function(req,res){
                         else{
                             if(result[0].cnt==0){
                                 console.log('no account on DB',result[0].cnt);
-                                res.json({result:"FAIL",resultmsg:"NO ACCOUNT"});
+                                res.json({result:"FAIL",myval:"NO ACCOUNT"});
                             }
                             else{
                                 console.log('Success on login, mydata : ',result);
@@ -61,7 +61,7 @@ exports.login = function(req,res){
                                     email:result[0].email,
                                     hand:result[0].hand,
                                     proPhoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+result[0].a_idx+"/"+result[0].prophoto
-                                }
+                                };
                                 callback(null,ret);
                             }
                         }
