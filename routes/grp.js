@@ -980,7 +980,7 @@ exports.groupmember = function(req,res){
                 }
                 else{
                     connection.query('SELECT prophoto from account where a_idx=?',
-                        [grpmemData.aidx],function(err2,result){
+                        [aidx],function(err2,result){
                             if(err2){
                                 console.log('error on query on grpmem take me',err);
                                 res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
