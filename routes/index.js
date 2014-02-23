@@ -246,7 +246,7 @@ exports.ranking = function(req,res){
                                             infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
-                                            avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
+                                            avg : parseFloat(arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             handi : arg1.results[i].handi,
@@ -347,7 +347,7 @@ exports.ranking = function(req,res){
                                             infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
-                                            avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
+                                            avg : parseFloat(arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             handi : arg1.results[i].handi,
@@ -490,7 +490,7 @@ exports.ranking = function(req,res){
                                             infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
-                                            avg : (arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
+                                            avg : parseFloat(arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             handi : arg1.results[i].handi,
@@ -633,7 +633,7 @@ exports.ranking = function(req,res){
                                             infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
-                                            avg : (arg1.results[i].g_score/arg1.results[i].g_game).toFixed(1),
+                                            avg : parseFloat(arg1.results[i].g_score/arg1.results[i].g_game).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             handi : arg1.results[i].handi,

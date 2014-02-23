@@ -631,9 +631,8 @@ exports.insertScore = function(req,res){
                 }
             }//group data
             else{
-                console.log('type error',insData);
-                res.json({result:"FAIL",resultmsg:"TYPE ERR"});
-                return;
+                console.log('type error',insData,data);
+                //res.json({result:"FAIL",resultmsg:"TYPE ERR"});
             }
         }//for
         if(errCount==0){
