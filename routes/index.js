@@ -274,7 +274,7 @@ exports.ranking = function(req,res){
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
                 }
                 else{
-                    console.log('data : ',results);
+                    console.log('success on world ranking data');
                     res.json(results);
                 }
             }
@@ -375,7 +375,7 @@ exports.ranking = function(req,res){
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
                 }
                 else{
-                    console.log('data : ',results);
+                    console.log('success on ranking aidx=0');
                     res.json(results);
                 }
             }
@@ -518,7 +518,7 @@ exports.ranking = function(req,res){
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
                 }
                 else{
-                    console.log('data : ',results);
+                    console.log('success on ranking local');
                     res.json(results);
                 }
             }
@@ -666,7 +666,7 @@ exports.ranking = function(req,res){
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
                 }
                 else{
-                    console.log('data : ',results);
+                    console.log('success on ranking grp');
                     res.json(results);
                 }
             }

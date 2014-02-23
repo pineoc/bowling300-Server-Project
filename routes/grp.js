@@ -1009,7 +1009,7 @@ exports.groupmember = function(req,res){
                 res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
             }
             else{
-                console.log('success,',result);
+                console.log('success on grp mem');
                 res.json(result);
             }
 
