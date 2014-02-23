@@ -88,7 +88,7 @@ exports.login = function(req,res){
                                 return;
                             }
                             else if(results){
-                                console.log('success list grp : ',results);
+                                console.log('success list grp');
                                 for(var i=0;i<results.length;i++){
                                     arr[i] = {
                                         gidx :results[i].gidx,
@@ -409,7 +409,7 @@ exports.ranking = function(req,res){
                                 }
                                 console.log('avg : ',avg);
                                 callback(null,{avg:avg,country:result[0].country,
-                                    prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+rankData.aidx+"/"+result[0].prophoto});
+                                    prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+result[0].prophoto});
                             }
                             else{
                                 console.log('no data');
@@ -438,7 +438,7 @@ exports.ranking = function(req,res){
                                     return;
                                 }
                                 else if(results.length){
-                                    console.log('avg : ',results[0].allscore/results[0].allgame);
+                                    console.log('avg : ',arg.avg);
                                     //console.log(result);
                                     callback(null,{results:results,avg:arg.avg,prophoto:arg.prophoto,country:arg.country});
                                 }
@@ -621,7 +621,7 @@ exports.ranking = function(req,res){
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
                                         if(arg1.results[i].prophoto==null){
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/test/1479/KakaoTalk_b6634420cfc0d1b1.png";
+                                            link = "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png";
                                         }
                                         else{
                                             link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
@@ -650,8 +650,8 @@ exports.ranking = function(req,res){
                                     callback(null,resultData);
                                 }
                                 else{
-                                    console.log('no data',results);
-                                    res.json({result:"SUCCESS",resultmsg:"NO DATA"});
+                                    console.log('no data on grp ranking');
+                                    res.json({result:"FAIL",resultmsg:"NO DATA"});
                                 }
                                 connection.release();
                             });//query

@@ -120,14 +120,15 @@ function deletePhoto(aidx,type){
                 console.log('error on conn pool del prophoto',err);
                 //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                 retval=-1;
-                return;
+                return retval;
             }else{
                 connection.query('SELECT prophoto from account where a_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del prophoto',err2);
                         //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                         retval=-1;
-                        return;
+                        connection.release();
+                        return retval;
                     }
                     else{
                         console.log('success prophoto:',result[0].prophoto);
@@ -136,7 +137,7 @@ function deletePhoto(aidx,type){
                             if (err){
                                 console.log('error on delete file',err);
                                 retval=-1;
-                                return;
+                                return retval;
                             }else{
                                 console.log('successfully deleted',userfolder);
                                 retval=1;
@@ -155,14 +156,15 @@ function deletePhoto(aidx,type){
                 console.log('error on conn pool del ballphoto',err);
                 //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                 retval=-1;
-                return;
+                return retval;
             }else{
                 connection.query('SELECT ballphoto from account where a_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del ballphoto',err);
                         //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                         retval=-1;
-                        return;
+                        connection.release();
+                        return retval;
                     }
                     else{
                         var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
@@ -189,14 +191,15 @@ function deletePhoto(aidx,type){
                 console.log('error on conn pool del grpphoto',err);
                 //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                 retval=-1;
-                return;
+                return retval;
             }else{
                 connection.query('SELECT g_photo from groups where g_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del grpphoto',err);
                         //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
                         retval=-1;
-                        return;
+                        connection.release();
+                        return retval;
                     }
                     else{
                         var userfolder = path.resolve(process.env.UPLOAD_PATH,'group',aidx);
@@ -224,6 +227,10 @@ function deletePhoto(aidx,type){
             }
         });//connection pool
         return retval;
+    }
+    else{
+        console.log('type error');
+        return -1;
     }
 }
 
