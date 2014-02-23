@@ -106,7 +106,7 @@ var uploadfunction = function(userid,type,upfile){
 /*
  * delete function
  * 최초 생성 날짜 : 2014.02.17
- * 최종 수정 날짜 : 2014.02.17
+ * 최종 수정 날짜 : 2014.02.23
  *
  * 받는 데이터 aidx, type
  * editor : pineoc
@@ -125,26 +125,35 @@ function deletePhoto(aidx,type){
                 connection.query('SELECT prophoto from account where a_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on query del prophoto',err2);
-                        //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                        retval=-1;
                         connection.release();
+                        retval=-1;
                         return retval;
                     }
-                    else{
-                        console.log('success prophoto:',result[0].prophoto);
+                    else if(result){
+                        console.log('success get prophoto name:',result[0].prophoto);
                         var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
-                        fs.unlink(userfolder+"/"+result[0].prophoto, function (err) {
-                            if (err){
-                                console.log('error on delete file',err);
-                                retval=-1;
-                                return retval;
-                            }else{
-                                console.log('successfully deleted',userfolder);
-                                retval=1;
-                            }
-                        });
-                        connection.release();
+                        if(result[0].prophoto!=null){
+                            fs.unlink(userfolder+"/"+result[0].prophoto, function (err) {
+                                if (err){
+                                    console.log('error on delete file',err);
+                                    retval=-1;
+                                    return retval;
+                                }else{
+                                    console.log('successfully deleted',userfolder);
+                                    retval=1;
+                                }
+                            });
+                        }
+                        else{
+                            console.log('null prophoto name',result[0].prophoto);
+                            retval=-1;
+                        }
                     }
+                    else{
+                        console.log('no data del prophoto get prophoto name');
+                        retval = -1;
+                    }
+                    connection.release();
                 });//query
             }
         });//connection pool
@@ -162,22 +171,32 @@ function deletePhoto(aidx,type){
                     if(err2){
                         console.log('error on query del ballphoto',err);
                         //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                        retval=-1;
                         connection.release();
-                        return retval;
+                        retval=-1;
+                        return;
+                    }
+                    else if (result){
+                        console.log('success get ballPhoto name : ',result[0].ballphoto);
+                        if(result[0].ballphoto!=null){
+                            fs.unlink(userfolder+"/"+result[0].ballphoto, function (err) {
+                                if (err){
+                                    console.log('error on delete file',err);
+                                    retval=-1;
+                                    return retval;
+                                }else{
+                                    console.log('successfully deleted',userfolder);
+                                    retval=1;
+                                }
+                            });
+                        }
+                        else{
+                            console.log('null ballphoto name',result[0].ballphoto);
+                            retval=-1;
+                        }
                     }
                     else{
-                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
-                        fs.unlink(userfolder+"/"+result[0].ballphoto, function (err) {
-                            if (err){
-                                console.log('error on delete file',err);
-                                retval=-1;
-                                return;
-                            }else{
-                                console.log('successfully deleted',userfolder);
-                                retval=1;
-                            }
-                        });
+                        console.log('no dataa on get ballphoto name');
+                        retval = -1;
                     }
                     connection.release();
                 });//query
@@ -197,30 +216,33 @@ function deletePhoto(aidx,type){
                     if(err2){
                         console.log('error on query del grpphoto',err);
                         //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                        retval=-1;
                         connection.release();
+                        retval=-1;
                         return retval;
                     }
-                    else{
+                    else if (result){
+                        console.log('Success get grpphoto name : ',result[0].g_photo);
                         var userfolder = path.resolve(process.env.UPLOAD_PATH,'group',aidx);
-                        fs.unlink(userfolder+"/"+result[0].g_photo, function (err) {
-                            if (err){
-                                console.log('error on delete file',err);
-                                retval=-1;
-                            }else{
-                                console.log('successfully deleted',userfolder);
-                                retval=1;
-                                fs.rmdir(userfolder,function(err){
-                                    if(err){
-                                        console.log('error on rmdir',err);
-                                        retval = -1;
-                                    }
-                                    else{
-                                        retval = 1;
-                                    }
-                                });
-                            }
-                        });
+                        if(result[0].g_photo==null){
+                            fs.unlink(userfolder+"/"+result[0].g_photo, function (err) {
+                                if (err){
+                                    console.log('error on delete file',err);
+                                    retval=-1;
+                                    return retval;
+                                }else{
+                                    console.log('successfully deleted',userfolder);
+                                    retval=1;
+                                }
+                            });
+                        }
+                        else{
+                            console.log('null grp photo name',result[0].g_photo);
+                            retval=-1;
+                        }
+                    }
+                    else{
+                        console.log('no data on get grpphoto name');
+                        retval = -1;
                     }
                     connection.release();
                 });//query
@@ -229,7 +251,7 @@ function deletePhoto(aidx,type){
         return retval;
     }
     else{
-        console.log('type error');
+        console.log('del function type error');
         return -1;
     }
 }

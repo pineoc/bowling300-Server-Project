@@ -52,8 +52,6 @@ app.get('/user/rankpoint',user.rankpoint);
 
 //insert data function( 점수 입력 함수 )
 app.post('/user/score',user.insertScore);
-//test
-app.post('/test/upload',test.upload);
 
 //group function ( 그룹 관련 함수)
 app.post('/user/groupmake',grp.groupMake);
@@ -63,8 +61,11 @@ app.post('/user/groupdel',grp.groupDelete);
 app.post('/user/groupsearch',grp.groupsearch);
 app.post('/user/groupmember',grp.groupmember);
 app.post('/user/groupleague',grp.groupLeague);
+
 //test
+app.post('/test/upload',test.upload);
 app.post('/test/cry',test.testenc);
+app.post('/test/delphoto',test.testdel);
 
 //board function ( 게시판 관련 함수 )
 app.get('/user/group/board/:groupidx',board.boardList);//그룹 글 목록

@@ -88,7 +88,7 @@ exports.login = function(req,res){
                                 return;
                             }
                             else if(results){
-                                console.log('success list grp');
+                                console.log('success list grp on login');
                                 for(var i=0;i<results.length;i++){
                                     arr[i] = {
                                         gidx :results[i].gidx,
@@ -196,7 +196,7 @@ exports.ranking = function(req,res){
                                     return;
                                 }
                                 else{
-                                    console.log('avg on query : ',arg);
+                                    console.log('avg : ',arg.avg);
                                     callback(null,{results:results,avg:arg.avg,prophoto:arg.prophoto});//data
                                 }
                                 connection.release();
@@ -310,64 +310,39 @@ exports.ranking = function(req,res){
             function (arg1,callback){
                 //console.log('arg1 : ',arg1,arg1.allscore,arg1.allgame);
                 var arr=[];
-                var avg = arg1.avg;
                 var resultData;
-                var worldRank=0;
-
-                db.pool.getConnection(function(err,connection){
-                    if(err){
-                        console.log('error on connection pool world rank me',err);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                        return;
-                    }//error on connection pool
-                    else{
-                        connection.query('SELECT count(*) cnt FROM account a where (a.allscore/a.allgame)>=? order by (a.allscore/a.allgame) desc',
-                            [avg],//평균 값, 해당 아이디 idx
-                            function(err2,results2){
-                                if(err2){
-                                    console.log('error on query world rank me',err2);
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                                    connection.release();
-                                    return;
-                                }
-                                else{
-                                    //console.log(worldRank,avg,results);
-                                    for(var i=0;i<arg1.results.length;i++){
-                                        var link;
-                                        if(arg1.results[i].prophoto==null){
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png";
-                                        }
-                                        else{
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
-                                        }
-                                        arr[i]={
-                                            rank : i+1,
-                                            name : arg1.results[i].name,
-                                            country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
-                                            infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
-                                            proPhoto : link,
-                                            ballPhoto : arg1.results[i].ballphoto,
-                                            avg : parseFloat(arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
-                                            allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
-                                            highscore : arg1.results[i].highscore,//그주의 최고점수
-                                            handi : arg1.results[i].handi,
-                                            hand : arg1.results[i].hand,
-                                            year : date.getFullYear()-arg1.results[i].year+1,
-                                            ballweight : arg1.results[i].ballweight,
-                                            style : arg1.results[i].style,
-                                            step : arg1.results[i].step,
-                                            series300 : arg1.results[i].series300,
-                                            series800 : arg1.results[i].series800
-                                        };//arr에 정보를 객체 형태로 저장
-                                    }//for
-                                    resultData = {arr:arr};
-                                    callback(null,resultData);
-                                }
-                                connection.release();
-                            });//query
+                for(var i=0;i<arg1.results.length;i++){
+                    var link;
+                    if(arg1.results[i].prophoto==null){
+                        link = "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png";
                     }
-                });//connection pool
+                    else{
+                        link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
+                    }
+                    arr[i]={
+                        rank : i+1,
+                        name : arg1.results[i].name,
+                        country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
+                        infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
+                        proPhoto : link,
+                        ballPhoto : arg1.results[i].ballphoto,
+                        avg : parseFloat(arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
+                        allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
+                        highscore : arg1.results[i].highscore,//그주의 최고점수
+                        handi : arg1.results[i].handi,
+                        hand : arg1.results[i].hand,
+                        year : date.getFullYear()-arg1.results[i].year+1,
+                        ballweight : arg1.results[i].ballweight,
+                        style : arg1.results[i].style,
+                        step : arg1.results[i].step,
+                        series300 : arg1.results[i].series300,
+                        series800 : arg1.results[i].series800
+                    };//arr에 정보를 객체 형태로 저장
+                }//for
+                resultData = {arr:arr};
+                callback(null,resultData);
             }
+
         ],
             function(err,results){
                 if(err){
@@ -412,7 +387,7 @@ exports.ranking = function(req,res){
                                     prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+result[0].prophoto});
                             }
                             else{
-                                console.log('no data');
+                                console.log('no data local rank my data');
                                 res.json({result:"FAIL",resultmsg:"NO DATA"});
                             }
                             connection.release();
@@ -558,7 +533,7 @@ exports.ranking = function(req,res){
                                 callback(null,{avg:avg,prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+result[0].prophoto});
                             }
                             else{
-                                console.log('no data');
+                                console.log('no data on grp account data me ');
                                 res.json({result:"FAIL",resultmsg:"NO DATA"});
                             }
                             connection.release();
@@ -587,7 +562,7 @@ exports.ranking = function(req,res){
                                     callback(null,{results:results,avg:arg.avg,prophoto:arg.prophoto});//data
                                 }
                                 else{
-                                    console.log('no data');
+                                    console.log('no data on grp rank');
                                     res.json({result:"FAIL",resultmsg:"NO DATA"});
                                 }
                                 connection.release();
