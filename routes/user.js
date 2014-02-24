@@ -469,7 +469,7 @@ exports.userinfo = function(req,res){
                         resultData = {
                             email : result[0].email,
                             name : result[0].name,
-                            proPhoto : result[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+infoData.aidx+"/"+result[0].prophoto,
+                            proPhoto : result[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+result[0].prophoto,
                             ballPhoto : result[0].ballphoto,
                             sex : result[0].sex,
                             hand : result[0].hand,
