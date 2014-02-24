@@ -53,7 +53,7 @@
       <file leaf-file-name="user.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/routes/user.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="627" column="147" selection-start="26089" selection-end="26089" vertical-scroll-proportion="-0.04385965" vertical-offset="10689" max-vertical-offset="11373">
+            <state line="420" column="35" selection-start="16257" selection-end="16257" vertical-scroll-proportion="-0.19298245" vertical-offset="7272" max-vertical-offset="11849">
               <folding>
                 <element signature="n#!!doc" expanded="true" />
               </folding>
@@ -100,8 +100,8 @@
         <option value="$PROJECT_DIR$/routes/index.js" />
         <option value="$PROJECT_DIR$/routes/grp.js" />
         <option value="$PROJECT_DIR$/app.js" />
-        <option value="$PROJECT_DIR$/routes/user.js" />
         <option value="$PROJECT_DIR$/routes/test.js" />
+        <option value="$PROJECT_DIR$/routes/user.js" />
       </list>
     </option>
   </component>
@@ -675,7 +675,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/routes/user.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="627" column="147" selection-start="26089" selection-end="26089" vertical-scroll-proportion="-0.04385965" vertical-offset="10689" max-vertical-offset="11373">
+        <state line="420" column="35" selection-start="16257" selection-end="16257" vertical-scroll-proportion="-0.19298245" vertical-offset="7272" max-vertical-offset="11849">
           <folding>
             <element signature="n#!!doc" expanded="true" />
           </folding>

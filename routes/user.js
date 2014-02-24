@@ -95,10 +95,23 @@ var uploadfunction = function(userid,type,upfile){
             }
             var destpath = path.resolve(__dirname,'..',groupfolder,name);
         }
+        else if(type=="ball"){
+            var userfolder = path.resolve(process.env.UPLOAD_PATH,'user','ball',userid.toString());//gidx를 이용
+            console.log('groupfolder : ',groupfolder);
+            if(!fs.existsSync(groupfolder)){
+                //fs.mkdirSync(userfolder);
+                mkdirp(groupfolder,function(err){
+                    if(err){
+                        console.log('error on mkdirp make balldir',err);
+                        return {result:"FAIL",resultmsg:"FAIL MKDIR"};
+                    }else{
+                        console.log('success');
+                    }
+                });//mkdirp
+            }
+            var destpath = path.resolve(__dirname,'..',groupfolder,name);
+        }
 //        else if(type=="board"){
-//
-//        }
-//        else if(type=="ball"){
 //
 //        }
 //        var name=upfile.name;//upload file name ex>file.jpg
@@ -398,31 +411,46 @@ exports.sign = function(req,res){
  * */
 exports.addsign = function(req,res){
     var addSignData = req.body; // json data
-    var aidx = cry.decB(req.body.aidx);
-    db.pool.getConnection(function(err,connection){
-        if(err){
-            console.log('error on connection pool addsign',err);
-            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-            return;
-        }//error on connection pool
-        else{
-            connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?,country=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
-                [addSignData.name,addSignData.pwd,addSignData.sex,addSignData.hand,addSignData.year,addSignData.country,
-                    addSignData.ballweight,addSignData.style,addSignData.step,addSignData.series800,addSignData.series300,aidx],function(err2,result){
-                    if(err2){
-                        console.log('error on query addsign',err2);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+    var aidx;
+    if (addSignData.aidx == 0) {
+        //aidx=0;
+        console.log('aidx 0 error on addsign');
+        res.json({result: "FAIL", resultmsg: "AIDX ZERO"});
+        return;
+    } else {
+        aidx = cry.decB(addSignData.aidx);
+        var photo_file;
+        var photo_name;
+        if (req.files && !(typeof req.files.photo === undefined)) {
+            photo_file = req.files.photo;
+            photo_name = photo_file.name;
+        }
+        db.pool.getConnection(function (err, connection) {
+            if (err) {
+                console.log('error on connection pool addsign', err);
+                res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                return;
+            }//error on connection pool
+            else {
+                connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?,country=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                    [addSignData.name, addSignData.pwd, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,
+                        addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
+                        if (err2) {
+                            console.log('error on query addsign', err2);
+                            res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                            connection.release();
+                            return;
+                        }//error on query
+                        else if (result.affectedRows == 1) {
+                            console.log('success, result : ', result);
+                            res.json({result: "SUCCESS", resultmsg: result}); // result_msg에 대한 부분은 차후 수정
+                        }//insert success
                         connection.release();
-                        return;
-                    }//error on query
-                    else if(result.affectedRows==1){
-                        console.log('success, result : ',result);
-                        res.json({result:"SUCCESS",resultmsg:result}); // result_msg에 대한 부분은 차후 수정
-                    }//insert success
-                    connection.release();
-                });//query
-        }//no error on connection pool
-    });//connection pool
+                    });//query
+            }//no error on connection pool
+        });//connection pool
+    }
+
 };
 
 /*
