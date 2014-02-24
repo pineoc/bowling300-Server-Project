@@ -29,10 +29,10 @@ var crypto = require('crypto');
 var cronJob = require('cron').CronJob;
 var rankPointDateStart = new Date();
 var rankPointDateEnd = new Date();
+
 var job = new cronJob({
     cronTime: '00 00 00 * * 1',
     onTick: function() {
-
         // Runs every weekday (Monday)
         // at 00:00:00 AM.
         rankPointDateStart.setDate(rankPointDateStart.getDate());//start point
@@ -42,6 +42,10 @@ var job = new cronJob({
     timeZone: "Asia/Seoul"
 });
 job.start();
+if(rankPointDateStart.getDay()!=1){
+    rankPointDateStart.setDate(rankPointDateStart.getDate()-(rankPointDateStart.getDay()-1));
+}
+rankPointDateEnd.setDate(rankPointDateStart.getDate()+7);
 
 
 if(process.env.UPLOAD_PATH == undefined)
@@ -296,10 +300,6 @@ function formatDate(date) {
  * */
 exports.rankpoint = function(req,res){
     //res.send("respond with a resource");
-    if(rankPointDateStart.getDay()!=1){
-        rankPointDateStart.setDate(rankPointDateStart.getDate()-(rankPointDateStart.getDay()-1));
-    }
-    rankPointDateEnd.setDate(rankPointDateStart.getDate()+7);
     var point = {
         startPoint:formatDate(rankPointDateStart),
         endPoint:formatDate(rankPointDateEnd)
