@@ -348,7 +348,7 @@ exports.sign = function(req,res){
                     function(err2,result){
                         if(err2){
                             console.log('error on query sign check dup',err2);
-                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                            res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                             connection.release();
                             return;
                         }
@@ -370,7 +370,7 @@ exports.sign = function(req,res){
                                             [signData.email, signData.name, signData.pwd,signData.sex,signData.country,signData.hand,photo_name,0,0], function (err2, result) {
                                                 if (err2) {
                                                     console.log('error on query sign', err2);
-                                                    res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                                    res.json({result: "FAIL", resultmsg: "INVALID DATA"});
                                                     connection.release();
                                                     return;
                                                 }
@@ -437,7 +437,7 @@ exports.addsign = function(req,res){
                         addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
                         if (err2) {
                             console.log('error on query addsign', err2);
-                            res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                            res.json({result: "FAIL", resultmsg: "INVALID DATA"});
                             connection.release();
                             return;
                         }//error on query
@@ -489,7 +489,7 @@ exports.userinfo = function(req,res){
                 connection.query('SELECT * FROM account where a_idx=?',[aidx],function(err2,result){
                     if(err2){
                         console.log('error on Query userinfo',err);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                        res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                         connection.release();
                         return;
                     }else if(result){
@@ -575,7 +575,7 @@ exports.insertScore = function(req,res){
                                 [s_allScore, s_allGame, aidx], function (err2, result) {
                                     if (err2) {
                                         console.log('error on query insert solo', err2);
-                                        res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                        res.json({result: "FAIL", resultmsg: "INVALID DATA"});
                                         errCount++;
                                         connection.release();
                                         return;
@@ -617,7 +617,7 @@ exports.insertScore = function(req,res){
                                 [grpScore, grpGame, aidx, grpIdx], function (err2, result) {
                                     if (err2) {
                                         console.log('error on query insert grp', err2);
-                                        res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                        res.json({result: "FAIL", resultmsg: "INVALID DATA"});
                                         errCount++;
                                         connection.release();
                                         return;
@@ -657,7 +657,7 @@ exports.insertScore = function(req,res){
                                 [parseFloat(grpScore / grpGame).toFixed(4), aidx, grpIdx], function (err2, result) {
                                     if (err2) {
                                         console.log('error on query league insert');
-                                        res.json({result: "FAIL", resultmsg: "ACCOUNT AND GROUP INCORRECT Q"});
+                                        res.json({result: "FAIL", resultmsg: "INVALID DATA"});
                                         errCount++;
                                         connection.release();
                                         return;

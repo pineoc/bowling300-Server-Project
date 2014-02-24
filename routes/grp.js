@@ -297,7 +297,7 @@ exports.groupMake = function(req,res){
                     function(err2,result){
                         if(err2){
                             console.log('error on query grp name check dup',err2);
-                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                            res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                             connection.release();
                             return;
                         }
@@ -323,7 +323,7 @@ exports.groupMake = function(req,res){
                                                     function (err2, result) {
                                                         if (err2) {
                                                             console.log('error on query makegrp on make', err2);
-                                                            res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                                            res.json({result: "FAIL", resultmsg: "INVALID DATA"});
                                                             connection.release();
                                                             return;
                                                         }
@@ -349,7 +349,7 @@ exports.groupMake = function(req,res){
                                                     [aidx, arg1.gidx, 0, 0], function (err2, result) {
                                                         if (err2) {
                                                             console.log('error on query makegrp on insert account has group', err2);
-                                                            res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                                            res.json({result: "FAIL", resultmsg: "INVALID DATA"});
                                                             connection.release();
                                                             return;
                                                         }
@@ -387,7 +387,7 @@ exports.groupMake = function(req,res){
                                                                 function (err2, result) {
                                                                     if (err2) {
                                                                         console.log('error on query makegrp on make upload file', err2);
-                                                                        res.json({result: "FAIL", resultmsg: "FAIL UPLOAD"});
+                                                                        res.json({result: "FAIL", resultmsg: "INVALID DATA"});
                                                                         connection.release();
                                                                         return;
                                                                     }

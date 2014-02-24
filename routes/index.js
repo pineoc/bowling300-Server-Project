@@ -41,7 +41,7 @@ exports.login = function(req,res){
                     connection.query('SELECT *,count(*) cnt FROM account WHERE email=? AND pwd=?',[loginData.email,loginData.pwd],function(err2,result){
                         if(err2){
                             console.log('error on query login',err2);
-                            res.json({myval:{result:"FAIL",resultmsg:"NETWORK ERR Q"}});
+                            res.json({myval:{result:"FAIL",resultmsg:"INVALID DATA"}});
                             connection.release();
                             return;
                         }
@@ -83,7 +83,7 @@ exports.login = function(req,res){
                         [cry.decB(arg.aidx)],function(err2,results){
                             if(err2){
                                 console.log('error on query grp list',err2);
-                                res.json({myval:{result:"FAIL",resultmsg:"NETWORK ERR Q"}});
+                                res.json({myval:{result:"FAIL",resultmsg:"INVALID DATA"}});
                                 connection.release();
                                 return;
                             }
@@ -155,7 +155,7 @@ exports.ranking = function(req,res){
                         connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
@@ -191,7 +191,7 @@ exports.ranking = function(req,res){
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query world rank',err2);
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                     connection.release();
                                     return;
                                 }
@@ -223,7 +223,7 @@ exports.ranking = function(req,res){
                             function(err2,results2){
                                 if(err2){
                                     console.log('error on query world rank me',err2);
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                     connection.release();
                                     return;
                                 }
@@ -295,7 +295,7 @@ exports.ranking = function(req,res){
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query world rank aidx=0',err2);
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                     connection.release();
                                     return;
                                 }
@@ -371,7 +371,7 @@ exports.ranking = function(req,res){
                         connection.query('SELECT allscore,allgame,prophoto,country from account where a_idx=?',[aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
@@ -408,7 +408,7 @@ exports.ranking = function(req,res){
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query local rank',err2);
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                     connection.release();
                                     return;
                                 }
@@ -444,7 +444,7 @@ exports.ranking = function(req,res){
                             function(err2,results2){
                                 if(err2){
                                     console.log('error on query local rank me',err2);
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                     connection.release();
                                     return;
                                 }
@@ -517,7 +517,7 @@ exports.ranking = function(req,res){
                             [groupidx,aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
@@ -554,7 +554,7 @@ exports.ranking = function(req,res){
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query group rank',err2);
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                     connection.release();
                                     return;
                                 }
@@ -587,7 +587,7 @@ exports.ranking = function(req,res){
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query group rank me',err2);
-                                    res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                     connection.release();
                                     return;
                                 }
