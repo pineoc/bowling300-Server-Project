@@ -201,7 +201,7 @@ if(process.env.UPLOAD_PATH == undefined)
     process.env.UPLOAD_PATH = 'test';
 }//if =local
 
- exports.upload = function(req, res){
+exports.upload = function(req, res){
     var uploadData = req.files.upfile;
     var a_idx = req.body.aidx;
     if(uploadData.originalFilename!=''){
@@ -282,3 +282,158 @@ exports.testdel = function(req,res){
         res.json({result:"FAIL"});
     }
 };
+
+exports.insertScore = function(req,res){
+    var insData = req.body; // 입력할 데이터를 받음
+    console.log('recv data insert Score: ',insData);
+    var data = insData.myscoredata;
+    var dataLength = insData.myscoredata.length;
+    var aidx = cry.decB(insData.aidx);
+    var s_allScore = 0;
+    var s_allGame = 0;
+    var errCount=0;
+
+    console.log('datalength: ',dataLength);
+    if (dataLength == 0) {//no data
+        console.log('error, no data ');
+        res.json({result: "FAIL", resultmsg: "NO DATA"});
+    } else {
+        data.forEach(function(ind){
+            if (ind.type == -1) {//solo data
+                s_allScore = ind.allScore;
+                s_allGame = ind.allGame;
+                console.log('s_data :', s_allGame, s_allScore);
+                if (s_allScore / s_allGame > 300) {//check valid
+                    console.log('INVALID data over 300 avg solo');
+                    res.json({result: "FAIL", resultmsg: "INVALID OVER 300"});
+                    return;
+                }
+                else if (s_allGame == 0) {
+                    console.log('INVALID data allgame 0 solo');
+                    res.json({result: "FAIL", resultmsg: "INVALID GAME ZERO"});
+                    return;
+                }
+                else {
+                    //update to db-------------------------------------------------
+                    db.pool.getConnection(function (err, connection) {
+                        if (err) {
+                            console.log('error on connection pool insert', err);
+                            res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                            return;
+                        }//error on connection pool
+                        else {
+                            connection.query('UPDATE account SET allscore=?, allgame=? WHERE a_idx=?',
+                                [s_allScore, s_allGame, aidx], function (err2, result) {
+                                    if (err2) {
+                                        console.log('error on query insert solo', err2);
+                                        res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                        errCount++;
+                                        connection.release();
+                                        return;
+                                    }
+                                    else if (result.affectedRows == 1) {
+                                        console.log('success solo, result', result);
+                                        //res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
+                                    }//insert success
+                                    connection.release();
+                                });//query
+                        }//no error on connection pool
+                    });//connection pool
+                    //-------------------------------------------------------------
+                }
+            }
+            else if (ind.type > 0 && ind.league == 0) {//group data
+                var grpIdx = ind.type;
+                var grpScore = ind.allScore;
+                var grpGame = ind.allGame;
+                if (grpScore / grpGame > 300) {//check valid
+                    console.log('INVALID data over 300 avg in grp, gidx : ', grpIdx);
+                    res.json({result: "FAIL", resultmsg: "INVALID OVER 300"});
+                    return;
+                }
+                else if (grpGame == 0) {
+                    console.log('INVALID data allgame 0 grp, gidx :', grpIdx);
+                    res.json({result: "FAIL", resultmsg: "INVALID GAME ZERO"});
+                    return;
+                }
+                else {
+                    db.pool.getConnection(function (err, connection) {
+                        if (err) {
+                            console.log('error on connection pool group', err);
+                            res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                            return;
+                        }//error on connection pool
+                        else {
+                            connection.query('UPDATE account_has_group SET g_score=?,g_game=? WHERE account_a_idx=? AND group_g_idx=?',
+                                [grpScore, grpGame, aidx, grpIdx], function (err2, result) {
+                                    if (err2) {
+                                        console.log('error on query insert grp', err2);
+                                        res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                        errCount++;
+                                        connection.release();
+                                        return;
+                                    }//error on query
+                                    else if (result.affectedRows == 1) {
+                                        console.log('success grp, result : ', result);
+                                        console.log('insertScore, grp data  on query : ', grpIdx, grpScore, grpGame);
+                                    }//insert success
+                                    connection.release();
+                                });//query
+                        }//no error on connection pool
+                    });//connection pool
+                }
+            }//group data
+            else if (ind.type > 0 && ind.league == 1) {//group data
+                var grpIdx = ind.type;
+                var grpScore = ind.allScore;
+                var grpGame = ind.allGame;
+                if (grpScore / grpGame > 300) {//check valid
+                    console.log('INVALID data over 300 avg in grp, gidx : ', grpIdx);
+                    res.json({result: "FAIL", resultmsg: "INVALID OVER 300"});
+                    return;
+                }
+                else if (grpGame == 0) {
+                    console.log('INVALID data allgame 0 grp, gidx:', grpIdx);
+                    res.json({result: "FAIL", resultmsg: "INVALID GAME ZERO"});
+                    return;
+                }
+                else {
+                    db.pool.getConnection(function (err, connection) {
+                        if (err) {
+                            console.log('error on conn pool league insert');
+                            res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                            return;
+                        } else {
+                            connection.query('UPDATE account_has_group SET league_avg=?,league_date=now() WHERE account_a_idx=? AND group_g_idx=?',
+                                [parseFloat(grpScore / grpGame).toFixed(4), aidx, grpIdx], function (err2, result) {
+                                    if (err2) {
+                                        console.log('error on query league insert');
+                                        res.json({result: "FAIL", resultmsg: "ACCOUNT AND GROUP INCORRECT Q"});
+                                        errCount++;
+                                        connection.release();
+                                        return;
+                                    }
+                                    else if (result.affectedRows == 1) {
+                                        console.log('success league , result', result);
+                                        console.log('insertScore, league data  on query : ', grpIdx, grpScore, grpGame);
+                                    }
+                                    connection.release();
+                                });//query
+                        }
+                    });//conn pool
+                }
+            }//group data
+            else {
+                console.log('type error', insData, data);
+            }
+        });
+        if (errCount == 0) {
+            console.log('success normal data all', data);
+            res.json({result: "SUCCESS", resultmsg: data}); // result_msg에 대한 부분은 차후 수정
+        }
+        else {
+            console.log('error occur on insert on solo or grp or league');
+            res.json({result: "FAIL", resultmsg: "ERROR ON INSERT", data: data});
+        }
+    }
+};//insertScore

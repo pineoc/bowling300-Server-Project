@@ -1,9 +1,9 @@
 /*
-by pineoc
-pineoc@naver.com
-content : user
-2014.02.03 - start
-* */
+ by pineoc
+ pineoc@naver.com
+ content : user
+ 2014.02.03 - start
+ * */
 var async = require('async');
 
 //var db = require('./localDB.js');
@@ -123,8 +123,8 @@ var uploadfunction = function(userid,type,upfile){
             return {result:"SUCCESS",resultmsg:"UPLOAD SUCCESS"};
         }
         else{//invalid data type
-                console.log('invalid file image');
-                //res.json({result:"FAIL",resultmsg:"INVALID"});
+            console.log('invalid file image');
+            //res.json({result:"FAIL",resultmsg:"INVALID"});
             return {result:"FAIL",resultmsg:"INVALID EXT"};
         }
     }
@@ -296,15 +296,15 @@ exports.rankpoint = function(req,res){
 };
 
 /*
-* 기능 : 회원가입 ( 기본정보 )
-* 최초 생성 날짜 : 2014.02.02
-* 최종 수정 날짜 : 2014.02.12
-*
-* editor : pineoc
-* 미구현 부분 : 사진 파일 업로드 부분
-* */
+ * 기능 : 회원가입 ( 기본정보 )
+ * 최초 생성 날짜 : 2014.02.02
+ * 최종 수정 날짜 : 2014.02.12
+ *
+ * editor : pineoc
+ * 미구현 부분 : 사진 파일 업로드 부분
+ * */
 
- exports.sign = function(req,res){
+exports.sign = function(req,res){
     var signData = req.body; // 입력할 json 데이터 받을 변수
     console.log('recv data sign : ',signData);
     //사진 파일 업로드 부분 현재
@@ -320,7 +320,7 @@ exports.rankpoint = function(req,res){
         console.log('error on invalid data');
         res.json({result:"FAIL",resultmsg:"INVALID DATA(NULL)"});
     }
-     else{
+    else{
         var chkDup;
         console.log('recv data sign : ',signData);
         db.pool.getConnection(function(err,connection){
@@ -333,55 +333,55 @@ exports.rankpoint = function(req,res){
                 //console.log('data : ',signData,signData.email,signData.name,signData.pwd);
                 connection.query('SELECT count(*) cnt FROM account WHERE email=?',[signData.email],
                     function(err2,result){
-                    if(err2){
-                        console.log('error on query sign check dup',err2);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                        connection.release();
-                        return;
-                    }
-                    else{
-                        console.log('check dup result : ',result[0].cnt);
-                        chkDup = result[0].cnt;
-                        if(chkDup!=0){
-                            console.log('duplication email', chkDup);
-                            res.json({result: "FAIL", resultmsg: "DUP EMAIL"});
-                        } else {
-                            db.pool.getConnection(function (err, connection) {
-                                if (err) {
-                                    console.log('error on connection pool sign', err);
-                                    res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
-                                    return;
-                                }//error on connection pool
-                                else {
-                                    connection.query('INSERT INTO account(email,name,pwd,sex,country,hand,prophoto,allscore,allgame) VALUES(?,?,?,?,?,?,?,?,?)',
-                                        [signData.email, signData.name, signData.pwd,signData.sex,signData.country,signData.hand,photo_name,0,0], function (err2, result) {
-                                            if (err2) {
-                                                console.log('error on query sign', err2);
-                                                res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
-                                                connection.release();
-                                                return;
-                                            }
-                                            else if (result.affectedRows == 1) {
-                                                console.log('sign result : ', result);
-                                                returnData = {result: "SUCCESS", aidx: cry.encB(result.insertId)};
-                                                var result_upload = uploadfunction(result.insertId,"profile",proPhoto_file);
-                                                if(result_upload.result=="SUCCESS"){
-                                                    console.log(result_upload);
-                                                    res.json(returnData);
-                                                }
-                                                else{
-                                                    console.log(result_upload);
-                                                    res.json({result:"FAIL",resultmsg:"BUT UPLOAD FAIL"});
-                                                }
-                                            }
-                                            connection.release();
-                                        });//query
-                                }
-                            });//connection pool
+                        if(err2){
+                            console.log('error on query sign check dup',err2);
+                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                            connection.release();
+                            return;
                         }
-                    }
-                    connection.release();
-                });//query
+                        else{
+                            console.log('check dup result : ',result[0].cnt);
+                            chkDup = result[0].cnt;
+                            if(chkDup!=0){
+                                console.log('duplication email', chkDup);
+                                res.json({result: "FAIL", resultmsg: "DUP EMAIL"});
+                            } else {
+                                db.pool.getConnection(function (err, connection) {
+                                    if (err) {
+                                        console.log('error on connection pool sign', err);
+                                        res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                                        return;
+                                    }//error on connection pool
+                                    else {
+                                        connection.query('INSERT INTO account(email,name,pwd,sex,country,hand,prophoto,allscore,allgame) VALUES(?,?,?,?,?,?,?,?,?)',
+                                            [signData.email, signData.name, signData.pwd,signData.sex,signData.country,signData.hand,photo_name,0,0], function (err2, result) {
+                                                if (err2) {
+                                                    console.log('error on query sign', err2);
+                                                    res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                                    connection.release();
+                                                    return;
+                                                }
+                                                else if (result.affectedRows == 1) {
+                                                    console.log('sign result : ', result);
+                                                    returnData = {result: "SUCCESS", aidx: cry.encB(result.insertId)};
+                                                    var result_upload = uploadfunction(result.insertId,"profile",proPhoto_file);
+                                                    if(result_upload.result=="SUCCESS"){
+                                                        console.log(result_upload);
+                                                        res.json(returnData);
+                                                    }
+                                                    else{
+                                                        console.log(result_upload);
+                                                        res.json({result:"FAIL",resultmsg:"BUT UPLOAD FAIL"});
+                                                    }
+                                                }
+                                                connection.release();
+                                            });//query
+                                    }
+                                });//connection pool
+                            }
+                        }
+                        connection.release();
+                    });//query
             }
         });//connection pool
     }
@@ -498,14 +498,13 @@ exports.userinfo = function(req,res){
 /*
  * 점수 데이터 입력
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.11
+ * 최종 수정 날짜 : 2014.02.24
  *
  * 받는 데이터 aidx , data(점수)
  * editor : pineoc
  * 미구현 부분 : 사진 파일 업로드 부분
  * */
 exports.insertScore = function(req,res){
-
     var insData = req.body; // 입력할 데이터를 받음
     console.log('recv data insert Score: ',insData);
     var data = insData.myscoredata;
@@ -516,138 +515,148 @@ exports.insertScore = function(req,res){
     var errCount=0;
 
     console.log('datalength: ',dataLength);
-    console.log('data : ',data);
-    if(dataLength!=0){
-        for(var i=0;i<dataLength;i++){
-            if(data[i].type==-1){//solo data
-                s_allScore = data[i].allScore;
-                s_allGame = data[i].allGame;
-                console.log('s_data :',s_allGame,s_allScore );
-                if(s_allScore/s_allGame>300){//check valid
+    if (dataLength == 0) {//no data
+        console.log('error, no data ');
+        res.json({result: "FAIL", resultmsg: "NO DATA"});
+    } else {
+        data.forEach(function(ind){
+            if (ind.type == -1) {//solo data
+                s_allScore = ind.allScore;
+                s_allGame = ind.allGame;
+                console.log('s_data :', s_allGame, s_allScore);
+                if (s_allScore / s_allGame > 300) {//check valid
                     console.log('INVALID data over 300 avg solo');
-                    res.json({result:"FAIL",resultmsg:"INVALID OVER 300"});
+                    res.json({result: "FAIL", resultmsg: "INVALID OVER 300"});
                     return;
                 }
-                else if(s_allGame==0){
+                else if (s_allGame == 0) {
                     console.log('INVALID data allgame 0 solo');
-                    res.json({result:"FAIL",resultmsg:"INVALID GAME ZERO"});
+                    res.json({result: "FAIL", resultmsg: "INVALID GAME ZERO"});
                     return;
                 }
-                else{
+                else {
                     //update to db-------------------------------------------------
-                    db.pool.getConnection(function(err,connection){
-                        if(err){
-                            console.log('error on connection pool insert',err);
-                            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    db.pool.getConnection(function (err, connection) {
+                        if (err) {
+                            console.log('error on connection pool insert', err);
+                            res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
                             return;
                         }//error on connection pool
-                        else{
+                        else {
                             connection.query('UPDATE account SET allscore=?, allgame=? WHERE a_idx=?',
-                                [s_allScore,s_allGame,aidx],function(err2,result){
-                                    if(err2){
-                                        console.log('error on query insert solo',err2);
-                                        res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                [s_allScore, s_allGame, aidx], function (err2, result) {
+                                    if (err2) {
+                                        console.log('error on query insert solo', err2);
+                                        res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
                                         errCount++;
                                         connection.release();
                                         return;
                                     }
-                                    else if(result.affectedRows==1){
-                                        console.log('success solo, result',result);
+                                    else if (result.affectedRows == 1) {
+                                        console.log('success solo, result', result);
                                         //res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
                                     }//insert success
                                     connection.release();
-                            });//query
+                                });//query
                         }//no error on connection pool
                     });//connection pool
                     //-------------------------------------------------------------
                 }
             }
-            else if(data[i].type>0){//group data
-                var grpIdx = data[i].type;
-                var grpScore = data[i].allScore;
-                var grpGame = data[i].allGame;
-                console.log('insertScore, grp data : ',grpIdx,grpScore,grpGame);
-                if(grpScore/grpGame>300){//check valid
-                    console.log('INVALID data over 300 avg in grp, gidx : ',grpIdx);
-                    res.json({result:"FAIL",resultmsg:"INVALID OVER 300"});
+            else if (ind.type > 0 && ind.league == 0) {//group data
+                var grpIdx = ind.type;
+                var grpScore = ind.allScore;
+                var grpGame = ind.allGame;
+                if (grpScore / grpGame > 300) {//check valid
+                    console.log('INVALID data over 300 avg in grp, gidx : ', grpIdx);
+                    res.json({result: "FAIL", resultmsg: "INVALID OVER 300"});
                     return;
                 }
-                else if(grpGame==0){
-                    console.log('INVALID data allgame 0 grp, gidx:',grpIdx);
-                    res.json({result:"FAIL",resultmsg:"INVALID GAME ZERO"});
+                else if (grpGame == 0) {
+                    console.log('INVALID data allgame 0 grp, gidx :', grpIdx);
+                    res.json({result: "FAIL", resultmsg: "INVALID GAME ZERO"});
                     return;
                 }
-                else{
-                    if(data[i].league==0){ // no league
-                        db.pool.getConnection(function(err,connection){
-                            if(err){
-                                console.log('error on connection pool group',err);
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                                return;
-                            }//error on connection pool
-                            else{
-                                connection.query('UPDATE account_has_group SET g_score=?,g_game=? WHERE account_a_idx=? AND group_g_idx=?',
-                                    [grpScore,grpGame,aidx,grpIdx],function(err2,result){
-                                        if(err2){
-                                            console.log('error on query insert grp',err2);
-                                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                                            errCount++;
-                                            connection.release();
-                                            return;
-                                        }//error on query
-                                        else if(result.affectedRows==1){
-                                            console.log('success grp, result : ',result);
-                                            //res.json({result:"SUCCESS",resultmsg:insData}); // result_msg에 대한 부분은 차후 수정
-                                        }//insert success
+                else {
+                    db.pool.getConnection(function (err, connection) {
+                        if (err) {
+                            console.log('error on connection pool group', err);
+                            res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                            return;
+                        }//error on connection pool
+                        else {
+                            connection.query('UPDATE account_has_group SET g_score=?,g_game=? WHERE account_a_idx=? AND group_g_idx=?',
+                                [grpScore, grpGame, aidx, grpIdx], function (err2, result) {
+                                    if (err2) {
+                                        console.log('error on query insert grp', err2);
+                                        res.json({result: "FAIL", resultmsg: "NETWORK ERR Q"});
+                                        errCount++;
                                         connection.release();
-                                    });//query
-                            }//no error on connection pool
-                        });//connection pool
-                    }
-                    else{ //league data
-                            db.pool.getConnection(function(err,connection){
-                            if(err){
-                                console.log('error on conn pool league insert');
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                                return;
-                            }else{
-                                connection.query('UPDATE account_has_group SET league_avg=?,league_date=now() WHERE account_a_idx=? AND group_g_idx=?',
-                                    [parseFloat(grpScore/grpGame).toFixed(4),aidx,grpIdx],function(err2,result){
-                                    if(err2){
+                                        return;
+                                    }//error on query
+                                    else if (result.affectedRows == 1) {
+                                        console.log('success grp, result : ', result);
+                                        console.log('insertScore, grp data  on query : ', grpIdx, grpScore, grpGame);
+                                    }//insert success
+                                    connection.release();
+                                });//query
+                        }//no error on connection pool
+                    });//connection pool
+                }
+            }//group data
+            else if (ind.type > 0 && ind.league == 1) {//group data
+                var grpIdx = ind.type;
+                var grpScore = ind.allScore;
+                var grpGame = ind.allGame;
+                if (grpScore / grpGame > 300) {//check valid
+                    console.log('INVALID data over 300 avg in grp, gidx : ', grpIdx);
+                    res.json({result: "FAIL", resultmsg: "INVALID OVER 300"});
+                    return;
+                }
+                else if (grpGame == 0) {
+                    console.log('INVALID data allgame 0 grp, gidx:', grpIdx);
+                    res.json({result: "FAIL", resultmsg: "INVALID GAME ZERO"});
+                    return;
+                }
+                else {
+                    db.pool.getConnection(function (err, connection) {
+                        if (err) {
+                            console.log('error on conn pool league insert');
+                            res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                            return;
+                        } else {
+                            connection.query('UPDATE account_has_group SET league_avg=?,league_date=now() WHERE account_a_idx=? AND group_g_idx=?',
+                                [parseFloat(grpScore / grpGame).toFixed(4), aidx, grpIdx], function (err2, result) {
+                                    if (err2) {
                                         console.log('error on query league insert');
-                                        res.json({result:"FAIL",resultmsg:"ACCOUNT AND GROUP INCORRECT Q"});
+                                        res.json({result: "FAIL", resultmsg: "ACCOUNT AND GROUP INCORRECT Q"});
                                         errCount++;
                                         connection.release();
                                         return;
                                     }
-                                    else if(result.affectedRows==1){
-                                        console.log('success league , result',result);
+                                    else if (result.affectedRows == 1) {
+                                        console.log('success league , result', result);
+                                        console.log('insertScore, league data  on query : ', grpIdx, grpScore, grpGame);
                                     }
                                     connection.release();
                                 });//query
-                            }
-                        });//conn pool
-                    }
+                        }
+                    });//conn pool
                 }
             }//group data
-            else{
-                console.log('type error',insData,data);
-                //res.json({result:"FAIL",resultmsg:"TYPE ERR"});
+            else {
+                console.log('type error', insData, data);
             }
-        }//for
-        if(errCount==0){
+        });
+        if (errCount == 0) {
             console.log('success normal data all', data);
-            res.json({result:"SUCCESS",resultmsg:data}); // result_msg에 대한 부분은 차후 수정
+            res.json({result: "SUCCESS", resultmsg: data}); // result_msg에 대한 부분은 차후 수정
         }
-        else{
+        else {
             console.log('error occur on insert on solo or grp or league');
-            res.json({result:"FAIL",resultmsg:"ERROR ON INSERT",data:data});
+            res.json({result: "FAIL", resultmsg: "ERROR ON INSERT", data: data});
         }
-    }//if end
-    else if(data.length==0){
-        console.log('error, no data ');
-        res.json({result:"FAIL",resultmsg:"NO DATA"});
-    }//no data
+    }
 };//insertScore
 
 exports.deletePhoto = function(req,res){

@@ -66,6 +66,7 @@ app.post('/user/groupleague',grp.groupLeague);
 app.post('/test/upload',test.upload);
 app.post('/test/cry',test.testenc);
 app.post('/test/delphoto',test.testdel);
+app.post('/test/score',test.insertScore);
 
 //board function ( 게시판 관련 함수 )
 app.get('/user/group/board/:groupidx',board.boardList);//그룹 글 목록
