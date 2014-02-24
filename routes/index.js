@@ -34,21 +34,21 @@ exports.login = function(req,res){
             db.pool.getConnection(function(err,connection){
                 if(err){
                     console.log('error on conn pool login',err);
-                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    res.json({myval:{result:"FAIL",resultmsg:"NETWORK ERR"}});
                     return ;
                 }
                 else{
                     connection.query('SELECT *,count(*) cnt FROM account WHERE email=? AND pwd=?',[loginData.email,loginData.pwd],function(err2,result){
                         if(err2){
                             console.log('error on query login',err2);
-                            res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                            res.json({myval:{result:"FAIL",resultmsg:"NETWORK ERR Q"}});
                             connection.release();
                             return;
                         }
                         else{
                             if(result[0].cnt==0){
                                 console.log('no account on DB',result[0].cnt);
-                                res.json({result:"FAIL",myval:"NO ACCOUNT"});
+                                res.json({myval:{result:"FAIL",resultmsg:"NO ACCOUNT"}});
                             }
                             else{
                                 console.log('Success on login, mydata : ',result);
@@ -75,7 +75,7 @@ exports.login = function(req,res){
             db.pool.getConnection(function(err,connection){
                 if(err){
                     console.log('error on connection pool grp list',err);
-                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    res.json({myval:{result:"FAIL",resultmsg:"NETWORK ERR"}});
                     return;
                 }//error on conn pool
                 else{
@@ -83,7 +83,7 @@ exports.login = function(req,res){
                         [cry.decB(arg.aidx)],function(err2,results){
                             if(err2){
                                 console.log('error on query grp list',err2);
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                res.json({myval:{result:"FAIL",resultmsg:"NETWORK ERR Q"}});
                                 connection.release();
                                 return;
                             }
@@ -110,7 +110,7 @@ exports.login = function(req,res){
     ],function(err,result){
         if(err){
             console.log('error on waterfall ',err);
-            res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
+            res.json({myval:{result:"FAIL",resultmsg:"NETWORK ERR W"}});
             return;
         }
         else{
