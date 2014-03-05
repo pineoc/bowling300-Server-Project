@@ -90,10 +90,6 @@ if(rankPointDateStart.getDay()!=1){
     rankPointDateStart.setDate(rankPointDateStart.getDate()-(rankPointDateStart.getDay()-1));
 }
 rankPointDateEnd.setDate(rankPointDateStart.getDate()+7);
-if(process.env.UPLOAD_PATH == undefined)
-{
-    process.env.UPLOAD_PATH = 'public';
-}//if =local
 
 /*
  * 날짜 스트링 연산

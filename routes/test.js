@@ -196,10 +196,6 @@ function deletePhoto(aidx,type,cb){
  * 받는 데이터 : 사진file ( req.files 로 받음) 변수명 prophoto, aidx
  * editor : pineoc
  * */
-if(process.env.UPLOAD_PATH == undefined)
-{
-    process.env.UPLOAD_PATH = 'test';
-}//if =local
 
 exports.upload = function(req, res){
     var uploadData = req.files.upfile;

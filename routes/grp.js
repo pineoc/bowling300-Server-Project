@@ -22,10 +22,6 @@ var prolink = "http://bowling.pineoc.cloulu.com/uploads/user/";
 var countrylink = "http://bowling.pineoc.cloulu.com/uploads/country/";
 var nonelink = "http://bowling.pineoc.cloulu.com/uploads/country/none.png";
 
-if(process.env.UPLOAD_PATH == undefined)
-{
-    process.env.UPLOAD_PATH = 'public';
-}//if =local
 
 function formatDate(date) {
     var year = date.getFullYear();

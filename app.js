@@ -28,8 +28,8 @@ app.use(app.router);
 app.use('/dir', express.directory(__dirname));
 app.use('/dir', express.static(__dirname));
 
-app.use('/uploads', express.directory(path.join(__dirname,'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.directory(path.join(__dirname,'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 process.on('uncaughtException',function(exception){
