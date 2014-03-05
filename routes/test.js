@@ -203,9 +203,8 @@ if(process.env.UPLOAD_PATH == undefined)
 
 exports.upload = function(req, res){
     var uploadData = req.files.upfile;
-    var a_idx = req.body.aidx;
     if(uploadData.originalFilename!=''){
-        var userfolder = path.resolve(process.env.UPLOAD_PATH,'country');
+        var userfolder = path.resolve(process.env.UPLOAD_PATH,'test','country');
         console.log('userfolder : ',userfolder);
         if(!fs.existsSync(userfolder)){
             mkdirp(userfolder,function(err){
@@ -238,7 +237,7 @@ exports.upload = function(req, res){
                 var ext = destpath.substring(idx); // .jpg
                 var filename = destpath.substring(0,idx);
             });//is.on callback function
-            console.log('success',{result:"SUCCESS",resultmsg:"FILE UPLOAD SUCCESS"});
+            console.log('test success',{result:"SUCCESS",resultmsg:"TEST FILE UPLOAD SUCCESS"});
             res.json({result:"SUCCESS",resultmsg:"FILE UPLOAD SUCCESS"});
         }
         else{
@@ -250,6 +249,36 @@ exports.upload = function(req, res){
     {
         console.log('error on no file');
         res.json({result:"FAIL",resultmsg:"NO FILE EXISTS"});
+    }
+};
+
+exports.uploadt = function(req, res){
+    var upfile = req.files.upfile;
+    if (upfile) {
+        var name = upfile.name, srcpath = upfile.path;
+        var path = require('path');
+        var destpath = path.resolve(process.env.UPLOAD_PATH,'test', name);
+
+        var is = fs.createReadStream(srcpath);
+        var os = fs.createWriteStream(destpath);
+
+        is.pipe(os);
+        is.on('end',function() {
+            fs.unlinkSync(srcpath);
+            res.json({result:"SUCCESS",resultmsg:"FILE UPLOADT SUCCESS"});
+        });
+    } else {
+        res.json({result:'fail'});
+    }
+};
+
+exports.filechk = function(req,res){
+    var data = req.body;
+    if (fs.existsSync(path.resolve(process.env.UPLOAD_PATH,data.path))) {
+        res.json({result:"EXISTS",path : path.resolve(process.env.UPLOAD_PATH,data.path)});
+    }
+    else{
+        res.json({result:"NOT EXISTS"});
     }
 };
 
