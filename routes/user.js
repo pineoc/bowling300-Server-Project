@@ -4,12 +4,14 @@
  content : user
  2014.02.03 - start
  * */
-var async = require('async');
+
 
 //var db = require('./localDB.js');
 var db = require('./clouluDB.js');
 var cry = require('./crypto_pineoc.js');
+var filemgr = require('./filemgr');
 
+var async = require('async');
 var path = require('path');
 var fs = require('fs');
 var easyimage = require('easyimage');
@@ -17,11 +19,16 @@ var util = require('util');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 
+if(process.env.UPLOAD_PATH == undefined)
+{
+    process.env.UPLOAD_PATH = 'public';
+}//if =local
+
 
 /*
  * cron function
  * 최초 생성 날짜 : 2014.02.11
- * 최종 수정 날짜 : 2014.02.11
+ * 최종 수정 날짜 : 2014.03.03
  *
  * 기준날짜를 설정하여 exports.rankpoint에서 사용한다.
  * editor : pineoc
@@ -29,6 +36,10 @@ var crypto = require('crypto');
 var cronJob = require('cron').CronJob;
 var rankPointDateStart = new Date();
 var rankPointDateEnd = new Date();
+var grplink = "http://bowling.pineoc.cloulu.com/uploads/group/";
+var prolink = "http://bowling.pineoc.cloulu.com/uploads/user/";
+var countrylink = "http://bowling.pineoc.cloulu.com/uploads/country/";
+var nonelink = "http://bowling.pineoc.cloulu.com/uploads/country/none.png";
 
 var job = new cronJob({
     cronTime: '00 00 00 * * 1',
@@ -37,6 +48,39 @@ var job = new cronJob({
         // at 00:00:00 AM.
         rankPointDateStart.setDate(rankPointDateStart.getDate());//start point
         console.log(rankPointDateStart);
+
+        //reset data on Monday
+        db.pool.getConnection(function(err,connection){
+            if(err){
+                console.log('error on reset data conn pool',err);
+            }
+            else{
+                connection.query('UPDATE account SET allscore=?, allgame=?, avg=?',[0,0,0],function(err2,result){
+                    if(err2){
+                        console.log('error on reset data query',err2);
+                    }
+                    else if(result.affectedRows>1){
+                        console.log('affected account data.');
+                    }
+                    else{
+                        console.log('none reset data');
+                    }
+                    connection.release();
+                });//query
+                connection.query('UPDATE account_has_group SET g_score=?, g_game=?, g_avg=?',[0,0,0],function(err2,result){
+                    if(err2){
+                        console.log('error on reset data query',err2);
+                    }
+                    else if(result.affectedRows>1){
+                        console.log('affected group data.');
+                    }
+                    else{
+                        console.log('none reset data');
+                    }
+                    connection.release();
+                });//query
+            }
+        });//conn pool
     },
     start: false,
     timeZone: "Asia/Seoul"
@@ -46,234 +90,10 @@ if(rankPointDateStart.getDay()!=1){
     rankPointDateStart.setDate(rankPointDateStart.getDate()-(rankPointDateStart.getDay()-1));
 }
 rankPointDateEnd.setDate(rankPointDateStart.getDate()+7);
-
-
 if(process.env.UPLOAD_PATH == undefined)
 {
     process.env.UPLOAD_PATH = 'public';
 }//if =local
-
-/*
- * upload function
- * 최초 생성 날짜 : 2014.02.09
- * 최종 수정 날짜 : 2014.02.11
- *
- * 받는 데이터 aidx, upfile, type
- * editor : pineoc
- * */
-var uploadfunction = function(userid,type,upfile){
-    var name=upfile.name;//upload file name ex>file.jpg
-    var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
-    var destpath;
-
-    if(upfile.originalFilename!=''){
-        if(type=="profile"){
-            var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',userid.toString());//aidx를 이용
-            console.log('userfolder : ',userfolder);
-            if(!fs.existsSync(userfolder)){
-                //fs.mkdirSync(userfolder);
-                mkdirp(userfolder,function(err){
-                    if(err){
-                        console.log('error on mkdirp make userdir',err);
-                        return {result:"FAIL",resultmsg:"MKDIR FAIL"};
-                    }else{
-                        console.log('success');
-                    }
-                });//mkdirp
-            }
-            var destpath = path.resolve(__dirname,'..',userfolder,name);
-        }
-        else if(type=="group"){
-            var groupfolder = path.resolve(process.env.UPLOAD_PATH,'group',userid.toString());//gidx를 이용
-            console.log('groupfolder : ',groupfolder);
-            if(!fs.existsSync(groupfolder)){
-                //fs.mkdirSync(userfolder);
-                mkdirp(groupfolder,function(err){
-                    if(err){
-                        console.log('error on mkdirp make groupdir',err);
-                        return {result:"FAIL",resultmsg:"FAIL MKDIR"};
-                    }else{
-                        console.log('success');
-                    }
-                });//mkdirp
-            }
-            var destpath = path.resolve(__dirname,'..',groupfolder,name);
-        }
-        else if(type=="ball"){
-            var userfolder = path.resolve(process.env.UPLOAD_PATH,'user','ball',userid.toString());//gidx를 이용
-            console.log('groupfolder : ',groupfolder);
-            if(!fs.existsSync(groupfolder)){
-                //fs.mkdirSync(userfolder);
-                mkdirp(groupfolder,function(err){
-                    if(err){
-                        console.log('error on mkdirp make balldir',err);
-                        return {result:"FAIL",resultmsg:"FAIL MKDIR"};
-                    }else{
-                        console.log('success');
-                    }
-                });//mkdirp
-            }
-            var destpath = path.resolve(__dirname,'..',groupfolder,name);
-        }
-//        else if(type=="board"){
-//
-//        }
-//        var name=upfile.name;//upload file name ex>file.jpg
-//        var srcpath = upfile.path;//현재 폴더 위치 -> 업로드 하는 기기
-//        var destpath = path.resolve(__dirname,'..',userfolder,name);
-//        //public/1/이미지.jpg
-        var checkext = path.extname(name);
-        checkext=checkext.toLowerCase();
-        //check image ext
-        if(checkext=='.jpg' || checkext=='.jpeg' || checkext=='.png'){
-            var is = fs.createReadStream(srcpath); //소스로부터 스트림을 입력받음
-            var os = fs.createWriteStream(destpath);//읽어온 스트림을 통해서 사진파일 생성
-            is.pipe(os);
-            is.on('end',function(){
-                fs.unlinkSync(srcpath);
-                var srcimg = destpath;
-                var idx = destpath.lastIndexOf('.');
-                var ext = destpath.substring(idx); // .jpg
-                var filename = destpath.substring(0,idx);
-            });//is.on callback function
-            console.log('success on save file');
-            return {result:"SUCCESS",resultmsg:"UPLOAD SUCCESS"};
-        }
-        else{//invalid data type
-            console.log('invalid file image');
-            //res.json({result:"FAIL",resultmsg:"INVALID"});
-            return {result:"FAIL",resultmsg:"INVALID EXT"};
-        }
-    }
-    else{//no file
-        console.log('no file');
-        return {result:"FAIL",resultmsg:"NO FILE"};
-    }
-};//upload function
-
-/*
- * delete function
- * 최초 생성 날짜 : 2014.02.17
- * 최종 수정 날짜 : 2014.02.17
- *
- * 받는 데이터 aidx, type
- * editor : pineoc
- * */
-
-function deletePhoto(aidx,type){
-    var retval;
-    if(type=="pro"){
-        db.pool.getConnection(function(err,connection){
-            if(err){
-                console.log('error on conn pool del prophoto',err);
-                //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                retval=-1;
-                return retval;
-            }else{
-                connection.query('SELECT prophoto from account where a_idx=?',[aidx],function(err2,result){
-                    if(err2){
-                        console.log('error on query del prophoto',err2);
-                        //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                        connection.release();
-                        retval=-1;
-                        return retval;
-                    }
-                    else{
-                        console.log('success prophoto:',result[0].prophoto);
-                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
-                        fs.unlink(userfolder+"/"+result[0].prophoto, function (err) {
-                            if (err){
-                                console.log('error on delete file',err);
-                                retval=-1;
-                                return retval;
-                            }else{
-                                console.log('successfully deleted',userfolder);
-                                retval=1;
-                            }
-                        });
-                        connection.release();
-                    }
-                });//query
-            }
-        });//connection pool
-        return retval;
-    }
-    else if(type=="ball"){
-        db.pool.getConnection(function(err,connection){
-            if(err){
-                console.log('error on conn pool del ballphoto',err);
-                //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                retval=-1;
-                return retval;
-            }else{
-                connection.query('SELECT ballphoto from account where a_idx=?',[aidx],function(err2,result){
-                    if(err2){
-                        console.log('error on query del ballphoto',err);
-                        //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                        connection.release();
-                        retval=-1;
-                        return;
-                    }
-                    else{
-                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
-                        fs.unlink(userfolder+"/"+result[0].ballphoto, function (err) {
-                            if (err){
-                                console.log('error on delete file',err);
-                                retval=-1;
-                                return retval;
-                            }else{
-                                console.log('successfully deleted',userfolder);
-                                retval=1;
-                            }
-                        });
-                    }
-                    connection.release();
-                });//query
-            }
-        });//connection pool
-        return retval;
-    }
-    else if(type=="group"){
-        db.pool.getConnection(function(err,connection){
-            if(err){
-                console.log('error on conn pool del grpphoto',err);
-                //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                retval=-1;
-                return retval;
-            }else{
-                connection.query('SELECT g_photo from groups where g_idx=?',[aidx],function(err2,result){
-                    if(err2){
-                        console.log('error on query del grpphoto',err);
-                        //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                        connection.release();
-                        retval=-1;
-                        return retval;
-                    }
-                    else{
-                        var userfolder = path.resolve(process.env.UPLOAD_PATH,'group',aidx);
-                        fs.unlink(userfolder+"/"+result[0].g_photo, function (err) {
-                            if (err){
-                                console.log('error on delete file',err);
-                                retval=-1;
-                                return retval;
-                            }else{
-                                console.log('successfully deleted',userfolder);
-                                retval=1;
-                            }
-                        });
-                    }
-                    connection.release();
-                });//query
-            }
-        });//connection pool
-        return retval;
-    }
-    else{
-        console.log('del function type error');
-        return -1;
-    }
-}
-
 
 /*
  * 날짜 스트링 연산
@@ -311,10 +131,10 @@ exports.rankpoint = function(req,res){
 /*
  * 기능 : 회원가입 ( 기본정보 )
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.12
+ * 최종 수정 날짜 : 2014.03.03
  *
+ * 밭는 데이터 : email, name, pwd, sex, hand, proPhoto
  * editor : pineoc
- * 미구현 부분 : 사진 파일 업로드 부분
  * */
 
 exports.sign = function(req,res){
@@ -328,14 +148,13 @@ exports.sign = function(req,res){
         photo_name = proPhoto_file.name;
     }
 
-
-    if(signData.email==null || signData.pwd==null || signData.name==null || signData.sex==null || signData.hand==null){
+    //check null data
+    if(signData.email==null || signData.pwd==null || signData.name==null || signData.country==null ||signData.sex==null || signData.hand==null || !(req.files && !(typeof req.files.proPhoto===undefined))){
         console.log('error on invalid data');
-        res.json({result:"FAIL",resultmsg:"INVALID DATA(NULL)"});
+        res.json({result:"FAIL",resultmsg:"INVALID DATA NULL"});
     }
     else{
         var chkDup;
-        console.log('recv data sign : ',signData);
         db.pool.getConnection(function(err,connection){
             if(err){
                 console.log('error on connection pool sign check dup',err);
@@ -343,7 +162,6 @@ exports.sign = function(req,res){
                 return;
             }//error on connection pool
             else{
-                //console.log('data : ',signData,signData.email,signData.name,signData.pwd);
                 connection.query('SELECT count(*) cnt FROM account WHERE email=?',[signData.email],
                     function(err2,result){
                         if(err2){
@@ -358,42 +176,47 @@ exports.sign = function(req,res){
                             if(chkDup!=0){
                                 console.log('duplication email', chkDup);
                                 res.json({result: "FAIL", resultmsg: "DUP EMAIL"});
+                                connection.release();
+                                return;
                             } else {
-                                db.pool.getConnection(function (err, connection) {
-                                    if (err) {
-                                        console.log('error on connection pool sign', err);
-                                        res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
-                                        return;
-                                    }//error on connection pool
-                                    else {
-                                        connection.query('INSERT INTO account(email,name,pwd,sex,country,hand,prophoto,allscore,allgame) VALUES(?,?,?,?,?,?,?,?,?)',
-                                            [signData.email, signData.name, signData.pwd,signData.sex,signData.country,signData.hand,photo_name,0,0], function (err2, result) {
-                                                if (err2) {
-                                                    console.log('error on query sign', err2);
-                                                    res.json({result: "FAIL", resultmsg: "INVALID DATA"});
-                                                    connection.release();
-                                                    return;
-                                                }
-                                                else if (result.affectedRows == 1) {
-                                                    console.log('sign result : ', result);
-                                                    returnData = {result: "SUCCESS", aidx: cry.encB(result.insertId)};
-                                                    var result_upload = uploadfunction(result.insertId,"profile",proPhoto_file);
-                                                    if(result_upload.result=="SUCCESS"){
-                                                        console.log(result_upload);
-                                                        res.json(returnData);
+                                connection.query('INSERT INTO account(email,name,pwd,sex,country,hand,prophoto,allscore,allgame,avg) VALUES(?,?,?,?,?,?,?,?,?,?)',
+                                    [signData.email, signData.name, signData.pwd,signData.sex,signData.country,signData.hand,photo_name,0,0,0], function (err2, result) {
+                                        if (err2) {
+                                            console.log('error on query sign', err2);
+                                            res.json({result: "FAIL", resultmsg: "INVALID DATA"});
+                                            connection.release();
+                                            return;
+                                        }
+                                        else if (result.affectedRows == 1) {
+                                            console.log('sign result : ', result);
+                                            returnData = {result: "SUCCESS", aidx: cry.encB(result.insertId)};
+                                            var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',(result.insertId).toString());//aidx를 이용
+                                            console.log('userfolder : ',userfolder);
+                                            if(!fs.existsSync(userfolder)){
+                                                mkdirp(userfolder,function(err){
+                                                    if(err){
+                                                        console.log('error on mkdirp make userdir',err);
+                                                        res.json({result:"FAIL",resultmsg:"FILE UPLOAD FAIL"});
+                                                        return;
+                                                    }else{
+                                                        console.log('success path load pro');
                                                     }
-                                                    else{
-                                                        console.log(result_upload);
-                                                        res.json({result:"FAIL",resultmsg:"BUT UPLOAD FAIL"});
-                                                    }
-                                                }
-                                                connection.release();
-                                            });//query
-                                    }
-                                });//connection pool
+                                                });//mkdirp
+                                            }
+                                            var result_upload = filemgr.uploadfunction(result.insertId,"profile",proPhoto_file);
+                                            if(result_upload.result=="SUCCESS"){
+                                                console.log(result_upload);
+                                                res.json(returnData);
+                                            }
+                                            else{
+                                                console.log(result_upload);
+                                                res.json({result:"FAIL",resultmsg:"FILE UPLOAD FAIL"});
+                                            }
+                                        }
+                                        connection.release();
+                                    });//query
                             }
                         }
-                        connection.release();
                     });//query
             }
         });//connection pool
@@ -443,7 +266,7 @@ exports.addsign = function(req,res){
                         }//error on query
                         else if (result.affectedRows == 1) {
                             console.log('success, result : ', result);
-                            res.json({result: "SUCCESS", resultmsg: result}); // result_msg에 대한 부분은 차후 수정
+                            res.json({result: "SUCCESS", resultmsg: "ADDSIGN SUCCESS"}); // result_msg에 대한 부분은 차후 수정
                         }//insert success
                         connection.release();
                     });//query
@@ -497,7 +320,7 @@ exports.userinfo = function(req,res){
                         resultData = {
                             email : result[0].email,
                             name : result[0].name,
-                            proPhoto : result[0].prophoto==null ? "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png" : "http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+result[0].prophoto,
+                            proPhoto : result[0].prophoto==null ? nonelink : prolink+aidx+"/"+result[0].prophoto,
                             ballPhoto : result[0].ballphoto,
                             sex : result[0].sex,
                             hand : result[0].hand,
@@ -571,8 +394,8 @@ exports.insertScore = function(req,res){
                             return;
                         }//error on connection pool
                         else {
-                            connection.query('UPDATE account SET allscore=?, allgame=? WHERE a_idx=?',
-                                [s_allScore, s_allGame, aidx], function (err2, result) {
+                            connection.query('UPDATE account SET allscore=?, allgame=?, avg=? WHERE a_idx=?',
+                                [s_allScore, s_allGame,parseFloat(s_allScore/s_allGame).toFixed(4), aidx], function (err2, result) {
                                     if (err2) {
                                         console.log('error on query insert solo', err2);
                                         res.json({result: "FAIL", resultmsg: "INVALID DATA"});
@@ -613,8 +436,8 @@ exports.insertScore = function(req,res){
                             return;
                         }//error on connection pool
                         else {
-                            connection.query('UPDATE account_has_group SET g_score=?,g_game=? WHERE account_a_idx=? AND group_g_idx=?',
-                                [grpScore, grpGame, aidx, grpIdx], function (err2, result) {
+                            connection.query('UPDATE account_has_group SET g_score=?,g_game=?,g_avg=? WHERE account_a_idx=? AND group_g_idx=?',
+                                [grpScore, grpGame,parseFloat(grpScore/grpGame).toFixed(4), aidx, grpIdx], function (err2, result) {
                                     if (err2) {
                                         console.log('error on query insert grp', err2);
                                         res.json({result: "FAIL", resultmsg: "INVALID DATA"});
@@ -686,7 +509,3 @@ exports.insertScore = function(req,res){
         }
     }
 };//insertScore
-
-exports.deletePhoto = function(req,res){
-
-};//사진 삭제
