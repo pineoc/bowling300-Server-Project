@@ -5,13 +5,21 @@
  2014.02.03 - start
  * */
 
-var async = require('async');
+
 
 //var db = require('./localDB.js');
 var db = require('./clouluDB.js');
 var cry = require('./crypto_pineoc.js');
-var date = new Date();
+var filemgr = require('./filemgr');
 
+
+var async = require('async');
+
+var date = new Date();
+var grplink = "http://bowling.pineoc.cloulu.com/uploads/group/";
+var prolink = "http://bowling.pineoc.cloulu.com/uploads/user/";
+var countrylink = "http://bowling.pineoc.cloulu.com/uploads/country/";
+var nonelink = "http://bowling.pineoc.cloulu.com/uploads/country/none.png";
 
 exports.index = function(req, res){
   res.render('index', { title: 'Express' });
@@ -60,7 +68,7 @@ exports.login = function(req,res){
                                     country:result[0].country,
                                     email:result[0].email,
                                     hand:result[0].hand,
-                                    proPhoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+result[0].a_idx+"/"+result[0].prophoto
+                                    proPhoto:prolink+result[0].a_idx+"/"+result[0].prophoto
                                 };
                                 callback(null,ret);
                             }
@@ -95,7 +103,6 @@ exports.login = function(req,res){
                                         gname:results[i].gname
                                     };
                                 }//for
-                                //res.json({result:"SUCCESS",group:arr});
                                 callback(null,{myval:arg,group:arr});
                             }
                             else{
@@ -121,9 +128,9 @@ exports.login = function(req,res){
 };
 
 /*
- * 랭킹 데이터
+ * 랭킹
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.18
+ * 최종 수정 날짜 : 2014.03.04
  *
  * 받는 데이터 allscore, allgame, type, limit
  * editor : pineoc
@@ -137,13 +144,11 @@ exports.ranking = function(req,res){
     else{
         aidx=0;
     }
-    var limit = 0;
+    var limit = parseInt(rankData.limit);
     console.log('recv data ranking : ',rankData);
-    //limit = req.params.limit;
     if(rankData.type=="world" && aidx!=0){//개인 데이터에 따른 월드 랭킹
         async.waterfall([//랭킹 데이터를 json 형태로 만들기 위해서
             function(callback){
-                var avg;
                 //get allscore and allgame
                 db.pool.getConnection(function(err,connection){
                     if(err){
@@ -152,23 +157,16 @@ exports.ranking = function(req,res){
                         return;
                     }
                     else{
-                        connection.query('SELECT allscore,allgame,prophoto from account where a_idx=?',[aidx],function(err2,result){
+                        connection.query('SELECT avg, prophoto from account where a_idx=?',[aidx],function(err2,result){
                             if(err2){
-                                console.log('error on get allscore allgame in ranking query',err2);
+                                console.log('error on get avg in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
                             else if(result.length){
-                                if(result[0].allgame!=0){
-                                    avg = result[0].allscore/result[0].allgame;
-                                }
-                                else{
-                                    avg=0;
-                                }
-                                console.log('avg : ',avg);
-                                //console.log(result);
-                                callback(null,{avg:avg,prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+result[0].prophoto});
+                                console.log('avg : ',result[0].avg);
+                                callback(null,{avg:result[0].avg, prophoto: prolink + aidx + "/" + result[0].prophoto});
                             }
                             else{
                                 console.log('no data');
@@ -187,7 +185,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT * FROM account order by (allscore/allgame) desc limit ?,30',[limit],
+                        connection.query('SELECT * FROM account order by avg desc limit ?,30',[limit],
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query world rank',err2);
@@ -196,7 +194,7 @@ exports.ranking = function(req,res){
                                     return;
                                 }
                                 else{
-                                    console.log('avg : ',arg.avg);
+                                    console.log('success ranking on world');
                                     callback(null,{results:results,avg:arg.avg,prophoto:arg.prophoto});//data
                                 }
                                 connection.release();
@@ -218,7 +216,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT count(*) cnt FROM account a where (a.allscore/a.allgame)>=? order by (a.allscore/a.allgame) desc',
+                        connection.query('SELECT count(*) cnt FROM account a where a.avg>=? order by a.avg desc',
                             [avg],//평균 값, 해당 아이디 idx
                             function(err2,results2){
                                 if(err2){
@@ -229,24 +227,23 @@ exports.ranking = function(req,res){
                                 }
                                 else{
                                     worldRank = results2[0].cnt;
-                                    console.log(worldRank,avg);
-                                    //console.log(worldRank,avg,results);
+                                    console.log('world rank : ',worldRank);
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
                                         if(arg1.results[i].prophoto==null){
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png";
+                                            link = nonelink;
                                         }
                                         else{
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
+                                            link = prolink+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
                                         }
                                         arr[i]={
-                                            rank : i+1,
+                                            rank : limit+i+1,
                                             name : arg1.results[i].name,
-                                            country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
-                                            infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
+                                            country : countrylink+arg1.results[i].country+".png",
+                                            infocountry :countrylink+"info"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
-                                            avg : parseFloat(arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
+                                            avg : parseFloat(arg1.results[i].avg).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             handi : arg1.results[i].handi,
@@ -291,7 +288,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT * FROM account order by (allscore/allgame) desc limit ?,30',[limit],
+                        connection.query('SELECT * FROM account order by avg desc limit ?,30',[limit],
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query world rank aidx=0',err2);
@@ -314,19 +311,19 @@ exports.ranking = function(req,res){
                 for(var i=0;i<arg1.results.length;i++){
                     var link;
                     if(arg1.results[i].prophoto==null){
-                        link = "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png";
+                        link = nonelink;
                     }
                     else{
-                        link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
+                        link = prolink+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
                     }
                     arr[i]={
-                        rank : i+1,
+                        rank : limit+i+1,
                         name : arg1.results[i].name,
-                        country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
-                        infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
+                        country : countrylink+arg1.results[i].country+".png",
+                        infocountry : countrylink+"info"+arg1.results[i].country+".png",
                         proPhoto : link,
                         ballPhoto : arg1.results[i].ballphoto,
-                        avg : parseFloat(arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
+                        avg : parseFloat(arg1.results[i].avg).toFixed(1),
                         allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                         highscore : arg1.results[i].highscore,//그주의 최고점수
                         handi : arg1.results[i].handi,
@@ -368,7 +365,7 @@ exports.ranking = function(req,res){
                         return;
                     }
                     else{
-                        connection.query('SELECT allscore,allgame,prophoto,country from account where a_idx=?',[aidx],function(err2,result){
+                        connection.query('SELECT avg, prophoto,country from account where a_idx=?',[aidx],function(err2,result){
                             if(err2){
                                 console.log('error on get allscore allgame in ranking query',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID DATA"});
@@ -376,15 +373,9 @@ exports.ranking = function(req,res){
                                 return;
                             }
                             else if(result.length){
-                                if(result[0].allgame!=0){
-                                    avg = result[0].allscore/result[0].allgame;
-                                }
-                                else{
-                                    avg=0;
-                                }
-                                console.log('avg : ',avg);
-                                callback(null,{avg:avg,country:result[0].country,
-                                    prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+result[0].prophoto});
+                                console.log('avg : ',result[0].avg);
+                                callback(null,{avg:result[0].avg,country:result[0].country,
+                                    prophoto: prolink + aidx + "/" + result[0].prophoto});
                             }
                             else{
                                 console.log('no data local rank my data');
@@ -403,7 +394,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT * FROM account where country=? order by (allscore/allgame) desc limit ?,30',
+                        connection.query('SELECT * FROM account where country=? order by avg desc limit ?,30',
                             [arg.country,limit],
                             function(err2,results){
                                 if(err2){
@@ -413,8 +404,7 @@ exports.ranking = function(req,res){
                                     return;
                                 }
                                 else if(results.length){
-                                    console.log('avg : ',arg.avg);
-                                    //console.log(result);
+                                    console.log('local rank data select');
                                     callback(null,{results:results,avg:arg.avg,prophoto:arg.prophoto,country:arg.country});
                                 }
                                 else{
@@ -439,7 +429,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT count(*) cnt FROM account a where (a.allscore/a.allgame)>=? and a.country=? order by (a.allscore/a.allgame) desc',
+                        connection.query('SELECT count(*) cnt FROM account a where a.avg>=? and a.country=? order by a.avg desc',
                             [avg,arg1.country],//평균 값, 해당 아이디 idx
                             function(err2,results2){
                                 if(err2){
@@ -453,19 +443,19 @@ exports.ranking = function(req,res){
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
                                         if(arg1.results[i].prophoto==null){
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png";
+                                            link = nonelink;
                                         }
                                         else{
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
+                                            link = prolink+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
                                         }
                                         arr[i]={
-                                            rank : i+1,
+                                            rank : limit+i+1,
                                             name : arg1.results[i].name,
-                                            country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
-                                            infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
+                                            country : countrylink+arg1.results[i].country+".png",
+                                            infocountry : countrylink+"info"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
-                                            avg : parseFloat(arg1.results[i].allscore/arg1.results[i].allgame).toFixed(1),
+                                            avg : parseFloat(arg1.results[i].avg).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             handi : arg1.results[i].handi,
@@ -522,15 +512,8 @@ exports.ranking = function(req,res){
                                 return;
                             }
                             else if(result.length){
-                                if(result[0].g_game!=0){
-                                    avg = result[0].g_score/result[0].g_game;
-                                }
-                                else{
-                                    avg=0;
-                                }
-                                console.log('avg : ',avg);
-                                //console.log(result);
-                                callback(null,{avg:avg,prophoto:"http://bowling.pineoc.cloulu.com/uploads/user/"+aidx+"/"+result[0].prophoto});
+                                console.log('avg : ',result[0].avg);
+                                callback(null,{avg:result[0].avg, prophoto: prolink + aidx + "/" + result[0].prophoto});
                             }
                             else{
                                 console.log('no data on grp account data me ');
@@ -549,7 +532,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('select * from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? order by (ag.g_score/ag.g_game) desc limit ?,30',
+                        connection.query('select * from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? order by ag.g_avg desc limit ?,30',
                             [groupidx,limit],
                             function(err2,results){
                                 if(err2){
@@ -582,7 +565,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('select count(*) cnt from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and (ag.g_score/ag.g_game)>=? order by (ag.g_score/ag.g_game) desc',
+                        connection.query('select count(*) cnt from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and (ag.avg)>=? order by (ag.avg) desc',
                             [groupidx,avg],
                             function(err2,results){
                                 if(err2){
@@ -596,19 +579,19 @@ exports.ranking = function(req,res){
                                     for(var i=0;i<arg1.results.length;i++){
                                         var link;
                                         if(arg1.results[i].prophoto==null){
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/country/KakaoTalk_b6634420cfc0d1b1.png";
+                                            link = nonelink;
                                         }
                                         else{
-                                            link = "http://bowling.pineoc.cloulu.com/uploads/user/"+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
+                                            link = prolink+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
                                         }
                                         arr[i]={
-                                            rank : i+1,
+                                            rank : limit+i+1,
                                             name : arg1.results[i].name,
-                                            country : "http://bowling.pineoc.cloulu.com/uploads/country/"+arg1.results[i].country+".png",
-                                            infocountry : "http://bowling.pineoc.cloulu.com/uploads/country/info"+arg1.results[i].country+".png",
+                                            country : countrylink+arg1.results[i].country+".png",
+                                            infocountry : countrylink+"info"+arg1.results[i].country+".png",
                                             proPhoto : link,
                                             ballPhoto : arg1.results[i].ballphoto,
-                                            avg : parseFloat(arg1.results[i].g_score/arg1.results[i].g_game).toFixed(1),
+                                            avg : parseFloat(arg1.results[i].g_avg).toFixed(1),
                                             allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                                             highscore : arg1.results[i].highscore,//그주의 최고점수
                                             handi : arg1.results[i].handi,
