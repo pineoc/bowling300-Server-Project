@@ -222,7 +222,7 @@ exports.sign = function(req,res){
 /*
  * 기능 : 회원 정보 추가 입력
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.19
+ * 최종 수정 날짜 : 2014.03.06
  *
  * 받는 데이터 : year, ballweight, style, step, series800, series300, ballphoto
  *
@@ -230,116 +230,74 @@ exports.sign = function(req,res){
  * */
 exports.addsign = function(req,res){
     var addSignData = req.body; // json data
-    var aidx;
-    if (addSignData.aidx == 0) {
-        //aidx=0;
+    var aidx = addSignData.aidx;
+    if (addSignData.aidx == 0 || !(req.files && !(typeof req.files.proPhoto===undefined)) || addSignData==null ) {
         console.log('aidx 0 error on addsign');
-        res.json({result: "FAIL", resultmsg: "AIDX ZERO"});
+        res.json({result: "FAIL", resultmsg: "INVALID DATA NULL"});
         return;
     } else {
         aidx = cry.decB(addSignData.aidx);
         var photo_file;
         var photo_name;
         if (req.files && !(typeof req.files.photo === undefined)) {
-            photo_file = req.files.photo;
+            photo_file = req.files.proPhoto;
             photo_name = photo_file.name;
         }
-        db.pool.getConnection(function (err, connection) {
-            if (err) {
-                console.log('error on connection pool addsign', err);
-                res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
-                return;
-            }//error on connection pool
-            else {
-                connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?,country=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
-                    [addSignData.name, addSignData.pwd, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,
-                        addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
-                        if (err2) {
-                            console.log('error on query addsign', err2);
-                            res.json({result: "FAIL", resultmsg: "INVALID DATA"});
-                            connection.release();
-                            return;
-                        }//error on query
-                        else if (result.affectedRows == 1) {
-                            console.log('success, result : ', result);
-                            res.json({result: "SUCCESS", resultmsg: "ADDSIGN SUCCESS"}); // result_msg에 대한 부분은 차후 수정
-                        }//insert success
-                        connection.release();
-                    });//query
-            }//no error on connection pool
-        });//connection pool
-    }
-
-};
-
-/*
- * 유저정보
- * 최초 생성 날짜 : 2014.02.19
- * 최종 수정 날짜 : 2014.02.19
- *
- * 받는 데이터 aidx
- * editor : pineoc
- * 미구현 부분 : 사진 파일 업로드 부분
- * */
-
-exports.userinfo = function(req,res){
-    var infoData = req.body;
-    console.log('recv data userinfo : ',infoData);
-    var aidx;
-    if(infoData.aidx!=0){
-        aidx = cry.decB(infoData.aidx);
-    }
-    else{
-        aidx=0;
-    }
-    var resultData;
-    if(aidx==0){
-        console.log('No data, because no id');
-        res.json({result:"FAIL",resultmsg:"NO ACCOUNT"});
-        return;
-    }
-    else{
-        db.pool.getConnection(function(err,connection){
+        async.waterfall([
+            function(callback){
+                filemgr.deletefunction(aidx,"pro");
+                console.log('delete pro photo addsign');
+                callback(null,1);
+            },
+            function(arg,callback){
+                var result_upload = filemgr.uploadfunction(aidx,"profile",photo_file);
+                if(result_upload.result=="SUCCESS"){
+                    console.log('success on file upload addsign');
+                    callback(null,1);
+                }
+                else{
+                    console.log('fail on file upload addsign');
+                    res.json({result:"FAIL",resultmsg:"FILE UPLOAD FAIL"});
+                    return;
+                }
+            },
+            function(arg1,callback){
+                db.pool.getConnection(function (err, connection) {
+                    if (err) {
+                        console.log('error on connection pool addsign', err);
+                        res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                        return;
+                    }//error on connection pool
+                    else {
+                        connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?,country=?,prophoto=? ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                            [addSignData.name, addSignData.pwd, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,photo_name,
+                                addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
+                                if (err2) {
+                                    console.log('error on query addsign', err2);
+                                    res.json({result: "FAIL", resultmsg: "INVALID DATA"});
+                                    connection.release();
+                                    return;
+                                }//error on query
+                                else if (result.affectedRows == 1) {
+                                    console.log('success, result : ', result);
+                                    callback(null,1);
+                                }//insert success
+                                connection.release();
+                            });//query
+                    }//no error on connection pool
+                });//connection pool
+            }
+        ],function(err,result){
             if(err){
-                console.log('error on conn pool userinfo',err);
-                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                console.log('addsign fail waterfall, err : ',err);
+                res.json({result: "FAIL", resultmsg: "NETWORK ERR W"});
                 return;
             }else{
-                connection.query('SELECT * FROM account where a_idx=?',[aidx],function(err2,result){
-                    if(err2){
-                        console.log('error on Query userinfo',err);
-                        res.json({result:"FAIL",resultmsg:"INVALID DATA"});
-                        connection.release();
-                        return;
-                    }else if(result){
-                        console.log('Success on query : ',result);
-                        resultData = {
-                            email : result[0].email,
-                            name : result[0].name,
-                            proPhoto : result[0].prophoto==null ? nonelink : prolink+aidx+"/"+result[0].prophoto,
-                            ballPhoto : result[0].ballphoto,
-                            sex : result[0].sex,
-                            hand : result[0].hand,
-                            locale : result[0].locale,
-                            allhighScore : result[0].all_highscore,
-                            country : result[0].country,
-                            style : result[0].style,
-                            step : result[0].step,
-                            series300 : result[0].series300,
-                            series800 : result[0].series800
-                        };
-                        res.json(resultData);
-                    }
-                    else{
-                        console.log('no data on query userinfo',result);
-                        res.json({result:"FAIL",resultmsg:"NO DATA"});
-                    }
-                    connection.release();
-                });//query
+                console.log('addsign success waterfall');
+                res.json({result: "SUCCESS", resultmsg: "ADDSIGN SUCCESS"});
             }
-        });//conn pool
+        });//waterfall end
     }
-
 };
 
 /*
