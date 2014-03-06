@@ -400,7 +400,7 @@ exports.ranking = function(req,res){
                         localRank = arg1.results[i].rank;
                     }
                     arr[i]={
-                        rank : limit+i+1,
+                        rank : arg1.results[i].rank,
                         name : arg1.results[i].name,
                         country : countrylink+arg1.results[i].country+".png",
                         infocountry : countrylink+"info"+arg1.results[i].country+".png",
