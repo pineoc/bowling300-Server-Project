@@ -512,8 +512,8 @@ exports.ranking = function(req,res){
                                 return;
                             }
                             else if(result.length){
-                                console.log('avg : ',result[0].avg);
-                                callback(null,{avg:result[0].avg, prophoto: prolink + aidx + "/" + result[0].prophoto});
+                                console.log('avg : ',result[0].g_avg);
+                                callback(null,{avg:result[0].g_avg, prophoto: prolink + aidx + "/" + result[0].prophoto});
                             }
                             else{
                                 console.log('no data on grp account data me ');
@@ -565,7 +565,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('select count(*) cnt from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and (ag.avg)>=? order by (ag.avg) desc',
+                        connection.query('select count(*) cnt from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and (ag.g_avg)>=? order by (ag.g_avg) desc',
                             [groupidx,avg],
                             function(err2,results){
                                 if(err2){
