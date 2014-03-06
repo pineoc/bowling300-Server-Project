@@ -246,6 +246,7 @@ exports.upload = function(req, res){
         console.log('error on no file');
         res.json({result:"FAIL",resultmsg:"NO FILE EXISTS"});
     }
+    return;
 };
 
 exports.uploadt = function(req, res){
