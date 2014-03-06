@@ -208,7 +208,6 @@ exports.ranking = function(req,res){
                 var avg = arg1.avg;
                 var resultData;
                 var worldRank=0;
-                worldRank = results2[0].cnt;
                 console.log('world rank : ',worldRank);
                 for(var i=0;i<arg1.results.length;i++){
                     var link;
