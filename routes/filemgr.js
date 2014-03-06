@@ -123,7 +123,7 @@ uploadfunction = function(userid,type,upfile){
 /*
  * delete function
  * 최초 생성 날짜 : 2014.02.17
- * 최종 수정 날짜 : 2014.02.23
+ * 최종 수정 날짜 : 2014.03.06
  *
  * 받는 데이터 aidx, type
  * editor : pineoc
@@ -139,7 +139,7 @@ deletefunction = function(aidx,type){
                 retval=-1;
                 return retval;
             }else{
-                connection.query('SELECT prophoto from account where a_idx=?',[aidx],function(err2,result){
+                connection.query('SELECT prophoto from account where a_idx=?',[parseInt(aidx)],function(err2,result){
                     if(err2){
                         console.log('error on query del prophoto',err2);
                         connection.release();
@@ -150,7 +150,7 @@ deletefunction = function(aidx,type){
                         console.log('success get prophoto name:',result[0].prophoto);
                         var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',aidx);
                         if(result[0].prophoto!=null){
-                            fs.unlink(userfolder+"/"+result[0].prophoto, function (err) {
+                            fs.unlink(userfolder + "/" + result[0].prophoto, function (err) {
                                 if (err){
                                     console.log('error on delete file',err);
                                     retval=-1;
@@ -184,7 +184,7 @@ deletefunction = function(aidx,type){
                 retval=-1;
                 return retval;
             }else{
-                connection.query('SELECT ballphoto from account where a_idx=?',[aidx],function(err2,result){
+                connection.query('SELECT ballphoto from account where a_idx=?',[parseInt(aidx)],function(err2,result){
                     if(err2){
                         console.log('error on query del ballphoto',err);
                         //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
@@ -225,11 +225,10 @@ deletefunction = function(aidx,type){
         db.pool.getConnection(function(err,connection){
             if(err){
                 console.log('error on conn pool del grpphoto',err);
-                //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                 retval=-1;
                 return retval;
             }else{
-                connection.query('SELECT g_photo from groups where g_idx=?',[aidx],function(err2,result){
+                connection.query('SELECT g_photo from groups where g_idx=?',[parseInt(aidx)],function(err2,result){
                     if(err2){
                         console.log('error on query del grpphoto',err);
                         //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
