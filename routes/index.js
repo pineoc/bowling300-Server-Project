@@ -185,7 +185,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT * FROM account order by avg desc limit ?,30',[limit],
+                        connection.query('SELECT *, @curRank := @curRank + 1 AS rank FROM account a, (SELECT @curRank := 0) r ORDER BY  a.avg desc limit ?,30',[limit],
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query world rank',err2);
@@ -208,61 +208,37 @@ exports.ranking = function(req,res){
                 var avg = arg1.avg;
                 var resultData;
                 var worldRank=0;
-
-                db.pool.getConnection(function(err,connection){
-                    if(err){
-                        console.log('error on connection pool world rank me',err);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                        return;
-                    }//error on connection pool
-                    else{
-                        connection.query('SELECT count(*) cnt FROM account a where a.avg>=? order by a.avg desc',
-                            [avg],//평균 값, 해당 아이디 idx
-                            function(err2,results2){
-                                if(err2){
-                                    console.log('error on query world rank me',err2);
-                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
-                                    connection.release();
-                                    return;
-                                }
-                                else{
-                                    worldRank = results2[0].cnt;
-                                    console.log('world rank : ',worldRank);
-                                    for(var i=0;i<arg1.results.length;i++){
-                                        var link;
-                                        if(arg1.results[i].prophoto==null){
-                                            link = nonelink;
-                                        }
-                                        else{
-                                            link = prolink+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
-                                        }
-                                        arr[i]={
-                                            rank : limit+i+1,
-                                            name : arg1.results[i].name,
-                                            country : countrylink+arg1.results[i].country+".png",
-                                            infocountry :countrylink+"info"+arg1.results[i].country+".png",
-                                            proPhoto : link,
-                                            ballPhoto : arg1.results[i].ballphoto,
-                                            avg : parseFloat(arg1.results[i].avg).toFixed(1),
-                                            allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
-                                            highscore : arg1.results[i].highscore,//그주의 최고점수
-                                            handi : arg1.results[i].handi,
-                                            hand : arg1.results[i].hand,
-                                            year : date.getFullYear()-arg1.results[i].year+1,
-                                            ballweight : arg1.results[i].ballweight,
-                                            style : arg1.results[i].style,
-                                            step : arg1.results[i].step,
-                                            series300 : arg1.results[i].series300,
-                                            series800 : arg1.results[i].series800
-                                        };//arr에 정보를 객체 형태로 저장
-                                    }//for
-                                    resultData = {myavg:parseFloat(avg).toFixed(1),myrank:worldRank,myproPhoto:arg1.prophoto,arr:arr};
-                                    callback(null,resultData);
-                                }
-                                connection.release();
-                            });//query
+                worldRank = results2[0].cnt;
+                console.log('world rank : ',worldRank);
+                for(var i=0;i<arg1.results.length;i++){
+                    var link;
+                    link = arg1.results[i].prophoto==null ? nonelink : prolink + arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
+                    if(arg1.results[i].a_idx == aidx){
+                        worldRank = arg1.results[i].rank;
                     }
-                });//connection pool
+                    arr[i]={
+                        rank : arg1.results[i].rank,
+                        name : arg1.results[i].name,
+                        country : countrylink+arg1.results[i].country+".png",
+                        infocountry :countrylink+"info"+arg1.results[i].country+".png",
+                        proPhoto : link,
+                        ballPhoto : arg1.results[i].ballphoto,
+                        avg : parseFloat(arg1.results[i].avg).toFixed(1),
+                        allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
+                        highscore : arg1.results[i].highscore,//그주의 최고점수
+                        handi : arg1.results[i].handi,
+                        hand : arg1.results[i].hand,
+                        year : date.getFullYear()-arg1.results[i].year+1,
+                        ballweight : arg1.results[i].ballweight,
+                        style : arg1.results[i].style,
+                        step : arg1.results[i].step,
+                        series300 : arg1.results[i].series300,
+                        series800 : arg1.results[i].series800
+
+                    };//arr에 정보를 객체 형태로 저장
+                }//for
+                resultData = {myavg:parseFloat(avg).toFixed(1), myrank:worldRank, myproPhoto:arg1.prophoto,arr:arr};
+                callback(null,resultData);
             }
         ],
             function(err,results){
@@ -288,7 +264,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT * FROM account order by avg desc limit ?,30',[limit],
+                        connection.query('SELECT *, @curRank := @curRank + 1 AS rank FROM account a, (SELECT @curRank := 0) r ORDER BY  a.avg desc limit ?,30',[limit],
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query world rank aidx=0',err2);
@@ -310,14 +286,9 @@ exports.ranking = function(req,res){
                 var resultData;
                 for(var i=0;i<arg1.results.length;i++){
                     var link;
-                    if(arg1.results[i].prophoto==null){
-                        link = nonelink;
-                    }
-                    else{
-                        link = prolink+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
-                    }
+                    link = arg1.results[i].prophoto==null ? nonelink : prolink + arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
                     arr[i]={
-                        rank : limit+i+1,
+                        rank : arg1.results[i].rank,
                         name : arg1.results[i].name,
                         country : countrylink+arg1.results[i].country+".png",
                         infocountry : countrylink+"info"+arg1.results[i].country+".png",
@@ -394,7 +365,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT * FROM account where country=? order by avg desc limit ?,30',
+                        connection.query('SELECT *, @curRank := @curRank + 1 AS rank FROM account a, (SELECT @curRank := 0) r where country=? order by avg desc limit ?,30',
                             [arg.country,limit],
                             function(err2,results){
                                 if(err2){
@@ -417,64 +388,39 @@ exports.ranking = function(req,res){
                 });//connection pool
             },
             function (arg1,callback){
-                console.log('arg1 : ',arg1);
                 var arr=[];
                 var avg = arg1.avg;
                 var resultData;
                 var localRank=0;
-                db.pool.getConnection(function(err,connection){
-                    if(err){
-                        console.log('error on connection pool local rank me',err);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                        return;
-                    }//error on connection pool
-                    else{
-                        connection.query('SELECT count(*) cnt FROM account a where a.avg>=? and a.country=? order by a.avg desc',
-                            [avg,arg1.country],//평균 값, 해당 아이디 idx
-                            function(err2,results2){
-                                if(err2){
-                                    console.log('error on query local rank me',err2);
-                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
-                                    connection.release();
-                                    return;
-                                }
-                                else{
-                                    localRank = results2[0].cnt;
-                                    for(var i=0;i<arg1.results.length;i++){
-                                        var link;
-                                        if(arg1.results[i].prophoto==null){
-                                            link = nonelink;
-                                        }
-                                        else{
-                                            link = prolink+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
-                                        }
-                                        arr[i]={
-                                            rank : limit+i+1,
-                                            name : arg1.results[i].name,
-                                            country : countrylink+arg1.results[i].country+".png",
-                                            infocountry : countrylink+"info"+arg1.results[i].country+".png",
-                                            proPhoto : link,
-                                            ballPhoto : arg1.results[i].ballphoto,
-                                            avg : parseFloat(arg1.results[i].avg).toFixed(1),
-                                            allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
-                                            highscore : arg1.results[i].highscore,//그주의 최고점수
-                                            handi : arg1.results[i].handi,
-                                            hand : arg1.results[i].hand,
-                                            year : date.getFullYear()-arg1.results[i].year+1,
-                                            ballweight : arg1.results[i].ballweight,
-                                            style : arg1.results[i].style,
-                                            step : arg1.results[i].step,
-                                            series300 : arg1.results[i].series300,
-                                            series800 : arg1.results[i].series800
-                                        };//arr에 정보를 객체 형태로 저장
-                                    }//for
-                                    resultData = {myavg:parseFloat(avg).toFixed(1),myrank:localRank,myproPhoto:arg1.prophoto,arr:arr};
-                                    callback(null,resultData);
-                                }
-                                connection.release();
-                            });//query
+
+                for(var i=0;i<arg1.results.length;i++){
+                    var link;
+                    link = arg1.results[i].prophoto==null ? nonelink : prolink + arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
+                    if(arg1.results[i].a_idx == aidx){
+                        localRank = arg1.results[i].rank;
                     }
-                });//connection pool
+                    arr[i]={
+                        rank : limit+i+1,
+                        name : arg1.results[i].name,
+                        country : countrylink+arg1.results[i].country+".png",
+                        infocountry : countrylink+"info"+arg1.results[i].country+".png",
+                        proPhoto : link,
+                        ballPhoto : arg1.results[i].ballphoto,
+                        avg : parseFloat(arg1.results[i].avg).toFixed(1),
+                        allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
+                        highscore : arg1.results[i].highscore,//그주의 최고점수
+                        handi : arg1.results[i].handi,
+                        hand : arg1.results[i].hand,
+                        year : date.getFullYear()-arg1.results[i].year+1,
+                        ballweight : arg1.results[i].ballweight,
+                        style : arg1.results[i].style,
+                        step : arg1.results[i].step,
+                        series300 : arg1.results[i].series300,
+                        series800 : arg1.results[i].series800
+                    };//arr에 정보를 객체 형태로 저장
+                }//for
+                resultData = {myavg:parseFloat(avg).toFixed(1),myrank:localRank,myproPhoto:arg1.prophoto,arr:arr};
+                callback(null,resultData);
             }
         ],
             function(err,results){
@@ -505,22 +451,22 @@ exports.ranking = function(req,res){
                     else{
                         connection.query('select * from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and a.a_idx=?',
                             [groupidx,aidx],function(err2,result){
-                            if(err2){
-                                console.log('error on get allscore allgame in ranking query',err2);
-                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
+                                if(err2){
+                                    console.log('error on get allscore allgame in ranking query',err2);
+                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
+                                    connection.release();
+                                    return;
+                                }
+                                else if(result.length){
+                                    console.log('avg : ',result[0].g_avg);
+                                    callback(null,{avg:result[0].g_avg, prophoto: prolink + aidx + "/" + result[0].prophoto});
+                                }
+                                else{
+                                    console.log('no data on grp account data me ');
+                                    res.json({result:"FAIL",resultmsg:"NO DATA"});
+                                }
                                 connection.release();
-                                return;
-                            }
-                            else if(result.length){
-                                console.log('avg : ',result[0].g_avg);
-                                callback(null,{avg:result[0].g_avg, prophoto: prolink + aidx + "/" + result[0].prophoto});
-                            }
-                            else{
-                                console.log('no data on grp account data me ');
-                                res.json({result:"FAIL",resultmsg:"NO DATA"});
-                            }
-                            connection.release();
-                        });//query
+                            });//query
                     }
                 });//connection pool
             },
@@ -532,8 +478,8 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('select * from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? order by ag.g_avg desc limit ?,30',
-                            [groupidx,limit],
+                        connection.query('SELECT *, @curRank := @curRank + 1 AS rank FROM account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=?  order by ag.g_avg desc limit ?,30',
+                            [parseInt(groupidx),limit],
                             function(err2,results){
                                 if(err2){
                                     console.log('error on query group rank',err2);
@@ -547,6 +493,7 @@ exports.ranking = function(req,res){
                                 else{
                                     console.log('no data on grp rank');
                                     res.json({result:"FAIL",resultmsg:"NO DATA"});
+                                    return;
                                 }
                                 connection.release();
                             });//query
@@ -558,63 +505,35 @@ exports.ranking = function(req,res){
                 var arr=[];
                 var avg = arg1.avg;
                 var resultData;
-                db.pool.getConnection(function(err,connection){
-                    if(err){
-                        console.log('error on connection pool group rank me',err);
-                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                        return;
-                    }//error on connection pool
-                    else{
-                        connection.query('select count(*) cnt from account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=? and (ag.g_avg)>=? order by (ag.g_avg) desc',
-                            [groupidx,avg],
-                            function(err2,results){
-                                if(err2){
-                                    console.log('error on query group rank me',err2);
-                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
-                                    connection.release();
-                                    return;
-                                }
-                                else if(results.length){
-                                    groupRank = results[0].cnt;
-                                    for(var i=0;i<arg1.results.length;i++){
-                                        var link;
-                                        if(arg1.results[i].prophoto==null){
-                                            link = nonelink;
-                                        }
-                                        else{
-                                            link = prolink+arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
-                                        }
-                                        arr[i]={
-                                            rank : limit+i+1,
-                                            name : arg1.results[i].name,
-                                            country : countrylink+arg1.results[i].country+".png",
-                                            infocountry : countrylink+"info"+arg1.results[i].country+".png",
-                                            proPhoto : link,
-                                            ballPhoto : arg1.results[i].ballphoto,
-                                            avg : parseFloat(arg1.results[i].g_avg).toFixed(1),
-                                            allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
-                                            highscore : arg1.results[i].highscore,//그주의 최고점수
-                                            handi : arg1.results[i].handi,
-                                            hand : arg1.results[i].hand,
-                                            year : arg1.results[i].year,
-                                            ballweight : arg1.results[i].ballweight,
-                                            style : arg1.results[i].style,
-                                            step : arg1.results[i].step,
-                                            series300 : arg1.results[i].series300,
-                                            series800 : arg1.results[i].series800
-                                        };//arr에 정보를 객체 형태로 저장
-                                    }//for
-                                    resultData = {myavg:parseFloat(avg).toFixed(1),myrank:groupRank,myproPhoto:arg1.prophoto,arr:arr};
-                                    callback(null,resultData);
-                                }
-                                else{
-                                    console.log('no data on grp ranking');
-                                    res.json({result:"FAIL",resultmsg:"NO DATA"});
-                                }
-                                connection.release();
-                            });//query
+
+                for(var i=0;i<arg1.results.length;i++){
+                    var link;
+                    link = arg1.results[i].prophoto==null ? nonelink : prolink + arg1.results[i].a_idx+"/"+arg1.results[i].prophoto;
+                    if(arg1.results[i].a_idx == aidx){
+                        groupRank = arg1.results[i].rank;
                     }
-                });//connection pool
+                    arr[i]={
+                        rank : arg1.results[i].rank,
+                        name : arg1.results[i].name,
+                        country : countrylink+arg1.results[i].country+".png",
+                        infocountry : countrylink+"info"+arg1.results[i].country+".png",
+                        proPhoto : link,
+                        ballPhoto : arg1.results[i].ballphoto,
+                        avg : parseFloat(arg1.results[i].g_avg).toFixed(1),
+                        allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
+                        highscore : arg1.results[i].highscore,//그주의 최고점수
+                        handi : arg1.results[i].handi,
+                        hand : arg1.results[i].hand,
+                        year : arg1.results[i].year,
+                        ballweight : arg1.results[i].ballweight,
+                        style : arg1.results[i].style,
+                        step : arg1.results[i].step,
+                        series300 : arg1.results[i].series300,
+                        series800 : arg1.results[i].series800
+                    };//arr에 정보를 객체 형태로 저장
+                }//for
+                resultData = {myavg:parseFloat(avg).toFixed(1), myrank:groupRank, myproPhoto:arg1.prophoto, arr:arr};
+                callback(null,resultData);
 
             }
         ],
