@@ -280,14 +280,7 @@ exports.filechk = function(req,res){
 };
 
 exports.testenc = function(req,res){
-    var data = req.body;
-    var enc = cry.encryption(data.idx);
-    console.log('enc, hex to integer : ',parseInt(enc,16));
-    var dec = cry.decryption(enc);
-    var hash_enc = hash_int(enc);
-    var hash_dec = hash_int(dec);
-    var b = cry.encB(data.idx);
-    res.json({enc:enc,dec:dec,henc:hash_enc,denc:hash_dec,encB:b,decB:cry.decB(b)});
+    res.json({encB:cry.encB(req.body.idx),decB:cry.decB(req.body.idx)});
 };
 
 exports.testdel = function(req,res){
