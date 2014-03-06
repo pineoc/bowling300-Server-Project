@@ -280,7 +280,7 @@ exports.filechk = function(req,res){
 };
 
 exports.testenc = function(req,res){
-    res.json({encB:cry.encB(req.body.idx),decB:cry.decB(req.body.idx)});
+    res.json({encB:cry.encB(req.body.idx)});
 };
 
 exports.testdel = function(req,res){
