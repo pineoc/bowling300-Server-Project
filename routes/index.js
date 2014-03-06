@@ -477,7 +477,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT *, @curRank := @curRank + 1 AS rank FROM account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=?  order by ag.g_avg desc limit ?,30',
+                        connection.query('SELECT *,@curRank := @curRank + 1 AS rank FROM (SELECT * FROM account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=?) as x, (SELECT @curRank := 0) as r order by x.g_avg desc limit ?,30',
                             [parseInt(groupidx),limit],
                             function(err2,results){
                                 if(err2){
