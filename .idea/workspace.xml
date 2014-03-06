@@ -107,8 +107,8 @@
         <option value="$PROJECT_DIR$/routes/test.js" />
         <option value="$PROJECT_DIR$/routes/crypto_pineoc.js" />
         <option value="$PROJECT_DIR$/app.js" />
-        <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/routes/index.js" />
+        <option value="$PROJECT_DIR$/package.json" />
       </list>
     </option>
   </component>
@@ -654,16 +654,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/package.json">
+    <entry file="file://$PROJECT_DIR$/app.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="23" selection-start="175" selection-end="175" vertical-scroll-proportion="0.21955404" vertical-offset="0" max-vertical-offset="583">
+        <state line="64" column="46" selection-start="1891" selection-end="1891" vertical-scroll-proportion="0.0" vertical-offset="601" max-vertical-offset="1520">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app.js">
+    <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="64" column="46" selection-start="1891" selection-end="1891" vertical-scroll-proportion="0.0" vertical-offset="601" max-vertical-offset="1520">
+        <state line="19" column="0" selection-start="322" selection-end="322" vertical-scroll-proportion="0.5214408" vertical-offset="0" max-vertical-offset="583">
           <folding />
         </state>
       </provider>
