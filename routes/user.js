@@ -222,7 +222,7 @@ exports.sign = function(req,res){
 /*
  * 기능 : 회원 정보 추가 입력
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.03.06
+ * 최종 수정 날짜 : 2014.03.10
  *
  * 받는 데이터 : year, ballweight, style, step, series800, series300, ballphoto
  *
@@ -270,21 +270,40 @@ exports.addsign = function(req,res){
                             return;
                         }//error on connection pool
                         else {
-                            connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?,country=?,prophoto=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
-                                [addSignData.name, addSignData.pwd, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,photo_name,
-                                    addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
-                                    if (err2) {
-                                        console.log('error on query addsign', err2);
-                                        res.json({result: "FAIL", resultmsg: "INVALID DATA"});
+                            if(addSignData.pwd==null){
+                                connection.query('UPDATE account SET name=?,sex=?,hand=?,year=?,country=?,prophoto=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                                    [addSignData.name, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,photo_name,
+                                        addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
+                                        if (err2) {
+                                            console.log('error on query addsign', err2);
+                                            res.json({result: "FAIL", resultmsg: "INVALID DATA"});
+                                            connection.release();
+                                            return;
+                                        }//error on query
+                                        else if (result.affectedRows == 1) {
+                                            console.log('success, result : ', result);
+                                            callback(null,1);
+                                        }//insert success
                                         connection.release();
-                                        return;
-                                    }//error on query
-                                    else if (result.affectedRows == 1) {
-                                        console.log('success, result : ', result);
-                                        callback(null,1);
-                                    }//insert success
-                                    connection.release();
-                                });//query
+                                    });//query
+
+                            }else{
+                                connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?,country=?,prophoto=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                                    [addSignData.name, addSignData.pwd, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,photo_name,
+                                        addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
+                                        if (err2) {
+                                            console.log('error on query addsign', err2);
+                                            res.json({result: "FAIL", resultmsg: "INVALID DATA"});
+                                            connection.release();
+                                            return;
+                                        }//error on query
+                                        else if (result.affectedRows == 1) {
+                                            console.log('success, result : ', result);
+                                            callback(null,1);
+                                        }//insert success
+                                        connection.release();
+                                    });//query
+                            }
                         }//no error on connection pool
                     });//connection pool
                 }
@@ -300,30 +319,58 @@ exports.addsign = function(req,res){
             });//waterfall end
         }
         else{//no file
-            db.pool.getConnection(function (err, connection) {
-                if (err) {
-                    console.log('error on connection pool addsign', err);
-                    res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
-                    return;
-                }//error on connection pool
-                else {
-                    connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?,country=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
-                        [addSignData.name, addSignData.pwd, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,
-                            addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
-                            if (err2) {
-                                console.log('error on query addsign', err2);
-                                res.json({result: "FAIL", resultmsg: "INVALID DATA"});
+            if(addSignData.pwd==null){
+                db.pool.getConnection(function (err, connection) {
+                    if (err) {
+                        console.log('error on connection pool addsign', err);
+                        res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                        return;
+                    }//error on connection pool
+                    else {
+                        connection.query('UPDATE account SET name=?,sex=?,hand=?,year=?,country=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                            [addSignData.name, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,
+                                addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
+                                if (err2) {
+                                    console.log('error on query addsign', err2);
+                                    res.json({result: "FAIL", resultmsg: "INVALID DATA"});
+                                    connection.release();
+                                    return;
+                                }//error on query
+                                else if (result.affectedRows == 1) {
+                                    console.log('success, result : ', result);
+                                    res.json({result: "SUCCESS", resultmsg: "ADDSIGN SUCCESS"});
+                                }//insert success
                                 connection.release();
-                                return;
-                            }//error on query
-                            else if (result.affectedRows == 1) {
-                                console.log('success, result : ', result);
-                                res.json({result: "SUCCESS", resultmsg: "ADDSIGN SUCCESS"});
-                            }//insert success
-                            connection.release();
-                        });//query
-                }//no error on connection pool
-            });//connection pool
+                            });//query
+                    }//no error on connection pool
+                });//connection pool
+
+            }else{
+                db.pool.getConnection(function (err, connection) {
+                    if (err) {
+                        console.log('error on connection pool addsign', err);
+                        res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
+                        return;
+                    }//error on connection pool
+                    else {
+                        connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?,country=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                            [addSignData.name, addSignData.pwd, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,
+                                addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
+                                if (err2) {
+                                    console.log('error on query addsign', err2);
+                                    res.json({result: "FAIL", resultmsg: "INVALID DATA"});
+                                    connection.release();
+                                    return;
+                                }//error on query
+                                else if (result.affectedRows == 1) {
+                                    console.log('success, result : ', result);
+                                    res.json({result: "SUCCESS", resultmsg: "ADDSIGN SUCCESS"});
+                                }//insert success
+                                connection.release();
+                            });//query
+                    }//no error on connection pool
+                });//connection pool
+            }
         }
     }
 };
