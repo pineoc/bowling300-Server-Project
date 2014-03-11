@@ -60,21 +60,6 @@ uploadfunction = function(userid,type,upfile){
             }
             destpath = path.resolve(__dirname,'..',groupfolder,name);
         }
-        else if(type=="ball"){
-            var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',userid.toString());//gidx를 이용
-            console.log('groupfolder : ',groupfolder);
-            if(!fs.existsSync(groupfolder)){
-                mkdirp(groupfolder,function(err){
-                    if(err){
-                        console.log('error on mkdirp make balldir',err);
-                        return {result:"FAIL",resultmsg:"FAIL MKDIR"};
-                    }else{
-                        console.log('success path load ball');
-                    }
-                });//mkdirp
-            }
-            destpath = path.resolve(__dirname,'..',groupfolder,name);
-        }
         else if(type=="board"){
             console.log('board');
             var groupfolder = path.resolve(process.env.UPLOAD_PATH,'group',userid.toString(),'board');//gidx를 이용
@@ -168,51 +153,6 @@ deletefunction = function(aidx,type){
                     }
                     else{
                         console.log('no data del prophoto get prophoto name');
-                        retval = -1;
-                    }
-                    connection.release();
-                });//query
-            }
-        });//connection pool
-        return retval;
-    }
-    else if(type=="ball"){
-        db.pool.getConnection(function(err,connection){
-            if(err){
-                console.log('error on conn pool del ballphoto',err);
-                //res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                retval=-1;
-                return retval;
-            }else{
-                connection.query('SELECT ballphoto from account where a_idx=?',[parseInt(aidx)],function(err2,result){
-                    if(err2){
-                        console.log('error on query del ballphoto',err);
-                        //res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
-                        connection.release();
-                        retval=-1;
-                        return;
-                    }
-                    else if (result){
-                        console.log('success get ballPhoto name : ',result[0].ballphoto);
-                        if(result[0].ballphoto!=null){
-                            fs.unlink(userfolder+"/"+result[0].ballphoto, function (err) {
-                                if (err){
-                                    console.log('error on delete file',err);
-                                    retval=-1;
-                                    return retval;
-                                }else{
-                                    console.log('successfully deleted',userfolder);
-                                    retval=1;
-                                }
-                            });
-                        }
-                        else{
-                            console.log('null ballphoto name',result[0].ballphoto);
-                            retval=-1;
-                        }
-                    }
-                    else{
-                        console.log('no dataa on get ballphoto name');
                         retval = -1;
                     }
                     connection.release();
