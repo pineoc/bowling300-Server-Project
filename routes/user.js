@@ -123,7 +123,6 @@ exports.rankpoint = function(req,res){
     console.log('point start : ',point.startPoint,' end : ',point.endPoint);
     res.json(point);
 };
-
 /*
  * 기능 : 회원가입 ( 기본정보 )
  * 최초 생성 날짜 : 2014.02.02
@@ -148,6 +147,7 @@ exports.sign = function(req,res){
     if(signData.email==null || signData.pwd==null || signData.name==null || signData.country==null ||signData.sex==null || signData.hand==null || !(req.files && !(typeof req.files.proPhoto===undefined))){
         console.log('error on invalid data');
         res.json({result:"FAIL",resultmsg:"INVALID DATA NULL"});
+        return;
     }
     else{
         var chkDup;
@@ -222,7 +222,7 @@ exports.sign = function(req,res){
 /*
  * 기능 : 회원 정보 추가 입력
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.03.10
+ * 최종 수정 날짜 : 2014.03.11
  *
  * 받는 데이터 : year, ballweight, style, step, series800, series300, ballphoto
  *
@@ -232,15 +232,15 @@ exports.addsign = function(req,res){
     var addSignData = req.body; // json data
     var aidx = addSignData.aidx;
     console.log('recv data addsign, data : ',addSignData);
-    if (addSignData.aidx == 0 || addSignData==null ) {
-        console.log('aidx 0 error on addsign');
+    if (addSignData.aidx == 0 || addSignData==null || addSignData.country==null || addSignData.name==null || addSignData.sex==null || addSignData.hand==null || addSignData.year==null) {
+        console.log('aidx 0, data null error on addsign');
         res.json({result: "FAIL", resultmsg: "INVALID DATA NULL"});
         return;
     } else {
         aidx = cry.decB(addSignData.aidx);
         var photo_file;
         var photo_name;
-        if (req.files && !(typeof req.files.photo === undefined)) {
+        if (req.files && !(typeof req.files.proPhoto === undefined)) {
             photo_file = req.files.proPhoto;
             photo_name = photo_file.name;
 
@@ -270,7 +270,7 @@ exports.addsign = function(req,res){
                             return;
                         }//error on connection pool
                         else {
-                            if(addSignData.pwd==null){
+                            if(addSignData.pwd==null || addSignData.pwd==' '){
                                 connection.query('UPDATE account SET name=?,sex=?,hand=?,year=?,country=?,prophoto=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
                                     [addSignData.name, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,photo_name,
                                         addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
@@ -319,7 +319,7 @@ exports.addsign = function(req,res){
             });//waterfall end
         }
         else{//no file
-            if(addSignData.pwd==null){
+            if(addSignData.pwd==null || addSignData.pwd==' '){
                 db.pool.getConnection(function (err, connection) {
                     if (err) {
                         console.log('error on connection pool addsign', err);
@@ -420,10 +420,8 @@ exports.userinfo = function(req,res){
                             email : result[0].email,
                             name : result[0].name,
                             proPhoto : result[0].prophoto==null ? nonelink : prolink+aidx+"/"+result[0].prophoto,
-                            ballPhoto : result[0].ballphoto,
                             sex : result[0].sex,
                             hand : result[0].hand,
-                            locale : result[0].locale,
                             allhighScore : result[0].all_highscore,
                             country : result[0].country,
                             style : result[0].style,
