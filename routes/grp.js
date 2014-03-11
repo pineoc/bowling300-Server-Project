@@ -23,6 +23,11 @@ var countrylink = "http://bowling.pineoc.cloulu.com/uploads/country/";
 var nonelink = "http://bowling.pineoc.cloulu.com/uploads/country/none.png";
 
 
+if(process.env.UPLOAD_PATH == undefined)
+{
+    process.env.UPLOAD_PATH = 'public';
+}//if =local
+
 function formatDate(date) {
     var year = date.getFullYear();
     var month = date.getMonth() + 1;
@@ -56,9 +61,10 @@ exports.groupMake = function(req,res){
 
     var grp_id;
     var chkDup; // check duplication
-    if(groupmakeData==null || groupmakeData.aidx==null|| groupmakeData.gname==null || groupmakeData.gpwd==null || aidx==0 ){
+    if(groupmakeData==null || groupmakeData.aidx==null|| groupmakeData.gname==null || groupmakeData.gpwd==null || aidx==0 || !(req.files && typeof req.files.grpPhoto===undefined)){
         console.log('INVALID DATA of grpmake data, NULL',groupmakeData);
-        res.json({result:"FAIL",resultmsg:"INVALID NULL"});
+        res.json({result:"FAIL",resultmsg:"INVALID DATA NULL"});
+        return;
     }
     else{
         async.waterfall([
@@ -238,7 +244,7 @@ exports.groupJoin = function(req,res){
     console.log('recv data grpJoin : ',grpjoinData);
     if(aidx==null||grpjoinData.gname==null||grpjoinData.gpwd==null){
         console.log('invalid data of null at grpJoin');
-        res.json({result:"FAIL",resultmsg:"INVALID NULL"});
+        res.json({result:"FAIL",resultmsg:"INVALID DATA NULL"});
         return;
     }
     else{
@@ -352,7 +358,7 @@ exports.groupList = function(req,res){
                             connection.release();
                             return;
                         }
-                        else if(results){
+                        else if(results.length){
                             console.log('success list grp : ',results);
                             for(var i=0;i<results.length;i++){
                                 arr[i] = {
@@ -367,6 +373,8 @@ exports.groupList = function(req,res){
                         else{
                             console.log('no group');
                             res.json({result:"FAIL",resultmsg:"NO GROUP"});
+                            connection.release();
+                            return;
                         }
                         connection.release();
                     });//query
@@ -394,7 +402,7 @@ exports.groupDelete = function(req,res){
     console.log('recv data grpdel : ',grpdelData);
     if(grpdelData==null || aidx==null || grpdelData.gidx==null){
         console.log('error on null recv data');
-        res.json({result:"FAIL",resultmsg:"NO DATA(NULL)"});
+        res.json({result:"FAIL",resultmsg:"INVALID DATA NULL"});
         return;
     }
     else{
@@ -414,9 +422,15 @@ exports.groupDelete = function(req,res){
                                     connection.release();
                                     return;
                                 }
-                                else{
+                                else if(result.length){
                                     console.log('success chk grp member n : ',result[0].cnt);//그룹원 수 출력
                                     callback(null,result[0].cnt);
+                                }
+                                else{
+                                    console.log('no data');
+                                    res.json({result:"FAIL",resultmsg:"NO DATA"});
+                                    connection.release();
+                                    return;
                                 }
                                 connection.release();
                             });//query
@@ -439,7 +453,7 @@ exports.groupDelete = function(req,res){
                                     connection.release();
                                     return;
                                 }
-                                else{
+                                else if(result.length){
                                     console.log('success chk grp g_master : ',result[0].cnt);//마스터 여부 출력
                                     if(result[0].cnt !=0){
                                         callback(null,{cnt:arg1,result:"master"});
@@ -481,7 +495,7 @@ exports.groupDelete = function(req,res){
                                                         connection.release();
                                                         return;
                                                     }
-                                                    else{
+                                                    else if(result.length){
                                                         console.log('success grp master change select : ',result[0].account_a_idx);
                                                         //res.json({result:"SUCCESS",resultmsg:"CHANGE SUCCESS"});
                                                         updateAidx = result[0].account_a_idx;
@@ -499,6 +513,12 @@ exports.groupDelete = function(req,res){
                                                                 }
                                                                 connection.release();
                                                             });//query
+                                                    }
+                                                    else{
+                                                        console.log('no account_has_group on group');
+                                                        res.json({result:"FAIL",resultmsg:"NO MEMBER ON DELETE GRP"});
+                                                        connection.release();
+                                                        return;
                                                     }
                                                 });//query
                                         }
@@ -610,7 +630,7 @@ exports.groupsearch = function(req,res){
                         function(err2,result){
                             if(err2){
                                 console.log('error on grp search query',err2);
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
@@ -630,6 +650,8 @@ exports.groupsearch = function(req,res){
                             else{
                                 console.log('nothing on grp search : ',result);
                                 res.json({result:"FAIL",resultmsg:"NO SEARCH GROUP"});
+                                connection.release();
+                                return;
                             }
                             connection.release();
                         });//query
@@ -648,7 +670,7 @@ exports.groupsearch = function(req,res){
                         [grpsearchData.gname+"%"],function(err2,result){
                             if(err2){
                                 console.log('error on grp search query w2');
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
@@ -666,6 +688,8 @@ exports.groupsearch = function(req,res){
                             else{
                                 console.log('nothing on grp search w2: ',result);
                                 res.json({result:"FAIL",resultmsg:"NO SEARCH GROUP"});
+                                connection.release();
+                                return;
                             }
                             connection.release();
                         });//query
@@ -730,16 +754,7 @@ exports.groupmember = function(req,res){
                                     arr[i]={
                                         name : result[i].name,
                                         country : result[i].country,
-                                        proPhoto : link,
-                                        ballPhoto : result[i].ballphoto,
-                                        avg : parseFloat(result[i].allscore/result[i].allgame).toFixed(1),
-                                        allhighScore : result[i].all_highscore,//지금까지의 최고점수
-                                        highscore : result[i].highscore,//그주의 최고점수
-                                        hand : result[i].hand,
-                                        style : result[i].style,
-                                        step : result[i].step,
-                                        series300 : result[i].series300,
-                                        series800 : result[i].series800
+                                        proPhoto : link
                                     };
                                 }
                                 callback(null,{member:arr});
@@ -761,7 +776,7 @@ exports.groupmember = function(req,res){
                         [aidx],function(err2,result){
                             if(err2){
                                 console.log('error on query on grpmem take me',err);
-                                res.json({result:"FAIL",resultmsg:"NETWORK ERR Q"});
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
@@ -778,7 +793,6 @@ exports.groupmember = function(req,res){
                         });//query
                 }
             });//connection pool
-
         }
     ],
         function(err,result){
@@ -790,10 +804,8 @@ exports.groupmember = function(req,res){
                 console.log('success on grp mem');
                 res.json(result);
             }
-
         }
     );//waterfall
-
 };
 
 /*
@@ -822,7 +834,7 @@ exports.groupLeague = function(req,res){
                         function(err2,results){
                             if(err2){
                                 console.log('error on query league rank',err2);
-                                res.json({result:"FAIL",resultmsg:"SORTING ERR Q"});
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
@@ -832,6 +844,7 @@ exports.groupLeague = function(req,res){
                             else{
                                 console.log('no data');
                                 res.json({result:"FAIL",resultmsg:"NO DATA"});
+                                connection.release();
                                 return;
                             }
                             connection.release();
@@ -867,7 +880,7 @@ exports.groupLeague = function(req,res){
                         function(err2,results){
                             if(err2){
                                 console.log('error on query league rank all avg',err2);
-                                res.json({result:"FAIL",resultmsg:"SORTING ERR Q"});
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
@@ -877,6 +890,7 @@ exports.groupLeague = function(req,res){
                             else{
                                 console.log('no data');
                                 res.json({result:"FAIL",resultmsg:"NO DATA"});
+                                connection.release();
                                 return;
                             }
                             connection.release();
@@ -903,7 +917,7 @@ exports.groupLeague = function(req,res){
                         function(err2,results){
                             if(err2){
                                 console.log('error on query league rank',err2);
-                                res.json({result:"FAIL",resultmsg:"SORTING ERR Q"});
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
@@ -920,6 +934,7 @@ exports.groupLeague = function(req,res){
                             else{
                                 console.log('no data');
                                 res.json({result:"FAIL",resultmsg:"NO DATA"});
+                                connection.release();
                                 return;
                             }
                             connection.release();
@@ -929,3 +944,4 @@ exports.groupLeague = function(req,res){
         }
     });//waterfall
 };//group league
+
