@@ -221,11 +221,9 @@ exports.ranking = function(req,res){
                         country : countrylink+arg1.results[i].country+".png",
                         infocountry :countrylink+"info"+arg1.results[i].country+".png",
                         proPhoto : link,
-                        ballPhoto : arg1.results[i].ballphoto,
                         avg : parseFloat(arg1.results[i].avg).toFixed(1),
                         allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                         highscore : arg1.results[i].highscore,//그주의 최고점수
-                        handi : arg1.results[i].handi,
                         hand : arg1.results[i].hand,
                         year : date.getFullYear()-arg1.results[i].year+1,
                         ballweight : arg1.results[i].ballweight,
@@ -292,11 +290,9 @@ exports.ranking = function(req,res){
                         country : countrylink+arg1.results[i].country+".png",
                         infocountry : countrylink+"info"+arg1.results[i].country+".png",
                         proPhoto : link,
-                        ballPhoto : arg1.results[i].ballphoto,
                         avg : parseFloat(arg1.results[i].avg).toFixed(1),
                         allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                         highscore : arg1.results[i].highscore,//그주의 최고점수
-                        handi : arg1.results[i].handi,
                         hand : arg1.results[i].hand,
                         year : date.getFullYear()-arg1.results[i].year+1,
                         ballweight : arg1.results[i].ballweight,
@@ -404,11 +400,9 @@ exports.ranking = function(req,res){
                         country : countrylink+arg1.results[i].country+".png",
                         infocountry : countrylink+"info"+arg1.results[i].country+".png",
                         proPhoto : link,
-                        ballPhoto : arg1.results[i].ballphoto,
                         avg : parseFloat(arg1.results[i].avg).toFixed(1),
                         allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                         highscore : arg1.results[i].highscore,//그주의 최고점수
-                        handi : arg1.results[i].handi,
                         hand : arg1.results[i].hand,
                         year : date.getFullYear()-arg1.results[i].year+1,
                         ballweight : arg1.results[i].ballweight,
@@ -477,7 +471,7 @@ exports.ranking = function(req,res){
                         return;
                     }//error on connection pool
                     else{
-                        connection.query('SELECT *,@curRank := @curRank + 1 AS rank FROM (SELECT * FROM account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=?) as x, (SELECT @curRank := 0) as r order by x.g_avg desc limit ?,30',
+                        connection.query('SELECT *, @curRank := @curRank + 1 AS rank FROM (SELECT * FROM account as a left outer join account_has_group as ag on a.a_idx = ag.account_a_idx where ag.group_g_idx is not null and ag.group_g_idx=?) as x, (SELECT @curRank := 0) as r order by x.g_avg desc limit ?,30',
                             [parseInt(groupidx),limit],
                             function(err2,results){
                                 if(err2){
@@ -517,11 +511,9 @@ exports.ranking = function(req,res){
                         country : countrylink+arg1.results[i].country+".png",
                         infocountry : countrylink+"info"+arg1.results[i].country+".png",
                         proPhoto : link,
-                        ballPhoto : arg1.results[i].ballphoto,
                         avg : parseFloat(arg1.results[i].g_avg).toFixed(1),
                         allhighScore : arg1.results[i].all_highscore,//지금까지의 최고점수
                         highscore : arg1.results[i].highscore,//그주의 최고점수
-                        handi : arg1.results[i].handi,
                         hand : arg1.results[i].hand,
                         year : arg1.results[i].year,
                         ballweight : arg1.results[i].ballweight,
