@@ -138,7 +138,7 @@ exports.boardWrite = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                         return;
                     }else{
-                        connection.query('INSERT INTO board(group_g_idx,title,name,content,picture,writedate) values(?,?,?,?,now())',[parseInt(writeData.gidx),writeData.title,arg,writeData.content],
+                        connection.query('INSERT INTO board(group_g_idx,title,name,content,picture,writedate) values(?,?,?,?,now())',[parseInt(writeData.gidx),writeData.title,arg,writeData.content,photo_name],
                             function(err2,result){
                                 if(err2){
                                     console.log('error on board write, err:',err2);
