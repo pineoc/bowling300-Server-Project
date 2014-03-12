@@ -101,24 +101,6 @@ exports.boardWrite = function(req,res){
 
     async.waterfall([
         function(callback){
-            if(req.files && !(typeof req.files.photo===undefined)){
-                var result_upload = filemgr.uploadfunction(writeData.gidx,"board",photo_file);
-                if(result_upload.result=="SUCCESS"){
-                    console.log('success on file upload');
-                    callback(null,1);
-                }
-                else{
-                    console.log('fail on file upload');
-                    res.json({result:"FAIL",resultmsg:"FILE UPLOAD FAIL"});
-                    return;
-                }
-            }
-            else{
-                console.log('no file`s board write');
-                callback(null,0);
-            }
-        },
-        function(arg,callback){
             db.pool.getConnection(function(err,connection){
                 if(err){
                     console.log('error on board write find name, err:',err);
@@ -208,6 +190,24 @@ exports.boardWrite = function(req,res){
                             });//query
                     }
                 });//conn pool
+            }
+        },
+        function(arg1,callback){
+            if(req.files && !(typeof req.files.photo===undefined)){
+                var result_upload = filemgr.uploadfunction(writeData.gidx,"board",photo_file);
+                if(result_upload.result=="SUCCESS"){
+                    console.log('success on file upload');
+                    callback(null,{result:"SUCCESS",resultmsg:"WRITE SUCCESS"});
+                }
+                else{
+                    console.log('fail on file upload');
+                    res.json({result:"FAIL",resultmsg:"FILE UPLOAD FAIL"});
+                    return;
+                }
+            }
+            else{
+                console.log('no file`s board write');
+                callback(null,{result:"SUCCESS",resultmsg:"WRITE SUCCESS"});
             }
         }
     ],
