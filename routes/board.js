@@ -133,12 +133,13 @@ exports.boardWrite = function(req,res){
                                 connection.release();
                                 return;
                             }
-                            else if(result.length){
+                            else if(result.length!=0){
                                 console.log('Success on board write find name');
                                 callback(null,result[0].name);
                             }
                             else{
                                 console.log('no name on account',result);
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
