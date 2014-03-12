@@ -43,7 +43,7 @@ exports.boardList = function(req,res){
             return;
         }
         else{
-            connection.query('SELECT * FROM board where group_g_idx=? limit ?,10',[parseInt(listdata.gidx),parseInt(listdata.limit)],function(err2,result){
+            connection.query('SELECT *,DATE_FORMAT(writedate,"%Y-%m-%d %h:%i:%S") writedate FROM board where group_g_idx=? limit ?,10',[parseInt(listdata.gidx),parseInt(listdata.limit)],function(err2,result){
                 if(err2){
                     console.log('error on boardlist query',err2);
                     res.json({result:"FAIL",resultmsg:"INVALID DATA"});
