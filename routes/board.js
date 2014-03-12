@@ -53,7 +53,6 @@ exports.boardList = function(req,res){
                 else if(result.length){
                     console.log('success select board list');
                     for(var i=0;i<result.length;i++){
-                        console.log(result[i].picture);
                         arr[i] = {
                             bidx : result[i].b_idx,
                             title : result[i].title,
