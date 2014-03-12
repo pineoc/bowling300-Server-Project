@@ -43,7 +43,7 @@ exports.boardList = function(req,res){
             return;
         }
         else{
-            connection.query('SELECT * FROM board where group_g_idx=? limit ?,10',[listdata.gidx,parseInt(listdata.limit)],function(err2,result){
+            connection.query('SELECT * FROM board where group_g_idx=? limit ?,10',[parseInt(listdata.gidx),parseInt(listdata.limit)],function(err2,result){
                 if(err2){
                     console.log('error on boardlist query',err2);
                     res.json({result:"FAIL",resultmsg:"INVALID DATA"});
@@ -107,7 +107,7 @@ exports.boardWrite = function(req,res){
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     return;
                 }else{
-                    connection.query('SELECT name from account where a_idx=?',[aidx],
+                    connection.query('SELECT name from account where a_idx=?',[parseInt(aidx)],
                         function(err2,result){
                             if(err2){
                                 console.log('error on board write find name , err : ',err2);
@@ -138,7 +138,7 @@ exports.boardWrite = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                         return;
                     }else{
-                        connection.query('INSERT INTO board(group_g_idx,title,name,content,picture,writedate) values(?,?,?,?,now())',[writeData.gidx,writeData.title,arg,writeData.content],
+                        connection.query('INSERT INTO board(group_g_idx,title,name,content,picture,writedate) values(?,?,?,?,now())',[parseInt(writeData.gidx),writeData.title,arg,writeData.content],
                             function(err2,result){
                                 if(err2){
                                     console.log('error on board write, err:',err2);
@@ -168,7 +168,7 @@ exports.boardWrite = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                         return;
                     }else{
-                        connection.query('INSERT INTO board(group_g_idx,title,name,content,writedate) values(?,?,?,?,now())',[writeData.gidx,writeData.title,arg,writeData.content],
+                        connection.query('INSERT INTO board(group_g_idx,title,name,content,writedate) values(?,?,?,?,now())',[parseInt(writeData.gidx),writeData.title,arg,writeData.content],
                             function(err2,result){
                                 if(err2){
                                     console.log('error on board write, err:',err2);
@@ -369,7 +369,7 @@ exports.commWrite = function(req,res){
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     return;
                 }else{
-                    connection.query('SELECT name from account where a_idx=?',[aidx],
+                    connection.query('SELECT name from account where a_idx=?',[parseInt(aidx)],
                         function(err2,result){
                             if(err2){
                                 console.log('error on comm write find name , err : ',err2);
@@ -399,7 +399,7 @@ exports.commWrite = function(req,res){
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     return;
                 }else{
-                    connection.query('INSERT INTO comment(board_b_idx,name_comm,content_comm,writedate) values(?,?,?,now())',[commWData.bidx,arg,commWData.content],function(err2,result){
+                    connection.query('INSERT INTO comment(board_b_idx,name_comm,content_comm,writedate) values(?,?,?,now())',[parseInt(commWData.bidx),arg,commWData.content],function(err2,result){
                         if(err2){
                             console.log('error on query comm write, err : ',err);
                             res.json({result:"FAIL",resultmsg:"INVALID DATA"});
