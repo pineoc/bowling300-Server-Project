@@ -22,6 +22,7 @@ var crypto = require('crypto');
 var boardlink = "http://bowling.pineoc.cloulu.com/uploads/group/";
 
 
+
 /*
  * 글 목록
  * 최초 생성 날짜 : 2014.03.04
@@ -52,12 +53,13 @@ exports.boardList = function(req,res){
                 else if(result.length){
                     console.log('success select board list');
                     for(var i=0;i<result.length;i++){
+                        console.log(result[i].picture);
                         arr[i] = {
                             bidx : result[i].b_idx,
                             title : result[i].title,
                             name : result[i].name,
                             writedate : result[i].writedate,
-                            photo : boardlink + listdata.gidx + "/board/" + result[i].picture
+                            photo :result[i].picture==null ? null : boardlink + listdata.gidx + "/board/" + result[i].picture
                         };
                     }
                     res.json({result:"SUCCESS",resultmsg:"SUCCESS ON LISTING",arr:arr});
@@ -91,7 +93,7 @@ exports.boardWrite = function(req,res){
         photo_file = req.files.photo;
         photo_name = photo_file.name;
     }
-    if(writeData.gidx==null || writeData.aidx==0 || writeData.title==null || writeData.content==null || (typeof req.files.photo===undefined)){
+    if(writeData.gidx==null || writeData.aidx==0 || writeData.title==null || writeData.content==null ){
         console.log('null data');
         res.json({result:"FAIL",resultmsg:"INVALID DATA NULL"});
         return;
@@ -99,15 +101,21 @@ exports.boardWrite = function(req,res){
 
     async.waterfall([
         function(callback){
-            var result_upload = filemgr.uploadfunction(writeData.gidx,"board",photo_file);
-            if(result_upload.result=="SUCCESS"){
-                console.log('success on file upload');
-                callback(null,1);
+            if(req.files && !(typeof req.files.photo===undefined)){
+                var result_upload = filemgr.uploadfunction(writeData.gidx,"board",photo_file);
+                if(result_upload.result=="SUCCESS"){
+                    console.log('success on file upload');
+                    callback(null,1);
+                }
+                else{
+                    console.log('fail on file upload');
+                    res.json({result:"FAIL",resultmsg:"FILE UPLOAD FAIL"});
+                    return;
+                }
             }
             else{
-                console.log('fail on file upload');
-                res.json({result:"FAIL",resultmsg:"FILE UPLOAD FAIL"});
-                return;
+                console.log('no file`s board write');
+                callback(null,0);
             }
         },
         function(arg,callback){
@@ -140,34 +148,66 @@ exports.boardWrite = function(req,res){
             });//conn pool
         },
         function(arg,callback){
-            db.pool.getConnection(function(err,connection){
-                if(err){
-                    console.log('error on board write, err:',err);
-                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                    return;
-                }else{
-                    connection.query('INSERT INTO board(group_g_idx,title,name,content,picture,writedate) values(?,?,?,?,?,now())',[writeData.gidx,writeData.title,arg,writeData.content,photo_name],
-                        function(err2,result){
-                            if(err2){
-                                console.log('error on board write, err:',err2);
-                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
+            if(req.files && !(typeof req.files.photo===undefined)){
+                db.pool.getConnection(function(err,connection){
+                    if(err){
+                        console.log('error on board write, err:',err);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
+                    }else{
+                        connection.query('INSERT INTO board(group_g_idx,title,name,content,picture,writedate) values(?,?,?,?,now())',[writeData.gidx,writeData.title,arg,writeData.content],
+                            function(err2,result){
+                                if(err2){
+                                    console.log('error on board write, err:',err2);
+                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
+                                    connection.release();
+                                    return;
+                                }
+                                else if(result.affectedRows==1){
+                                    console.log('Success on board write');
+                                    callback(null,{result:"SUCCESS",resultmsg:"WRITE SUCCESS"});
+                                }
+                                else{
+                                    console.log('error on board write, not affected',result);
+                                    res.json({result:"FAIL",resultmsg:"NOT WRITE"});
+                                    connection.release();
+                                    return;
+                                }
                                 connection.release();
-                                return;
-                            }
-                            else if(result.affectedRows==1){
-                                console.log('Success on board write');
-                                callback(null,{result:"SUCCESS",resultmsg:"WRITE SUCCESS"});
-                            }
-                            else{
-                                console.log('error on board write, not affected',result);
-                                res.json({result:"FAIL",resultmsg:"NOT WRITE"});
+                            });//query
+                    }
+                });//conn pool
+            }
+            else{
+                db.pool.getConnection(function(err,connection){
+                    if(err){
+                        console.log('error on board write, err:',err);
+                        res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                        return;
+                    }else{
+                        connection.query('INSERT INTO board(group_g_idx,title,name,content,writedate) values(?,?,?,?,now())',[writeData.gidx,writeData.title,arg,writeData.content],
+                            function(err2,result){
+                                if(err2){
+                                    console.log('error on board write, err:',err2);
+                                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
+                                    connection.release();
+                                    return;
+                                }
+                                else if(result.affectedRows==1){
+                                    console.log('Success on board write');
+                                    callback(null,{result:"SUCCESS",resultmsg:"WRITE SUCCESS"});
+                                }
+                                else{
+                                    console.log('error on board write, not affected',result);
+                                    res.json({result:"FAIL",resultmsg:"NOT WRITE"});
+                                    connection.release();
+                                    return;
+                                }
                                 connection.release();
-                                return;
-                            }
-                            connection.release();
-                        });//query
-                }
-            });//conn pool
+                            });//query
+                    }
+                });//conn pool
+            }
         }
     ],
         function(err,result){
@@ -342,6 +382,7 @@ exports.commWrite = function(req,res){
                             }
                             else{
                                 console.log('no name on account',result);
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                                 connection.release();
                                 return;
                             }
@@ -417,8 +458,8 @@ exports.boardSearch = function(req,res){
             return;
         }
         else{
-            connection.query('SELECT *,DATE_FORMAT(writedate,"%Y-%m-%d %h:%i:%S") writedate FROM board where group_g_idx=? OR name=? OR title=?',
-                [searchData.name,parseInt(searchData.gidx),searchData.title],function(err2,result){
+            connection.query('SELECT *,DATE_FORMAT(writedate,"%Y-%m-%d %h:%i:%S") writedate FROM board where group_g_idx=? AND( name LIKE ? OR title LIKE ? )',
+                [parseInt(searchData.gidx),searchData.name+"%",searchData.title+"%"],function(err2,result){
                 if(err2){
                     console.log('error on query board read comm data w1, err : ',err2);
                     res.json({result:"FAIL",resultmsg:"INVALID DATA"});
@@ -427,13 +468,16 @@ exports.boardSearch = function(req,res){
                 }
                 else if (result.length){//data
                     console.log('select success, data : ',result[0]);
-                    var ret = {
-                        bidx : result[0].b_idx,
-                        name : result[0].name,
-                        title : result[0].title,
-                        content : result[0].content,
-                        picture : boardlink + searchData.gidx + "/board/" + result[0].picture
-                    };
+                    var ret = [];
+                    for(var i=0;i<result.length;i++){
+                        ret[i] = {
+                            bidx : result[0].b_idx,
+                            name : result[0].name,
+                            title : result[0].title,
+                            content : result[0].content,
+                            picture : boardlink + searchData.gidx + "/board/" + result[0].picture
+                        };
+                    }
                     res.json({result:"SUCCESS", resultmsg : "SEARCH SUCCESS", data : ret});
                 }
                 else{//no data
@@ -448,5 +492,3 @@ exports.boardSearch = function(req,res){
     });//conn pool
 
 };//글 찾기
-
-
