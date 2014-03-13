@@ -43,7 +43,7 @@ exports.boardList = function(req,res){
             return;
         }
         else{
-            connection.query('SELECT *,DATE_FORMAT(writedate,"%Y-%m-%d %h:%i:%S") writedate FROM board where group_g_idx=? limit ?,10',[parseInt(listdata.gidx),parseInt(listdata.limit)],function(err2,result){
+            connection.query('SELECT *,DATE_FORMAT(writedate,"%Y-%m-%d %h:%i:%S") FROM board where group_g_idx=? limit ?,10',[parseInt(listdata.gidx),parseInt(listdata.limit)],function(err2,result){
                 if(err2){
                     console.log('error on boardlist query',err2);
                     res.json({result:"FAIL",resultmsg:"INVALID DATA"});
@@ -291,6 +291,7 @@ exports.boardRead = function(req,res){
                         else if(result.length){
                             for(var i=0;i<result.length;i++){
                                 arr[i]={
+                                    cidx : result[i].c_idx,
                                     name_comm : result[i].name_comm,
                                     comment : result[i].content_comm,
                                     writedate : result[i].writedate
@@ -344,7 +345,77 @@ exports.boardUpdate = function(req,res){
  * */
 exports.boardDelete = function(req,res){
     var deleteData = req.body;
+    var aidx = cry.decB(deleteData.aidx);
     console.log('recv data board delete, data : ',deleteData);
+    async.waterfall([
+        function(callback){
+            db.pool.getConnection(function(err,connection){
+                if(err){
+                    console.log('error on board del find name, err:',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return;
+                }else{
+                    connection.query('SELECT name from account where a_idx=?',[parseInt(aidx)],
+                        function(err2,result){
+                            if(err2){
+                                console.log('error on board del find name , err : ',err2);
+                                res.json({result:"FAIL", resultmsg:"INVALID DATA"});
+                                connection.release();
+                                return;
+                            }
+                            else if(result.length!=0){
+                                console.log('Success on board del find name');
+                                callback(null,result[0].name);
+                            }
+                            else{
+                                console.log('no name on account del',result);
+                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
+                                connection.release();
+                                return;
+                            }
+                            connection.release();
+                        });//query
+                }
+            });//conn pool
+        },
+        function(arg,callback){//delete row data
+            db.pool.getConnection(function(err,conn){
+                if(err){
+                    console.log('error on  commUpdate conn pool, err:',err);
+                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+                    return;
+                }else{
+                    conn.query('DELETE FROM board where b_idx=? and name=?',[parseInt(deleteData.bidx),arg],function(err2,result){
+                        if(err2){
+                            console.log('error on comm delete query, err : ',err2);
+                            res.json({result:"FAIL",resultmsg:"INVALID DATA"});
+                            conn.release();
+                            return;
+                        }
+                        else{
+                            console.log('delete success comment');
+                            res.json({result:"SUCCESS",resultmsg:"COMM DELETE SUCCESS"});
+                        }
+                        conn.release();
+                    });//query
+                }
+            });//conn pool
+        },
+        function(arg1,callback){
+
+        }
+    ],function(err,result){
+        if(err){
+            console.log('error on board delete waterfall, err : ',err);
+            res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
+            return;
+        }else{
+            console.log('Success on delete board');
+
+
+        }
+
+    });//waterfall
 
 };//글 삭제
 
@@ -430,12 +501,35 @@ exports.commWrite = function(req,res){
 /*
  * 덧글 수정 / 삭제
  * 최초 생성 날짜 : 2014.03.04
- * 최종 수정 날짜 : 2014.03.04
+ * 최종 수정 날짜 : 2014.03.13
  *
- * 받는 데이터 gidx, aidx, title, content, picture
+ * 받는 데이터 cidx , bidx
  * editor : pineoc
  * */
 exports.commUpdate = function(req,res){
+    var commUData = req.body;
+    console.log('recv data on commUpdate : ',commUData);
+    db.pool.getConnection(function(err,conn){
+        if(err){
+            console.log('error on  commUpdate conn pool, err:',err);
+            res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+            return;
+        }else{
+            conn.query('DELETE FROM comment where c_idx=? and board_b_idx=?',[parseInt(commUData.cidx),parseInt(commUData.bidx)],function(err2,result){
+                if(err2){
+                    console.log('error on comm delete query, err : ',err2);
+                    res.json({result:"FAIL",resultmsg:"INVALID DATA"});
+                    conn.release();
+                    return;
+                }
+                else{
+                    console.log('delete success comment');
+                    res.json({result:"SUCCESS",resultmsg:"COMM DELETE SUCCESS"});
+                }
+                conn.release();
+            });//query
+        }
+    });//conn pool
 
 };//덧글 수정 / 삭제
 
