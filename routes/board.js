@@ -20,6 +20,7 @@ var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 
 var boardlink = "http://bowling.pineoc.cloulu.com/uploads/group/";
+var prolink = "http://bowling.pineoc.cloulu.com/uploads/user/";
 
 
 
@@ -73,10 +74,11 @@ exports.boardList = function(req,res){
     });//conn pool
 };//글 목록
 
+
 /*
  * 글 쓰기
  * 최초 생성 날짜 : 2014.03.04
- * 최종 수정 날짜 : 2014.03.04
+ * 최종 수정 날짜 : 2014.03.15
  *
  * 받는 데이터 gidx, aidx, title, content, picture
  * editor : pineoc
@@ -137,7 +139,7 @@ exports.boardWrite = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                         return;
                     }else{
-                        connection.query('INSERT INTO board(group_g_idx,title,name,content,picture,writedate) values(?,?,?,?,?,now())',[parseInt(writeData.gidx),writeData.title,arg,writeData.content,photo_name],
+                        connection.query('INSERT INTO board(group_g_idx,title,name,content,picture,writedate,b_a_idx) values(?,?,?,?,?,?,now())',[parseInt(writeData.gidx),writeData.title,arg,writeData.content,photo_name,parseInt(aidx)],
                             function(err2,result){
                                 if(err2){
                                     console.log('error on board write, err:',err2);
@@ -167,7 +169,7 @@ exports.boardWrite = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                         return;
                     }else{
-                        connection.query('INSERT INTO board(group_g_idx,title,name,content,writedate) values(?,?,?,?,now())',[parseInt(writeData.gidx),writeData.title,arg,writeData.content],
+                        connection.query('INSERT INTO board(group_g_idx,title,name,content,writedate,b_a_idx) values(?,?,?,?,?,now())',[parseInt(writeData.gidx),writeData.title,arg,writeData.content,parseInt(aidx)],
                             function(err2,result){
                                 if(err2){
                                     console.log('error on board write, err:',err2);
@@ -226,7 +228,7 @@ exports.boardWrite = function(req,res){
 /*
  * 글 읽기
  * 최초 생성 날짜 : 2014.03.04
- * 최종 수정 날짜 : 2014.03.04
+ * 최종 수정 날짜 : 2014.03.15
  *
  * 받는 데이터 gidx, bidx
  * editor : pineoc
@@ -243,7 +245,7 @@ exports.boardRead = function(req,res){
                         return;
                     }
                     else{
-                        connection.query('SELECT *,DATE_FORMAT(writedate,"%Y-%m-%d %h:%i:%S") writedate FROM board where b_idx=? and group_g_idx=?',[parseInt(readData.bidx),parseInt(readData.gidx)],function(err2,result){
+                        connection.query('select *,DATE_FORMAT(writedate,"%Y-%m-%d %h:%i:%S") writedate from board as b left outer join account as a on b.b_a_idx = a.a_idx where b.b_idx is not null and b.b_idx=? and b.group_g_idx=?',[parseInt(readData.bidx),parseInt(readData.gidx)],function(err2,result){
                             if(err2){
                                 console.log('error on query board read comm data w1, err : ',err2);
                                 res.json({result:"FAIL",resultmsg:"INVALID DATA"});
@@ -255,9 +257,11 @@ exports.boardRead = function(req,res){
                                 var res = {
                                     bidx : result[0].b_idx,
                                     name : result[0].name,
+                                    writerPhoto:result[0].prophoto==null ? null : prolink+result[0].b_a_idx+'/'+result[0].prophoto,
                                     title : result[0].title,
                                     content : result[0].content,
-                                    picture : boardlink + readData.gidx + "/board/" + result[0].picture
+                                    picture :result[0].picture==null ? null : boardlink + readData.gidx + "/board/" + result[0].picture,
+                                    writedate : result[0].writedate
                                 };
                                 callback(null,res);
                             }
