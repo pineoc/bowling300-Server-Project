@@ -28,7 +28,7 @@ exports.index = function(req, res){
 /*
  * 로그인
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.02.17
+ * 최종 수정 날짜 : 2014.03.17
  *
  * 받는 데이터 email, pwd
  * editor : pineoc
@@ -46,7 +46,7 @@ exports.login = function(req,res){
                     return ;
                 }
                 else{
-                    connection.query('SELECT *,count(*) cnt FROM account WHERE email=? AND pwd=?',[loginData.email,loginData.pwd],function(err2,result){
+                    connection.query('SELECT *,count(*) cnt FROM account WHERE email=TRIM(?) AND pwd=TRIM(?)',[loginData.email,loginData.pwd],function(err2,result){
                         if(err2){
                             console.log('error on query login',err2);
                             res.json({myval:{result:"FAIL",resultmsg:"INVALID DATA"}});

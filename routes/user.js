@@ -219,10 +219,11 @@ exports.sign = function(req,res){
     }
 };
 
+
 /*
  * 기능 : 회원 정보 추가 입력
  * 최초 생성 날짜 : 2014.02.02
- * 최종 수정 날짜 : 2014.03.11
+ * 최종 수정 날짜 : 2014.03.17
  *
  * 받는 데이터 : year, ballweight, style, step, series800, series300, ballphoto
  *
@@ -271,7 +272,7 @@ exports.addsign = function(req,res){
                         }//error on connection pool
                         else {
                             if(addSignData.pwd==null || addSignData.pwd==' '){
-                                connection.query('UPDATE account SET name=?,sex=?,hand=?,year=?,country=?,prophoto=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                                connection.query('UPDATE account SET name=TRIM(?),sex=?,hand=?,year=?,country=?,prophoto=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
                                     [addSignData.name, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,photo_name,
                                         addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
                                         if (err2) {
@@ -288,7 +289,7 @@ exports.addsign = function(req,res){
                                     });//query
 
                             }else{
-                                connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?,country=?,prophoto=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                                connection.query('UPDATE account SET name=TRIM(?),pwd=TRIM(?),sex=?,hand=?,year=?,country=?,prophoto=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
                                     [addSignData.name, addSignData.pwd, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,photo_name,
                                         addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
                                         if (err2) {
@@ -327,7 +328,7 @@ exports.addsign = function(req,res){
                         return;
                     }//error on connection pool
                     else {
-                        connection.query('UPDATE account SET name=?,sex=?,hand=?,year=?,country=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                        connection.query('UPDATE account SET name=TRIM(?),sex=?,hand=?,year=?,country=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
                             [addSignData.name, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,
                                 addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
                                 if (err2) {
@@ -353,7 +354,7 @@ exports.addsign = function(req,res){
                         return;
                     }//error on connection pool
                     else {
-                        connection.query('UPDATE account SET name=?,pwd=?,sex=?,hand=?,year=?,country=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
+                        connection.query('UPDATE account SET name=TRIM(?),pwd=TRIM(?),sex=?,hand=?,year=?,country=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
                             [addSignData.name, addSignData.pwd, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,
                                 addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
                                 if (err2) {
