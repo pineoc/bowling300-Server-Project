@@ -344,7 +344,7 @@ exports.boardUpdate = function(req,res){
  * 최초 생성 날짜 : 2014.03.04
  * 최종 수정 날짜 : 2014.03.04
  *
- * 받는 데이터 gidx, aidx, title, content, picture
+ * 받는 데이터 gidx, aidx
  * editor : pineoc
  * */
 exports.boardDelete = function(req,res){
@@ -352,53 +352,23 @@ exports.boardDelete = function(req,res){
     var aidx = cry.decB(deleteData.aidx);
     console.log('recv data board delete, data : ',deleteData);
     async.waterfall([
-        function(callback){
-            db.pool.getConnection(function(err,connection){
-                if(err){
-                    console.log('error on board del find name, err:',err);
-                    res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
-                    return;
-                }else{
-                    connection.query('SELECT name from account where a_idx=?',[parseInt(aidx)],
-                        function(err2,result){
-                            if(err2){
-                                console.log('error on board del find name , err : ',err2);
-                                res.json({result:"FAIL", resultmsg:"INVALID DATA"});
-                                connection.release();
-                                return;
-                            }
-                            else if(result.length!=0){
-                                console.log('Success on board del find name');
-                                callback(null,result[0].name);
-                            }
-                            else{
-                                console.log('no name on account del',result);
-                                res.json({result:"FAIL",resultmsg:"INVALID DATA"});
-                                connection.release();
-                                return;
-                            }
-                            connection.release();
-                        });//query
-                }
-            });//conn pool
-        },
-        function(arg,callback){//delete row data
+        function(callback){//delete row data
             db.pool.getConnection(function(err,conn){
                 if(err){
-                    console.log('error on  commUpdate conn pool, err:',err);
+                    console.log('error on  board del conn pool, err:',err);
                     res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                     return;
                 }else{
-                    conn.query('DELETE FROM board where b_idx=? and name=?',[parseInt(deleteData.bidx),arg],function(err2,result){
+                    conn.query('DELETE FROM board where b_idx=? and b_a_idx=?',[parseInt(deleteData.bidx),parseInt(aidx)],function(err2,result){
                         if(err2){
-                            console.log('error on comm delete query, err : ',err2);
+                            console.log('error on board delete query, err : ',err2);
                             res.json({result:"FAIL",resultmsg:"INVALID DATA"});
                             conn.release();
                             return;
                         }
                         else{
-                            console.log('delete success comment');
-                            res.json({result:"SUCCESS",resultmsg:"COMM DELETE SUCCESS"});
+                            console.log('delete success board');
+                            callback(null,1);
                         }
                         conn.release();
                     });//query
@@ -406,6 +376,20 @@ exports.boardDelete = function(req,res){
             });//conn pool
         },
         function(arg1,callback){
+            var re = filemgr.deletefunction(deleteData.gidx,'group');
+            console.log('re : ',re);
+            if(re==1){
+                console.log('success delete photo board');
+                callback(null,1);
+            }
+            else if(re==-1){
+                console.log('fail delete photo board');
+                callback(null,2);
+            }
+            else{
+                console.log('error function callback deletefunction on return undefined, re : ',re);
+                callback(null,3);
+            }
 
         }
     ],function(err,result){
@@ -414,9 +398,18 @@ exports.boardDelete = function(req,res){
             res.json({result:"FAIL",resultmsg:"NETWORK ERR W"});
             return;
         }else{
-            console.log('Success on delete board');
-
-
+            if(result==1){
+                console.log('Success on delete board');
+                res.json({result:"SUCCESS",resultmsg:"BOARD DEL SUCCESS"});
+            }
+            else if(result==2){
+                console.log('fail delete file board, but board data delete success');
+                res.json({result:"SUCCESS",resultmsg:"BOARD DEL SUCCESS"});
+            }
+            else{
+                console.log('fail delete file board, but board data delete success 2, undefined');
+                res.json({result:"SUCCESS",resultmsg:"BOARD DEL SUCCESS"});
+            }
         }
 
     });//waterfall
