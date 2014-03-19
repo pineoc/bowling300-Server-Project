@@ -57,6 +57,7 @@ exports.groupMake = function(req,res){
         grpfilename = grp_photo.name;
     }
     console.log('recv data grpMake : ',groupmakeData);
+    console.log('recv photo grpMake : ',req.files);
     var date = new Date();
 
     var grp_id;
