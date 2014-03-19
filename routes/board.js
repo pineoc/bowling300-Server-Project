@@ -139,7 +139,7 @@ exports.boardWrite = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                         return;
                     }else{
-                        connection.query('INSERT INTO board(group_g_idx,title,name,content,picture,writedate,b_a_idx) values(?,?,?,?,?,?,now())',[parseInt(writeData.gidx),writeData.title,arg,writeData.content,photo_name,parseInt(aidx)],
+                        connection.query('INSERT INTO board(group_g_idx,title,name,content,picture,writedate,b_a_idx) values(?,?,?,?,?,now(),?)',[parseInt(writeData.gidx),writeData.title,arg,writeData.content,photo_name,parseInt(aidx)],
                             function(err2,result){
                                 if(err2){
                                     console.log('error on board write, err:',err2);
@@ -169,7 +169,7 @@ exports.boardWrite = function(req,res){
                         res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
                         return;
                     }else{
-                        connection.query('INSERT INTO board(group_g_idx,title,name,content,writedate,b_a_idx) values(?,?,?,?,?,now())',[parseInt(writeData.gidx),writeData.title,arg,writeData.content,parseInt(aidx)],
+                        connection.query('INSERT INTO board(group_g_idx,title,name,content,writedate,b_a_idx) values(?,?,?,?,now(),?)',[parseInt(writeData.gidx),writeData.title,arg,writeData.content,parseInt(aidx)],
                             function(err2,result){
                                 if(err2){
                                     console.log('error on board write, err:',err2);
