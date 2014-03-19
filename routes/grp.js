@@ -62,7 +62,7 @@ exports.groupMake = function(req,res){
 
     var grp_id;
     var chkDup; // check duplication
-    if(groupmakeData==null || groupmakeData.aidx==null|| groupmakeData.gname==null || groupmakeData.gpwd==null || aidx==0 || !(req.files && typeof req.files.grpPhoto===undefined)){
+    if(groupmakeData==null || groupmakeData.aidx==null|| groupmakeData.gname==null || groupmakeData.gpwd==null || aidx==0 || (req.files && typeof req.files.grpPhoto===undefined)){
         console.log('INVALID DATA of grpmake data, NULL',groupmakeData);
         res.json({result:"FAIL",resultmsg:"INVALID DATA NULL"});
         return;
