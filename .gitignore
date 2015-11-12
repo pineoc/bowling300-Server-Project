@@ -2,8 +2,8 @@
 #ignore files
 
 #modules
-./node_modules
+node_modules
 
 #webstorm folder
-./.idea
+.idea
 
