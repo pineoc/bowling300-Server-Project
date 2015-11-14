@@ -6,7 +6,7 @@
  * */
 
 //var db = require('./localDB');
-var db = require('./clouluDB');
+var db = require('./DB');
 var cry = require('./crypto_pineoc');
 
 var path = require('path');

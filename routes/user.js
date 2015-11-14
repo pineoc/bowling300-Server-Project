@@ -6,8 +6,7 @@
  * */
 
 
-//var db = require('./localDB.js');
-var db = require('./clouluDB.js');
+var db = require('./DB.js');
 var cry = require('./crypto_pineoc.js');
 var filemgr = require('./filemgr');
 
@@ -19,8 +18,7 @@ var util = require('util');
 var mkdirp = require('mkdirp');
 var crypto = require('crypto');
 
-if(process.env.UPLOAD_PATH == undefined)
-{
+if (process.env.UPLOAD_PATH == undefined) {
     process.env.UPLOAD_PATH = 'public';
 }//if =local
 
@@ -43,38 +41,38 @@ var nonelink = "http://bowling.pineoc.cloulu.com/uploads/country/none.png";
 
 var job = new cronJob({
     cronTime: '00 00 00 * * 1',
-    onTick: function() {
+    onTick: function () {
         // Runs every weekday (Monday)
         // at 00:00:00 AM.
         rankPointDateStart.setDate(rankPointDateStart.getDate());//start point
         console.log(rankPointDateStart);
 
         //reset data on Monday
-        db.pool.getConnection(function(err,connection){
-            if(err){
-                console.log('error on reset data conn pool',err);
+        db.pool.getConnection(function (err, connection) {
+            if (err) {
+                console.log('error on reset data conn pool', err);
             }
-            else{
-                connection.query('UPDATE account SET allscore=?, allgame=?, avg=?',[0,0,0],function(err2,result){
-                    if(err2){
-                        console.log('error on reset data query',err2);
+            else {
+                connection.query('UPDATE account SET allscore=?, allgame=?, avg=?', [0, 0, 0], function (err2, result) {
+                    if (err2) {
+                        console.log('error on reset data query', err2);
                     }
-                    else if(result.affectedRows>1){
+                    else if (result.affectedRows > 1) {
                         console.log('affected account data.');
                     }
-                    else{
+                    else {
                         console.log('none reset data');
                     }
                     connection.release();
                 });//query
-                connection.query('UPDATE account_has_group SET g_score=?, g_game=?, g_avg=?',[0,0,0],function(err2,result){
-                    if(err2){
-                        console.log('error on reset data query',err2);
+                connection.query('UPDATE account_has_group SET g_score=?, g_game=?, g_avg=?', [0, 0, 0], function (err2, result) {
+                    if (err2) {
+                        console.log('error on reset data query', err2);
                     }
-                    else if(result.affectedRows>1){
+                    else if (result.affectedRows > 1) {
                         console.log('affected group data.');
                     }
-                    else{
+                    else {
                         console.log('none reset data');
                     }
                     connection.release();
@@ -86,10 +84,10 @@ var job = new cronJob({
     timeZone: "Asia/Seoul"
 });
 job.start();
-if(rankPointDateStart.getDay()!=1){
-    rankPointDateStart.setDate(rankPointDateStart.getDate()-(rankPointDateStart.getDay()-1));
+if (rankPointDateStart.getDay() != 1) {
+    rankPointDateStart.setDate(rankPointDateStart.getDate() - (rankPointDateStart.getDay() - 1));
 }
-rankPointDateEnd.setDate(rankPointDateStart.getDate()+7);
+rankPointDateEnd.setDate(rankPointDateStart.getDate() + 7);
 
 /*
  * 날짜 스트링 연산
@@ -103,8 +101,8 @@ function formatDate(date) {
     var year = date.getFullYear();
     var month = date.getMonth() + 1;
     var day = date.getDate();
-    console.log((year.toString() +'-'+ month.toString() +'-'+ day.toString()));
-    return (year.toString() +'-'+ month.toString() +'-'+ day.toString());
+    console.log((year.toString() + '-' + month.toString() + '-' + day.toString()));
+    return (year.toString() + '-' + month.toString() + '-' + day.toString());
 }
 /*
  * ranking 기준점 전송
@@ -114,13 +112,13 @@ function formatDate(date) {
  * 받는 데이터
  * editor : pineoc
  * */
-exports.rankpoint = function(req,res){
+exports.rankpoint = function (req, res) {
     //res.send("respond with a resource");
     var point = {
-        startPoint:formatDate(rankPointDateStart),
-        endPoint:formatDate(rankPointDateEnd)
+        startPoint: formatDate(rankPointDateStart),
+        endPoint: formatDate(rankPointDateEnd)
     };
-    console.log('point start : ',point.startPoint,' end : ',point.endPoint);
+    console.log('point start : ', point.startPoint, ' end : ', point.endPoint);
     res.json(point);
 };
 /*
@@ -132,51 +130,51 @@ exports.rankpoint = function(req,res){
  * editor : pineoc
  * */
 
-exports.sign = function(req,res){
+exports.sign = function (req, res) {
     var signData = req.body; // 입력할 json 데이터 받을 변수
-    console.log('recv data sign : ',signData);
+    console.log('recv data sign : ', signData);
     //사진 파일 업로드 부분 현재
     var proPhoto_file;
     var photo_name;
-    if(req.files && !(typeof req.files.proPhoto===undefined)){
+    if (req.files && !(typeof req.files.proPhoto === undefined)) {
         proPhoto_file = req.files.proPhoto;
         photo_name = proPhoto_file.name;
     }
 
     //check null data
-    if(signData.email==null || signData.pwd==null || signData.name==null || signData.country==null ||signData.sex==null || signData.hand==null || !(req.files && !(typeof req.files.proPhoto===undefined))){
+    if (signData.email == null || signData.pwd == null || signData.name == null || signData.country == null || signData.sex == null || signData.hand == null || !(req.files && !(typeof req.files.proPhoto === undefined))) {
         console.log('error on invalid data');
-        res.json({result:"FAIL",resultmsg:"INVALID DATA NULL"});
+        res.json({result: "FAIL", resultmsg: "INVALID DATA NULL"});
         return;
     }
-    else{
+    else {
         var chkDup;
-        db.pool.getConnection(function(err,connection){
-            if(err){
-                console.log('error on connection pool sign check dup',err);
-                res.json({result:"FAIL",result_msg:"NETWORK ERR"});
+        db.pool.getConnection(function (err, connection) {
+            if (err) {
+                console.log('error on connection pool sign check dup', err);
+                res.json({result: "FAIL", result_msg: "NETWORK ERR"});
                 return;
             }//error on connection pool
-            else{
-                connection.query('SELECT count(*) cnt FROM account WHERE email=?',[signData.email],
-                    function(err2,result){
-                        if(err2){
-                            console.log('error on query sign check dup',err2);
-                            res.json({result:"FAIL",resultmsg:"INVALID DATA"});
+            else {
+                connection.query('SELECT count(*) cnt FROM account WHERE email=?', [signData.email],
+                    function (err2, result) {
+                        if (err2) {
+                            console.log('error on query sign check dup', err2);
+                            res.json({result: "FAIL", resultmsg: "INVALID DATA"});
                             connection.release();
                             return;
                         }
-                        else{
-                            console.log('check dup result : ',result[0].cnt);
+                        else {
+                            console.log('check dup result : ', result[0].cnt);
                             chkDup = result[0].cnt;
-                            if(chkDup!=0){
+                            if (chkDup != 0) {
                                 console.log('duplication email', chkDup);
                                 res.json({result: "FAIL", resultmsg: "DUP EMAIL"});
                                 connection.release();
                                 return;
                             } else {
                                 connection.query('INSERT INTO account(email,name,pwd,sex,country,hand,prophoto,allscore,allgame,avg) VALUES(?,?,?,?,?,?,?,?,?,?)',
-                                    [signData.email, signData.name, signData.pwd,signData.sex,signData.country,signData.hand,photo_name,0,0,0], function (err2, result) {
+                                    [signData.email, signData.name, signData.pwd, signData.sex, signData.country, signData.hand, photo_name, 0, 0, 0], function (err2, result) {
                                         if (err2) {
                                             console.log('error on query sign', err2);
                                             res.json({result: "FAIL", resultmsg: "INVALID DATA"});
@@ -186,27 +184,27 @@ exports.sign = function(req,res){
                                         else if (result.affectedRows == 1) {
                                             console.log('sign result : ', result);
                                             returnData = {result: "SUCCESS", aidx: cry.encB(result.insertId)};
-                                            var userfolder = path.resolve(process.env.UPLOAD_PATH,'user',(result.insertId).toString());//aidx를 이용
-                                            console.log('userfolder : ',userfolder);
-                                            if(!fs.existsSync(userfolder)){
-                                                mkdirp(userfolder,function(err){
-                                                    if(err){
-                                                        console.log('error on mkdirp make userdir',err);
-                                                        res.json({result:"FAIL",resultmsg:"FILE UPLOAD FAIL"});
+                                            var userfolder = path.resolve(process.env.UPLOAD_PATH, 'user', (result.insertId).toString());//aidx를 이용
+                                            console.log('userfolder : ', userfolder);
+                                            if (!fs.existsSync(userfolder)) {
+                                                mkdirp(userfolder, function (err) {
+                                                    if (err) {
+                                                        console.log('error on mkdirp make userdir', err);
+                                                        res.json({result: "FAIL", resultmsg: "FILE UPLOAD FAIL"});
                                                         return;
-                                                    }else{
+                                                    } else {
                                                         console.log('success path load pro');
                                                     }
                                                 });//mkdirp
                                             }
-                                            var result_upload = filemgr.uploadfunction(result.insertId,"profile",proPhoto_file);
-                                            if(result_upload.result=="SUCCESS"){
+                                            var result_upload = filemgr.uploadfunction(result.insertId, "profile", proPhoto_file);
+                                            if (result_upload.result == "SUCCESS") {
                                                 console.log(result_upload);
                                                 res.json(returnData);
                                             }
-                                            else{
+                                            else {
                                                 console.log(result_upload);
-                                                res.json({result:"FAIL",resultmsg:"FILE UPLOAD FAIL"});
+                                                res.json({result: "FAIL", resultmsg: "FILE UPLOAD FAIL"});
                                             }
                                         }
                                         connection.release();
@@ -229,11 +227,11 @@ exports.sign = function(req,res){
  *
  * editor : pineoc
  * */
-exports.addsign = function(req,res){
+exports.addsign = function (req, res) {
     var addSignData = req.body; // json data
     var aidx = addSignData.aidx;
-    console.log('recv data addsign, data : ',addSignData);
-    if (addSignData.aidx == 0 || addSignData==null || addSignData.country==null || addSignData.name==null || addSignData.sex==null || addSignData.hand==null || addSignData.year==null) {
+    console.log('recv data addsign, data : ', addSignData);
+    if (addSignData.aidx == 0 || addSignData == null || addSignData.country == null || addSignData.name == null || addSignData.sex == null || addSignData.hand == null || addSignData.year == null) {
         console.log('aidx 0, data null error on addsign');
         res.json({result: "FAIL", resultmsg: "INVALID DATA NULL"});
         return;
@@ -246,24 +244,24 @@ exports.addsign = function(req,res){
             photo_name = photo_file.name;
 
             async.waterfall([
-                function(callback){
-                    filemgr.deletefunction(aidx,"pro");
+                function (callback) {
+                    filemgr.deletefunction(aidx, "pro");
                     console.log('delete pro photo addsign');
-                    callback(null,1);
+                    callback(null, 1);
                 },
-                function(arg,callback){
-                    var result_upload = filemgr.uploadfunction(aidx,"profile",photo_file);
-                    if(result_upload.result=="SUCCESS"){
+                function (arg, callback) {
+                    var result_upload = filemgr.uploadfunction(aidx, "profile", photo_file);
+                    if (result_upload.result == "SUCCESS") {
                         console.log('success on file upload addsign');
-                        callback(null,1);
+                        callback(null, 1);
                     }
-                    else{
+                    else {
                         console.log('fail on file upload addsign');
-                        res.json({result:"FAIL",resultmsg:"FILE UPLOAD FAIL"});
+                        res.json({result: "FAIL", resultmsg: "FILE UPLOAD FAIL"});
                         return;
                     }
                 },
-                function(arg1,callback){
+                function (arg1, callback) {
                     db.pool.getConnection(function (err, connection) {
                         if (err) {
                             console.log('error on connection pool addsign', err);
@@ -271,9 +269,9 @@ exports.addsign = function(req,res){
                             return;
                         }//error on connection pool
                         else {
-                            if(addSignData.pwd==null || addSignData.pwd==' '){
+                            if (addSignData.pwd == null || addSignData.pwd == ' ') {
                                 connection.query('UPDATE account SET name=TRIM(?),sex=?,hand=?,year=?,country=?,prophoto=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
-                                    [addSignData.name, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,photo_name,
+                                    [addSignData.name, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country, photo_name,
                                         addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
                                         if (err2) {
                                             console.log('error on query addsign', err2);
@@ -283,14 +281,14 @@ exports.addsign = function(req,res){
                                         }//error on query
                                         else if (result.affectedRows == 1) {
                                             console.log('success, result : ', result);
-                                            callback(null,1);
+                                            callback(null, 1);
                                         }//insert success
                                         connection.release();
                                     });//query
 
-                            }else{
+                            } else {
                                 connection.query('UPDATE account SET name=TRIM(?),pwd=TRIM(?),sex=?,hand=?,year=?,country=?,prophoto=?, ballweight=?, style=?,step=?,series800=?,series300=? where a_idx=?',
-                                    [addSignData.name, addSignData.pwd, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country,photo_name,
+                                    [addSignData.name, addSignData.pwd, addSignData.sex, addSignData.hand, addSignData.year, addSignData.country, photo_name,
                                         addSignData.ballweight, addSignData.style, addSignData.step, addSignData.series800, addSignData.series300, aidx], function (err2, result) {
                                         if (err2) {
                                             console.log('error on query addsign', err2);
@@ -300,7 +298,7 @@ exports.addsign = function(req,res){
                                         }//error on query
                                         else if (result.affectedRows == 1) {
                                             console.log('success, result : ', result);
-                                            callback(null,1);
+                                            callback(null, 1);
                                         }//insert success
                                         connection.release();
                                     });//query
@@ -308,19 +306,19 @@ exports.addsign = function(req,res){
                         }//no error on connection pool
                     });//connection pool
                 }
-            ],function(err,result){
-                if(err){
-                    console.log('addsign fail waterfall, err : ',err);
+            ], function (err, result) {
+                if (err) {
+                    console.log('addsign fail waterfall, err : ', err);
                     res.json({result: "FAIL", resultmsg: "NETWORK ERR W"});
                     return;
-                }else{
+                } else {
                     console.log('addsign success waterfall');
                     res.json({result: "SUCCESS", resultmsg: "ADDSIGN SUCCESS"});
                 }
             });//waterfall end
         }
-        else{//no file
-            if(addSignData.pwd==null || addSignData.pwd==' '){
+        else {//no file
+            if (addSignData.pwd == null || addSignData.pwd == ' ') {
                 db.pool.getConnection(function (err, connection) {
                     if (err) {
                         console.log('error on connection pool addsign', err);
@@ -346,7 +344,7 @@ exports.addsign = function(req,res){
                     }//no error on connection pool
                 });//connection pool
 
-            }else{
+            } else {
                 db.pool.getConnection(function (err, connection) {
                     if (err) {
                         console.log('error on connection pool addsign', err);
@@ -386,55 +384,55 @@ exports.addsign = function(req,res){
  * 미구현 부분 : 사진 파일 업로드 부분
  * */
 
-exports.userinfo = function(req,res){
+exports.userinfo = function (req, res) {
     var infoData = req.body;
-    console.log('recv data userinfo : ',infoData);
+    console.log('recv data userinfo : ', infoData);
     var aidx;
-    if(infoData.aidx!=0){
+    if (infoData.aidx != 0) {
         aidx = cry.decB(infoData.aidx);
     }
-    else{
-        aidx=0;
+    else {
+        aidx = 0;
     }
     var resultData;
-    if(aidx==0){
+    if (aidx == 0) {
         console.log('No data, because no id');
-        res.json({result:"FAIL",resultmsg:"NO ACCOUNT"});
+        res.json({result: "FAIL", resultmsg: "NO ACCOUNT"});
         return;
     }
-    else{
-        db.pool.getConnection(function(err,connection){
-            if(err){
-                console.log('error on conn pool userinfo',err);
-                res.json({result:"FAIL",resultmsg:"NETWORK ERR"});
+    else {
+        db.pool.getConnection(function (err, connection) {
+            if (err) {
+                console.log('error on conn pool userinfo', err);
+                res.json({result: "FAIL", resultmsg: "NETWORK ERR"});
                 return;
-            }else{
-                connection.query('SELECT * FROM account where a_idx=?',[aidx],function(err2,result){
-                    if(err2){
-                        console.log('error on Query userinfo',err);
-                        res.json({result:"FAIL",resultmsg:"INVALID DATA"});
+            } else {
+                connection.query('SELECT * FROM account where a_idx=?', [aidx], function (err2, result) {
+                    if (err2) {
+                        console.log('error on Query userinfo', err);
+                        res.json({result: "FAIL", resultmsg: "INVALID DATA"});
                         connection.release();
                         return;
-                    }else if(result){
-                        console.log('Success on query : ',result);
+                    } else if (result) {
+                        console.log('Success on query : ', result);
                         resultData = {
-                            email : result[0].email,
-                            name : result[0].name,
-                            proPhoto : result[0].prophoto==null ? nonelink : prolink+aidx+"/"+result[0].prophoto,
-                            sex : result[0].sex,
-                            hand : result[0].hand,
-                            allhighScore : result[0].all_highscore,
-                            country : result[0].country,
-                            style : result[0].style,
-                            step : result[0].step,
-                            series300 : result[0].series300,
-                            series800 : result[0].series800
+                            email: result[0].email,
+                            name: result[0].name,
+                            proPhoto: result[0].prophoto == null ? nonelink : prolink + aidx + "/" + result[0].prophoto,
+                            sex: result[0].sex,
+                            hand: result[0].hand,
+                            allhighScore: result[0].all_highscore,
+                            country: result[0].country,
+                            style: result[0].style,
+                            step: result[0].step,
+                            series300: result[0].series300,
+                            series800: result[0].series800
                         };
                         res.json(resultData);
                     }
-                    else{
-                        console.log('no data on query userinfo',result);
-                        res.json({result:"FAIL",resultmsg:"NO DATA"});
+                    else {
+                        console.log('no data on query userinfo', result);
+                        res.json({result: "FAIL", resultmsg: "NO DATA"});
                     }
                     connection.release();
                 });//query
@@ -453,22 +451,22 @@ exports.userinfo = function(req,res){
  * editor : pineoc
  * 미구현 부분 : 사진 파일 업로드 부분
  * */
-exports.insertScore = function(req,res){
+exports.insertScore = function (req, res) {
     var insData = req.body; // 입력할 데이터를 받음
-    console.log('recv data insert Score: ',insData);
+    console.log('recv data insert Score: ', insData);
     var data = insData.myscoredata;
     var dataLength = insData.myscoredata.length;
     var aidx = cry.decB(insData.aidx);
     var s_allScore = 0;
     var s_allGame = 0;
-    var errCount=0;
+    var errCount = 0;
 
-    console.log('datalength: ',dataLength);
+    console.log('datalength: ', dataLength);
     if (dataLength == 0) {//no data
         console.log('error, no data ');
         res.json({result: "FAIL", resultmsg: "NO DATA"});
     } else {
-        data.forEach(function(ind){
+        data.forEach(function (ind) {
             if (ind.type == -1) {//solo data
                 s_allScore = ind.allScore;
                 s_allGame = ind.allGame;
@@ -493,7 +491,7 @@ exports.insertScore = function(req,res){
                         }//error on connection pool
                         else {
                             connection.query('UPDATE account SET allscore=?, allgame=?, avg=? WHERE a_idx=?',
-                                [s_allScore, s_allGame,parseFloat(s_allScore/s_allGame).toFixed(4), aidx], function (err2, result) {
+                                [s_allScore, s_allGame, parseFloat(s_allScore / s_allGame).toFixed(4), aidx], function (err2, result) {
                                     if (err2) {
                                         console.log('error on query insert solo', err2);
                                         res.json({result: "FAIL", resultmsg: "INVALID DATA"});
@@ -535,7 +533,7 @@ exports.insertScore = function(req,res){
                         }//error on connection pool
                         else {
                             connection.query('UPDATE account_has_group SET g_score=?,g_game=?,g_avg=? WHERE account_a_idx=? AND group_g_idx=?',
-                                [grpScore, grpGame,parseFloat(grpScore/grpGame).toFixed(4), aidx, grpIdx], function (err2, result) {
+                                [grpScore, grpGame, parseFloat(grpScore / grpGame).toFixed(4), aidx, grpIdx], function (err2, result) {
                                     if (err2) {
                                         console.log('error on query insert grp', err2);
                                         res.json({result: "FAIL", resultmsg: "INVALID DATA"});

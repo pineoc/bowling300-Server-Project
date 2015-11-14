@@ -1,5 +1,5 @@
 /**
- * Created by skplanet on 14. 2. 19.
+ * Created by pineoc on 14. 2. 19.
  */
 var crypto = require('crypto');
 var hash_int = require('hash-int');

@@ -32,6 +32,7 @@ app.use('/uploads', express.directory(path.join(__dirname,'uploads')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
+//long term exception
 process.on('uncaughtException',function(exception){
     console.log('uncaughtException occurred: ' + exception.stack);
 });
@@ -66,12 +67,14 @@ app.post('/user/groupmember',grp.groupmember);
 app.post('/user/groupleague',grp.groupLeague);
 
 //test
+/*
 app.post('/test/upload',test.upload);
 app.post('/test/uploadt',test.uploadt);
 app.post('/test/cry',test.testenc);
 app.post('/test/delphoto',test.testdel);
 app.post('/test/score',test.insertScore);
 app.post('/test/filechk',test.filechk);
+*/
 
 //board function ( 게시판 관련 함수 )
 app.post('/user/group/board/list',board.boardList);//그룹 글 목록
@@ -81,8 +84,6 @@ app.post('/user/group/board/read',board.boardRead);//글보기
 app.post('/user/group/board/commwrite',board.commWrite);//덧글 입력
 app.post('/user/group/board/commupdate',board.commUpdate);//덧글 수정 / 삭제
 app.post('/user/group/board/search',board.boardSearch);//board search
-
-console.log('Version: ' + process.version);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
